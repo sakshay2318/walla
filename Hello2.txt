@@ -1,0 +1,457 @@
+public static final List<Pattern> authFlaws = Arrays.asList(
+
+// 1. No authentication check in API calls
+Pattern.compile("\\b(fetch|axios)\\s*\\(.*['\"`](/api/\\w+)['\"`]"), // API call without authentication
+
+// 2. Hardcoded credentials in frontend
+Pattern.compile("\\b(apiKey|authToken|password)\\s*:\\s*['\"`][a-zA-Z0-9]{10,}['\"`]"), // Hardcoded credentials
+
+// 3. Missing authentication middleware
+Pattern.compile("router\\.(get|post|put|delete)\\s*\\(['\"`]/\\w+['\"`],\\s*(req|res)\\s*=>"), // No auth middleware
+
+// 4. Directly exposing JWT tokens
+Pattern.compile("\\b(localStorage|sessionStorage)\\.setItem\\(['\"`]token['\"`],\\s*['\"`][a-zA-Z0-9\\-_.]+['\"`]"), // JWT stored in localStorage
+
+// 5. No token verification in API requests
+Pattern.compile("\\bfetch\\(.*['\"`]Authorization['\"`],\\s*['\"`].*['\"`]"), // API requests without token validation
+
+// 6. Exposed sensitive routes without authentication
+Pattern.compile("router\\.get\\(['\"`]/(admin|settings|user-management)['\"`]"), // Admin routes without protection
+
+// 7. Weak login form validation
+Pattern.compile("\\bdocument\\.getElementById\\(['\"`](password|email)['\"`]\\)\\.value"), // Weak form validation
+
+// 8. Missing authentication on protected pages
+Pattern.compile("useEffect\\(.*\\b(auth|user)\\b.*\\)", Pattern.CASE_INSENSITIVE), // No authentication check in useEffect
+
+// 9. Auto-login functionality without validation
+Pattern.compile("\\b(localStorage|sessionStorage)\\.getItem\\(['\"`]user['\"`]\\)"), // Auto-login based on local storage
+
+// 10. Unprotected logout mechanism
+Pattern.compile("\\b(localStorage|sessionStorage)\\.removeItem\\(['\"`]token['\"`]\\)"), // Token deletion without backend confirmation
+
+// 11. Login without checking credentials properly
+Pattern.compile("\\bif\\s*\\(.*\\.password\\s*===\\s*['\"`]\\w+['\"`]\\)"), // Hardcoded password checks
+
+// 12. Storing sensitive data in cookies
+Pattern.compile("document\\.cookie\\s*=\\s*['\"`].*token.*['\"`]"), // Storing JWT tokens in cookies
+
+// 13. Using 'Basic' authentication without TLS
+Pattern.compile("\\bAuthorization:\\s*['\"`]Basic\\s+[A-Za-z0-9+/=]+['\"`]"), // Exposed basic auth credentials
+
+// 14. Client-side role verification
+Pattern.compile("\\bif\\s*\\(user\\.role\\s*===\\s*['\"`].+['\"`]\\)"), // Role checks only on frontend
+
+// 15. Missing CSRF token in API requests
+Pattern.compile("\\bfetch\\(.*\\bheaders\\s*:\\s*\\{[^}]*\\}\\)"), // No CSRF token in headers
+
+// 16. Allowing authentication bypass
+Pattern.compile("\\bif\\s*\\(.*auth\\s*==\\s*false.*\\)\\s*return"), // Allows bypass if no authentication
+
+// 17. Exposed authentication API keys in JavaScript
+Pattern.compile("\\b(api_key|auth_token|client_id)\\s*:\\s*['\"`][a-zA-Z0-9]+['\"`]"), // Hardcoded API keys
+
+// 18. Missing HTTPS in API calls
+Pattern.compile("\\bfetch\\(.*['\"`]http://.*['\"`]"), // Fetch API using insecure HTTP
+
+// 19. Unhashed password in localStorage
+Pattern.compile("\\blocalStorage\\.setItem\\(['\"`](password)['\"`],\\s*['\"`][a-zA-Z0-9]{6,}['\"`]"), // Storing raw passwords
+
+// 20. Token leaks in console logs
+Pattern.compile("\\bconsole\\.log\\(.*\\b(token|password|secret)\\b.*\\)"), // Logging sensitive data
+
+// 21. Frontend session management without validation
+Pattern.compile("\\bsessionStorage\\.setItem\\(['\"`](user)['\"`],\\s*['\"`].+['\"`]\\)"), // Unvalidated session handling
+
+// 22. Authentication bypass via query parameters
+Pattern.compile("auth=\\w+"), // Using query param for authentication
+
+// 23. Insecure logout implementation
+Pattern.compile("\\bfetch\\(.*logout.*\\)"), // Logout without session invalidation
+
+// 24. Exposed admin panel without protection
+Pattern.compile("\\b(admin|dashboard|settings)\\.jsx?"), // Admin UI without authentication
+
+// 25. Insecure local storage access in React
+Pattern.compile("window\\.localStorage\\.getItem\\(\\s*['\"`]token['\"`]\\s*\\)"), // Local storage access for auth
+
+// 26. API call without authorization header
+Pattern.compile("\\bfetch\\(.*\\bheaders\\s*:\\s*\\{[^}]*\\}\\)"), // Fetch without authorization
+
+// 27. Weak password policy enforcement
+Pattern.compile("password\\s*=\\s*['\"`].{0,5}['\"`]"), // Weak passwords
+
+// 28. Storing user session ID in localStorage
+Pattern.compile("\\blocalStorage\\.setItem\\(['\"`](session_id)['\"`],\\s*['\"`].+['\"`]\\)"), // Session ID in local storage
+
+// 29. No timeout for user sessions
+Pattern.compile("\\bexpires:\\s*null"), // No expiration for sessions
+
+// 30. Unprotected user settings page
+Pattern.compile("path:\\s*['\"`]/user/settings['\"`]"), // No authentication on settings page
+
+// 31. Hardcoded password hints
+Pattern.compile("\\b(passwordHint)\\s*:\\s*['\"`].+['\"`]"), // Hardcoded password hints
+
+// 32. Exposed API response with authentication tokens
+Pattern.compile("\\bresponse\\s*=\\s*fetch.*token"), // API responses containing auth tokens
+
+// 33. No password hashing before sending to backend
+Pattern.compile("\\bfetch\\(.*password\\s*:\\s*document\\.getElementById"), // Sending raw passwords
+
+// 34. JavaScript redirect to login page without session check
+Pattern.compile("window\\.location\\.href\\s*=\\s*['\"`].*/login['\"`]"), // Redirect without checking session
+
+// 35. Insecure OAuth token storage
+Pattern.compile("oauth_token=\\w+"), // OAuth tokens in local storage
+
+// 36. Allowing login with empty passwords
+Pattern.compile("if\\s*\\(password\\s*===\\s*['\"`]['\"`]"), // Empty password checks
+
+// 37. No logout session invalidation
+Pattern.compile("\\blocalStorage\\.removeItem\\(['\"`]token['\"`]\\)"), // Token removal without server logout
+
+// 38. User email exposure in UI
+Pattern.compile("document\\.getElementById\\(['\"`]email['\"`]\\)\\.innerText"), // Exposed email
+
+// 39. Auto-filling authentication credentials
+Pattern.compile("autocomplete\\s*=\\s*['\"`]on['\"`]"), // Autofill enabled
+
+// 40. Exposed social login secrets
+Pattern.compile("\\b(client_secret|app_secret)\\s*:\\s*['\"`].+['\"`]"), // Hardcoded secrets
+
+// 41. Weak regex for email validation
+Pattern.compile("regex:\\s*['\"`].*@.*['\"`]"), // Weak email validation
+
+// 42. No MFA enforcement in login
+Pattern.compile("mfaRequired:\\s*false"), // Disabling MFA
+
+// 43. Exposed admin accounts in UI
+Pattern.compile("admin_email\\s*:\\s*['\"`].+@.+['\"`]"), // Hardcoded admin email
+
+// 44. No re-authentication for sensitive actions
+Pattern.compile("if\\s*\\(userAuthenticated\\s*==\\s*true\\)"), // Allowing access without re-authentication
+
+// 45. Hardcoded session tokens
+Pattern.compile("sessionToken\\s*=\\s*['\"`].+['\"`]"), // Hardcoded session tokens
+
+// 46-50. Additional variations of the above patterns
+);
+public static final List<Pattern> authFlawsExtended = Arrays.asList(
+
+// 51. Storing JWT in URL parameters (vulnerable to leakage)
+Pattern.compile("token=\\w+"), // Example: ?token=abc123
+
+// 52. Unencrypted transmission of credentials
+Pattern.compile("fetch\\s*\\(.*http://.*password=.*\\)"), // Sending credentials over HTTP
+
+// 53. Exposing session data in global variables
+Pattern.compile("window\\.sessionData\\s*=\\s*\\{.*['\"`]user['\"`]"), // Global session data
+
+// 54. Hardcoded OAuth tokens
+Pattern.compile("\\b(oauthToken|accessToken)\\s*:\\s*['\"`][a-zA-Z0-9]+['\"`]"), // Hardcoded OAuth tokens
+
+// 55. Weak encryption of sensitive data
+Pattern.compile("\\bencrypt\\(.*['\"`].{1,4}['\"`]\\)"), // Weak encryption key
+
+// 56. Hardcoded user roles in frontend
+Pattern.compile("\\brole\\s*:\\s*['\"`](admin|user|guest)['\"`]"), // Hardcoded roles
+
+// 57. Allowing login without CAPTCHA verification
+Pattern.compile("\\b(enableCaptcha)\\s*:\\s*false"), // CAPTCHA disabled
+
+// 58. Storing sensitive data in JavaScript variables
+Pattern.compile("\\bvar\\s+(password|secret|token)\\s*=\\s*['\"`][^\"']+['\"`]"), // Sensitive data in JS variables
+
+// 59. Missing account lockout mechanism
+Pattern.compile("\\b(maxFailedAttempts)\\s*:\\s*0"), // No account lockout
+
+// 60. Storing API keys in environment variables exposed in UI
+Pattern.compile("process\\.env\\.(API_KEY|SECRET_KEY)"), // Exposed env vars
+
+// 61. Hardcoded social media API secrets
+Pattern.compile("fbAppSecret\\s*=\\s*['\"`].+['\"`]"), // Hardcoded Facebook app secret
+
+// 62. Missing password complexity requirements
+Pattern.compile("password\\s*=\\s*['\"`].{1,5}['\"`]"), // Weak password complexity
+
+// 63. Bypassing authentication with default credentials
+Pattern.compile("if\\s*\\(username\\s*===\\s*['\"`]admin['\"`]\\s*&&\\s*password\\s*===\\s*['\"`]admin['\"`]\\)"), // Default credentials
+
+// 64. Using GET for sensitive actions (exposes data in URLs)
+Pattern.compile("\\bfetch\\(.*method\\s*:\\s*['\"`]GET['\"`]\\s*,.*['\"`]password['\"`]"), // GET with password
+
+// 65. Insecure redirects to external domains
+Pattern.compile("window\\.location\\.href\\s*=\\s*['\"`]http://.*\\)"), // Insecure redirects
+
+// 66. Improper session expiration
+Pattern.compile("expiresIn\\s*:\\s*['\"`]?\\d{1,2}['\"`]?\\s*(s|m)"), // Short expiration
+
+// 67. Storing password hints in localStorage
+Pattern.compile("\\blocalStorage\\.setItem\\(['\"`]passwordHint['\"`],.*\\)"), // Password hints stored
+
+// 68. Allowing login with social media accounts without verification
+Pattern.compile("auth\\.loginWith(\\s*['\"`]facebook['\"`]\\s*)"), // No verification on social login
+
+// 69. Weak logout functionality
+Pattern.compile("\\bfetch\\(.*logout.*\\)"), // Logout without server validation
+
+// 70. Storing JWT without secure flags
+Pattern.compile("document\\.cookie\\s*=\\s*['\"`]jwt=.+['\"`]"), // JWT in cookies without secure flags
+
+// 71. Exposing sensitive routes based on user-agent
+Pattern.compile("if\\s*\\(navigator\\.userAgent\\.includes\\(\\s*['\"`]Mozilla['\"`]\\)"), // User-agent based access
+
+// 72. Bypassing login with localStorage manipulation
+Pattern.compile("localStorage\\.setItem\\(['\"`]isLoggedIn['\"`],\\s*true\\)"), // Bypass with localStorage
+
+// 73. Using eval() for authentication logic
+Pattern.compile("eval\\s*\\(.*\\)"), // Insecure eval usage
+
+// 74. Allowing login without session initialization
+Pattern.compile("if\\s*\\(session\\.user\\s*==\\s*undefined\\)"), // No session check
+
+// 75. Weak OAuth redirect URI validation
+Pattern.compile("redirect_uri\\s*=\\s*['\"`]?http://.*['\"`]"), // Insecure redirect URI
+
+// 76. Using insecure hashing algorithms for passwords
+Pattern.compile("\\b(md5|sha1)\\s*\\(.*\\)"), // Weak hashing algorithms
+
+// 77. Exposed debug endpoints
+Pattern.compile("router\\.get\\(['\"`]/debug['\"`]"), // Debug routes exposed
+
+// 78. Missing email verification for new users
+Pattern.compile("emailVerified\\s*:\\s*false"), // Email verification bypass
+
+// 79. Logging sensitive user actions without masking
+Pattern.compile("console\\.log\\(.*['\"`].*(password|token).*['\"`]"), // Logging sensitive info
+
+// 80. Using weak API key validation
+Pattern.compile("apiKey\\s*=\\s*['\"`]?.{0,5}['\"`]"), // Weak API key
+
+// 81. Allowing account recovery without proper checks
+Pattern.compile("if\\s*\\(securityQuestion\\s*===\\s*['\"`].+['\"`]\\)"), // Weak recovery mechanisms
+
+// 82. Exposed admin endpoints via query parameters
+Pattern.compile("admin=true"), // Query param for admin access
+
+// 83. No HTTPS enforcement for login forms
+Pattern.compile("<form.*action=['\"`]http://.*login['\"`]"), // HTTP login form
+
+// 84. Allowing multiple concurrent sessions
+Pattern.compile("allowConcurrentSessions\\s*:\\s*true"), // Concurrent sessions enabled
+
+// 85. No MFA enforcement for critical actions
+Pattern.compile("mfaRequiredForSensitiveActions\\s*:\\s*false"), // MFA bypass
+
+// 86. Exposing user emails in client-side code
+Pattern.compile("const\\s+email\\s*=\\s*['\"`]?.+@.+['\"`]"), // Exposed emails
+
+// 87. Allowing password reset without token verification
+Pattern.compile("resetPassword\\s*\\(.*\\)"), // No token in password reset
+
+// 88. Auto-logging users after registration
+Pattern.compile("autoLoginAfterSignup\\s*:\\s*true"), // Auto-login enabled
+
+// 89. Missing X-Frame-Options in headers
+Pattern.compile("res\\.setHeader\\(['\"`]X-Frame-Options['\"`],\\s*['\"`]DENY['\"`]"), // Missing X-Frame-Options
+
+// 90. Unvalidated ID tokens in APIs
+Pattern.compile("id_token=\\w+"), // ID token without validation
+
+// 91. Weak authentication for mobile APIs
+Pattern.compile("mobileAuth\\s*:\\s*['\"`]passcode['\"`]"), // Weak mobile auth
+
+// 92. No password expiration policy
+Pattern.compile("passwordExpirationDays\\s*:\\s*0"), // No expiration
+
+// 93. Hardcoded API endpoints
+Pattern.compile("apiEndpoint\\s*=\\s*['\"`]http://.+['\"`]"), // Hardcoded API endpoint
+
+// 94. Bypassing login with URL manipulation
+Pattern.compile("bypassLogin=true"), // Login bypass in URL
+
+// 95. Weak challenge-response for authentication
+Pattern.compile("challengeResponse\\s*:\\s*['\"`]?\\w{1,4}['\"`]"), // Weak challenge-response
+
+// 96. Insecure password reset mechanism
+Pattern.compile("resetToken\\s*=\\s*['\"`].+['\"`]"), // Reset without validation
+
+// 97. Missing session revocation on logout
+Pattern.compile("session\\.destroy\\(\\)"), // No session destruction
+
+// 98. No account deletion confirmation
+Pattern.compile("deleteAccount\\(.*\\)"), // No confirmation for delete
+
+// 99. Exposed admin logs in UI
+Pattern.compile("adminLogs\\s*:\\s*\\["), // Exposed admin logs
+
+// 100. Weak regex for password validation
+Pattern.compile("password\\.match\\(['\"`].{0,5}['\"`]\\)"), // Weak password regex
+);
+public static final List<Pattern> authFlawsMore = Arrays.asList(
+
+// 101. API Key exposed in query parameters
+Pattern.compile("api_key=\\w+"), // Example: ?api_key=123abc
+
+// 102. Hardcoded default passwords
+Pattern.compile("\\bpassword\\s*=\\s*['\"`](admin|password123|root)['\"`]"), // Weak default passwords
+
+// 103. Storing passwords in plain text variables
+Pattern.compile("\\bconst\\s+password\\s*=\\s*['\"`][^\"']+['\"`]"), // Example: const password = "12345";
+
+// 104. Exposing JWT without secure flag
+Pattern.compile("localStorage\\.setItem\\(['\"`]jwt['\"`],\\s*['\"`][^\"']+['\"`]\\)"), // JWT stored without security
+
+// 105. Missing authentication middleware in routes
+Pattern.compile("\\bapp\\.(get|post|put|delete)\\s*\\(['\"`]/[^'\"`]*['\"`]"), // API routes without auth middleware
+
+// 106. Allowing login via username only (no password check)
+Pattern.compile("if\\s*\\(user\\.username\\s*==\\s*req\\.body\\.username\\)"), // No password validation
+
+// 107. Using HTTP for OAuth redirect URIs
+Pattern.compile("redirect_uri\\s*=\\s*['\"`]http://.*['\"`]"), // Insecure OAuth redirects
+
+// 108. Weak API key validation (accepting short keys)
+Pattern.compile("apiKey\\s*=\\s*['\"`]?.{1,5}['\"`]"), // Weak API key validation
+
+// 109. Hardcoded client secrets
+Pattern.compile("\\bclientSecret\\s*:\\s*['\"`][^\"']+['\"`]"), // Hardcoded OAuth client secret
+
+// 110. API authentication using basic auth (vulnerable to MITM)
+Pattern.compile("Authorization:\\s*Basic\\s+[A-Za-z0-9+/=]+"), // Basic auth used
+
+// 111. Hardcoded session tokens
+Pattern.compile("\\bsessionToken\\s*=\\s*['\"`][^\"']+['\"`]"), // Hardcoded session tokens
+
+// 112. Allowing unauthenticated API access
+Pattern.compile("if\\s*\\(req\\.user\\s*==\\s*undefined\\)\\s*return"), // No auth check in API
+
+// 113. Insecure token generation using Math.random()
+Pattern.compile("token\\s*=\\s*Math\\.random\\(\\)"), // Weak random token generation
+
+// 114. Login without rate limiting (brute force possible)
+Pattern.compile("\\battemptsAllowed\\s*:\\s*0"), // No rate limiting on login
+
+// 115. Exposing authentication-related environment variables
+Pattern.compile("process\\.env\\.(JWT_SECRET|AUTH_SECRET)"), // Exposed env variables
+
+// 116. Allowing password reset without email verification
+Pattern.compile("resetPassword\\(req, res\\)"), // No email verification for reset
+
+// 117. Auto-approving OAuth logins without user confirmation
+Pattern.compile("autoApprove\\s*:\\s*true"), // OAuth auto-approval
+
+// 118. Using MD5 for hashing passwords (insecure)
+Pattern.compile("md5\\s*\\(.*\\)"), // MD5 used for password hashing
+
+// 119. Missing CSRF protection in login forms
+Pattern.compile("<form.*method=['\"`]post['\"`].*action=['\"`]/login['\"`]"), // No CSRF token in login form
+
+// 120. Accepting short or common passwords
+Pattern.compile("password\\.length\\s*<\\s*8"), // Weak password requirement
+
+// 121. Exposing admin credentials in logs
+Pattern.compile("console\\.log\\(.*admin.*['\"`].*(password|token).*['\"`]"), // Logging admin credentials
+
+// 122. Using eval() for token verification
+Pattern.compile("eval\\s*\\(.*token.*\\)"), // eval() used for token validation
+
+// 123. Allowing login without session validation
+Pattern.compile("if\\s*\\(!session\\)"), // No session validation
+
+// 124. Allowing guest access to protected resources
+Pattern.compile("if\\s*\\(user\\.role\\s*==\\s*['\"`]guest['\"`]\\)"), // Guest access to sensitive data
+
+// 125. Storing session tokens in localStorage instead of cookies
+Pattern.compile("localStorage\\.setItem\\(['\"`]sessionToken['\"`],\\s*['\"`][^\"']+['\"`]\\)"), // Tokens stored in localStorage
+
+// 126. Using weak password hashing algorithms (SHA1)
+Pattern.compile("sha1\\s*\\(.*\\)"), // SHA1 used for password hashing
+
+// 127. Allowing access to sensitive pages without authentication
+Pattern.compile("if\\s*\\(!req\\.user\\)\\s*res\\.redirect\\(['\"`]/dashboard['\"`]\\)"), // No auth check for dashboard
+
+// 128. Missing secure flag on authentication cookies
+Pattern.compile("res\\.cookie\\(['\"`]auth['\"`],\\s*['\"`][^\"']+['\"`].*secure:\\s*false"), // Secure flag missing
+
+// 129. Logging in users automatically after registration
+Pattern.compile("autoLoginAfterSignup\\s*:\\s*true"), // Auto-login enabled
+
+// 130. No multi-factor authentication (MFA) enforcement
+Pattern.compile("mfaEnabled\\s*:\\s*false"), // No MFA required
+
+// 131. Allowing account enumeration via error messages
+Pattern.compile("if\\s*\\(err\\.message\\s*==\\s*['\"`]User not found['\"`]\\)"), // Error message leaks user existence
+
+// 132. Using security questions as the only authentication factor
+Pattern.compile("securityQuestion\\s*:\\s*['\"`]"), // Weak authentication via security questions
+
+// 133. Storing authentication state in client-side JavaScript
+Pattern.compile("window\\.authState\\s*=\\s*\\{"), // Exposing auth state
+
+// 134. Allowing weak challenge-response authentication
+Pattern.compile("challengeResponse\\s*:\\s*['\"`]?\\w{1,4}['\"`]"), // Weak challenge-response
+
+// 135. Using insecure fingerprinting methods for authentication
+Pattern.compile("fingerprint\\.scan\\(.*\\)"), // Insecure fingerprinting
+
+// 136. No logout mechanism after session expiration
+Pattern.compile("sessionTimeout\\s*:\\s*0"), // No session timeout
+
+// 137. Allowing login with expired JWTs
+Pattern.compile("jwt\\.verify\\(.*,{.*ignoreExpiration:\\s*true.*}\\)"), // Ignoring JWT expiration
+
+// 138. Exposed Firebase API key in client-side code
+Pattern.compile("firebaseConfig\\s*=\\s*\\{.*apiKey:.*['\"`][^\"']+['\"`]"), // Exposed Firebase API key
+
+// 139. Accepting weak password reset tokens
+Pattern.compile("resetToken\\s*=\\s*['\"`].{1,5}['\"`]"), // Weak reset tokens
+
+// 140. Allowing session hijacking via predictable session IDs
+Pattern.compile("sessionID\\s*=\\s*['\"`]?\\d+['\"`]"), // Numeric session IDs
+
+// 141. Bypassing login with empty passwords
+Pattern.compile("if\\s*\\(req\\.body\\.password\\s*==\\s*['\"`]['\"`]\\)"), // Empty password bypass
+
+// 142. Allowing authentication via browser storage tampering
+Pattern.compile("localStorage\\.setItem\\(['\"`]isAuthenticated['\"`],\\s*true\\)"), // Authentication via storage
+
+// 143. Using date-based tokens (easily guessable)
+Pattern.compile("token\\s*=\\s*['\"`]\\d{4}-\\d{2}-\\d{2}['\"`]"), // Date-based token
+
+// 144. Allowing authentication via client-side cookies only
+Pattern.compile("document\\.cookie\\s*=\\s*['\"`]auth=.+['\"`]"), // Client-side auth cookie
+
+// 145. Allowing login from multiple devices simultaneously
+Pattern.compile("allowMultipleSessions\\s*:\\s*true"), // No session restriction
+
+// 146. Exposing private keys in client-side code
+Pattern.compile("\\bprivateKey\\s*=\\s*['\"`][^\"']+['\"`]"), // Hardcoded private keys
+
+// 147. Allowing login with social media without verification
+Pattern.compile("auth\\.loginWith\\(['\"`]google['\"`]\\)"), // Google login without verification
+
+// 148. Allowing authentication with phone numbers only
+Pattern.compile("auth\\.signInWithPhoneNumber\\("), // Phone-only authentication
+
+// 149. Exposed JWT secret keys
+Pattern.compile("jwtSecret\\s*=\\s*['\"`][^\"']+['\"`]"), // Hardcoded JWT secrets
+
+// 150. No password expiration enforced
+Pattern.compile("passwordExpiration\\s*:\\s*false") // No password expiry
+);
+// 151. Using GET instead of POST for login (credentials in URL)
+Pattern.compile("app\\.get\\s*\\(['\"`]/login['\"`]"), // Example: app.get('/login')
+
+// 152. Allowing authentication bypass with `OR 1=1` SQL Injection
+Pattern.compile("SELECT.*FROM.*WHERE.*['\"`]?(\\w+)['\"`]?\\s*=\\s*['\"`]?(\\1)['\"`]?\\s*OR\\s*1=1"), // SQL Injection in authentication
+
+// 153. Allowing wildcard (`*`) origins in CORS configuration (any website can send requests)
+Pattern.compile("res\\.header\\(\\s*['\"`]Access-Control-Allow-Origin['\"`],\\s*['\"`]\\*['\"`]"), // Example: res.header("Access-Control-Allow-Origin", "*")
+
+// 154. Exposing OAuth tokens in URL parameters
+Pattern.compile("access_token=\\w+"), // Example: https://example.com/callback?access_token=abc123
+
+// 155. Not enforcing HTTPS in authentication requests
+Pattern.compile("if\\s*\\(req\\.protocol\\s*==\\s*['\"`]http['\"`]\\)"), // Example: if (req.protocol == "http")
