@@ -1,0 +1,570 @@
+public static final List<Pattern> sessionManagementIssues = Arrays.asList(
+
+// 1. No session management mechanism in place
+Pattern.compile("req\\.session\\s*==\\s*undefined"), // Example: if (req.session == undefined)
+
+// 2. Using localStorage for storing session tokens (not secure)
+Pattern.compile("localStorage\\.setItem\\(\\s*['\"`](auth|session|token)['\"`]"), // Example: localStorage.setItem("auth", token)
+
+// 3. Using sessionStorage for storing session tokens (not persistent)
+Pattern.compile("sessionStorage\\.setItem\\(\\s*['\"`](auth|session|token)['\"`]"), // Example: sessionStorage.setItem("session", token)
+
+// 4. No session expiration or timeout defined
+Pattern.compile("req\\.session\\.cookie\\.expires\\s*=\\s*null"), // Example: req.session.cookie.expires = null
+
+// 5. JWT tokens not set to expire
+Pattern.compile("expiresIn:\\s*['\"`]none['\"`]"), // Example: expiresIn: 'none'
+
+// 6. No session regeneration after login
+Pattern.compile("req\\.session\\.regenerate\\s*\\(\\s*\\)"), // Example: req.session.regenerate()
+
+// 7. Using cookies without HTTPOnly flag
+Pattern.compile("res\\.cookie\\(.*HttpOnly:\\s*false"), // Example: res.cookie("token", token, { HttpOnly: false })
+
+// 8. Using cookies without Secure flag (allows transmission over HTTP)
+Pattern.compile("res\\.cookie\\(.*Secure:\\s*false"), // Example: res.cookie("session", id, { Secure: false })
+
+// 9. Using weak session IDs
+Pattern.compile("req\\.session\\.id\\s*=\\s*[\"']?\\w{1,5}[\"']?"), // Example: req.session.id = "abc"
+
+// 10. Storing session tokens in client-side JS variables
+Pattern.compile("var\\s+sessionToken\\s*=\\s*[\"'`].+[\"'`]"), // Example: var sessionToken = "eyJhb..."
+
+// 11. No CSRF protection on session-related requests
+Pattern.compile("res\\.setHeader\\(['\"`]X-CSRF-Token['\"`]\\s*,\\s*null"), // Example: res.setHeader("X-CSRF-Token", null)
+
+// 12. Using GET requests for logout (should be POST)
+Pattern.compile("app\\.get\\s*\\(['\"`]/logout['\"`]"), // Example: app.get('/logout')
+
+// 13. Hardcoded session keys in source code
+Pattern.compile("session\\.key\\s*=\\s*['\"`].+['\"`]"), // Example: session.key = "mySecret"
+
+// 14. Allowing session fixation (not changing session ID after login)
+Pattern.compile("req\\.session\\.id\\s*=\\s*req\\.query\\.sessionId"), // Example: req.session.id = req.query.sessionId
+
+// 15. Using plaintext session tokens in API calls
+Pattern.compile("fetch\\(.*['\"`]Authorization['\"`]\\s*:\\s*['\"`]Bearer\\s+\\w{10,}['\"`]"), // Example: fetch('/api', { headers: { Authorization: 'Bearer abc123' } })
+
+// 16. Exposing session tokens in URL parameters
+Pattern.compile("session_token=\\w+"), // Example: ?session_token=abc123
+
+// 17. Missing session validation in middleware
+Pattern.compile("if\\s*\\(!req\\.session\\)\\s*\\{\\s*next\\(\\)"), // Example: if (!req.session) { next(); }
+
+// 18. Not restricting session to same-site requests
+Pattern.compile("res\\.cookie\\(.*SameSite:\\s*['\"`]None['\"`]"), // Example: res.cookie("session", token, { SameSite: "None" })
+
+// 19. Setting session duration too long
+Pattern.compile("maxAge:\\s*\\d{7,}"), // Example: maxAge: 99999999
+
+// 20. Missing session logout handler
+Pattern.compile("app\\.(get|post)\\s*\\(['\"`]/logout['\"`]"), // Example: app.get('/logout')
+
+// 21. Not invalidating sessions after logout
+Pattern.compile("req\\.session\\.destroy\\s*\\(\\s*\\)\\s*;?\\s*res\\.redirect"), // Example: req.session.destroy(); res.redirect('/')
+
+// 22. Session hijacking vulnerability (reading another user’s session ID)
+Pattern.compile("req\\.session\\.userId\\s*=\\s*req\\.query\\.id"), // Example: req.session.userId = req.query.id
+
+// 23. Not using secure storage for session tokens
+Pattern.compile("document\\.cookie\\s*=\\s*['\"`]?session_token=['\"`]?.+"), // Example: document.cookie = "session_token=abc"
+
+// 24. Allowing session reuse across devices
+Pattern.compile("session.reuse\\s*=\\s*true"), // Example: session.reuse = true
+
+// 25. Using default session secret keys
+Pattern.compile("secret:\\s*['\"`]keyboardcat['\"`]"), // Example: secret: 'keyboardcat'
+
+// 26. Allowing multiple simultaneous logins per session
+Pattern.compile("allowMultipleSessions:\\s*true"), // Example: allowMultipleSessions: true
+
+// 27. No IP address binding for session tokens
+Pattern.compile("session.ip_binding\\s*=\\s*false"), // Example: session.ip_binding = false
+
+// 28. No user-agent validation in sessions
+Pattern.compile("session.userAgentValidation\\s*=\\s*false"), // Example: session.userAgentValidation = false
+
+// 29. Not encrypting session tokens
+Pattern.compile("encryptSession:\\s*false"), // Example: encryptSession: false
+
+// 30. Not setting a session inactivity timeout
+Pattern.compile("sessionTimeout:\\s*null"), // Example: sessionTimeout: null
+
+// 31. Using predictable session ID generation
+Pattern.compile("session\\.id\\s*=\\s*['\"`]\\d{1,5}['\"`]"), // Example: session.id = "12345"
+
+// 32. Allowing session creation without authentication
+Pattern.compile("if\\s*\\(!req\\.session\\)\\s*req\\.session\\s*=\\s*{}"), // Example: if (!req.session) req.session = {}
+
+// 33. Missing logging for session-related actions
+Pattern.compile("console\\.log\\(\\s*req\\.session"), // Example: console.log(req.session)
+
+// 34. Using static session keys
+Pattern.compile("sessionKey\\s*=\\s*['\"`].+['\"`]"), // Example: sessionKey = "staticKey"
+
+// 35. Not checking session validity before processing requests
+Pattern.compile("if\\s*\\(!req\\.session\\)\\s*next\\(\\)"), // Example: if (!req.session) next();
+
+// 36. Allowing session data manipulation via client-side scripts
+Pattern.compile("req\\.session\\['\\w+'\\]\\s*=\\s*req\\.query\\['\\w+'\\]"), // Example: req.session['user'] = req.query['user']
+
+// 37. Using eval() with session data (security risk)
+Pattern.compile("eval\\(req\\.session\\['\\w+'\\]\\)"), // Example: eval(req.session['userData'])
+
+// 38. Not encrypting session data in storage
+Pattern.compile("store:\\s*new\\s+SessionStore\\(\\{\\s*secure:\\s*false"), // Example: store: new SessionStore({ secure: false })
+
+// 39. Allowing weak session hashing algorithms
+Pattern.compile("hashAlgorithm:\\s*['\"`]md5['\"`]"), // Example: hashAlgorithm: "md5"
+
+// 40. Missing session timeout warning
+Pattern.compile("sessionTimeoutWarning:\\s*false"), // Example: sessionTimeoutWarning: false
+
+// 41. Allowing session token transmission via HTTP
+Pattern.compile("session\\.secure\\s*=\\s*false"), // Example: session.secure = false
+
+// 42. Not revoking old session tokens upon re-authentication
+Pattern.compile("oldSessionToken\\.valid\\s*=\\s*true"), // Example: oldSessionToken.valid = true
+
+// 43. Using base64 encoding for session tokens (easily decoded)
+Pattern.compile("btoa\\(sessionToken\\)"), // Example: btoa(sessionToken)
+
+// 44. Allowing long-lived refresh tokens
+Pattern.compile("refreshTokenTTL:\\s*\\d{7,}"), // Example: refreshTokenTTL: 9999999
+
+// 45. Allowing weak session encryption
+Pattern.compile("sessionEncryption:\\s*['\"`]none['\"`]"), // Example: sessionEncryption: "none"
+
+);
+public static final List<Pattern> sessionManagementIssues = Arrays.asList(
+
+// 46. Session ID in URL paths
+Pattern.compile("\\/session\\/\\w{5,}"), // Example: /session/abc123
+
+// 47. Session ID exposed in query parameters
+Pattern.compile("sessionId=\\w{5,}"), // Example: ?sessionId=abc123
+
+// 48. Session management without checking user authentication
+Pattern.compile("if\\s*\\(\\s*!req\\.session\\.user\\s*\\)\\s*\\{\\s*next\\(\\)"), // Example: if (!req.session.user) { next(); }
+
+// 49. Using HTTP headers to transmit session tokens without encryption
+Pattern.compile("\\.setHeader\\(\\s*['\"`]Authorization['\"`]\\s*,\\s*['\"`]Bearer\\s+\\w+['\"`]\\)"), // Example: res.setHeader("Authorization", "Bearer abc123")
+
+// 50. Session hijacking vulnerability (changing user session dynamically)
+Pattern.compile("req\\.session\\.user\\s*=\\s*req\\.query\\.newUser"), // Example: req.session.user = req.query.newUser
+
+// 51. Allowing session reuse by storing tokens in global variables
+Pattern.compile("global\\.sessionToken\\s*=\\s*['\"`].+['\"`]"), // Example: global.sessionToken = "abc123"
+
+// 52. Using hardcoded session secrets in source code
+Pattern.compile("secret\\s*:\\s*['\"`]hardcodedSecret['\"`]"), // Example: secret: "hardcodedSecret"
+
+// 53. No session expiration on logout
+Pattern.compile("req\\.session\\.destroy\\s*\\(\\s*\\)\\s*;?\\s*res\\.send\\(.*\\)"), // Example: req.session.destroy(); res.send("Logged out")
+
+// 54. Session tokens transmitted over HTTP instead of HTTPS
+Pattern.compile("protocol:\\s*['\"`]http['\"`]"), // Example: protocol: "http"
+
+// 55. Using non-secure cookies for session storage
+Pattern.compile("document\\.cookie\\s*=\\s*['\"`]session=.+['\"`]"), // Example: document.cookie = "session=abc123"
+
+// 56. Allowing cross-origin session sharing without validation
+Pattern.compile("res\\.setHeader\\(\\s*['\"`]Access-Control-Allow-Origin['\"`]\\s*,\\s*['\"`]\\*['\"`]"), // Example: res.setHeader("Access-Control-Allow-Origin", "*")
+
+// 57. Allowing long-lived authentication sessions without refreshing
+Pattern.compile("sessionTimeout:\\s*Infinity"), // Example: sessionTimeout: Infinity
+
+// 58. Not invalidating user sessions after password reset
+Pattern.compile("passwordReset\\s*:\\s*true\\s*,\\s*sessionValid\\s*:\\s*true"), // Example: passwordReset: true, sessionValid: true
+
+// 59. Not setting session timeouts for inactive users
+Pattern.compile("inactiveTimeout:\\s*null"), // Example: inactiveTimeout: null
+
+// 60. Storing authentication tokens in IndexedDB (not secure)
+Pattern.compile("indexedDB\\.open\\(\\s*['\"`]AuthDB['\"`]"), // Example: indexedDB.open("AuthDB")
+
+// 61. Allowing weak password-based session authentication
+Pattern.compile("passwordAuth:\\s*['\"`]weak['\"`]"), // Example: passwordAuth: "weak"
+
+// 62. Using non-random session identifiers
+Pattern.compile("sessionId\\s*=\\s*['\"`]12345['\"`]"), // Example: sessionId = "12345"
+
+// 63. Using unvalidated session tokens for authentication
+Pattern.compile("auth\\s*:\\s*req\\.session\\.token"), // Example: auth: req.session.token
+
+// 64. Not rotating session tokens after authentication
+Pattern.compile("sessionRotate\\s*:\\s*false"), // Example: sessionRotate: false
+
+// 65. Allowing unencrypted JWT tokens
+Pattern.compile("jwtSecret\\s*:\\s*null"), // Example: jwtSecret: null
+
+// 66. Not revoking session tokens after logout
+Pattern.compile("sessionRevocation\\s*:\\s*false"), // Example: sessionRevocation: false
+
+// 67. Allowing access to session data from third-party scripts
+Pattern.compile("Content-Security-Policy:\\s*['\"`]default-src\\s*\\*['\"`]"), // Example: "Content-Security-Policy": "default-src *"
+
+// 68. Using plain text session storage in cookies
+Pattern.compile("res\\.cookie\\(.*['\"`]session['\"`],\\s*['\"`].+['\"`]"), // Example: res.cookie("session", "abc123")
+
+// 69. Allowing access to session variables in client-side JavaScript
+Pattern.compile("window\\.session\\s*=\\s*req\\.session"), // Example: window.session = req.session
+
+// 70. Not clearing session cookies upon logout
+Pattern.compile("res\\.clearCookie\\(\\s*['\"`]session['\"`]\\s*\\)"), // Example: res.clearCookie("session")
+
+// 71. Allowing session ID enumeration attacks
+Pattern.compile("sessionId\\s*=\\s*['\"`]user[1-9]+['\"`]"), // Example: sessionId = "user123"
+
+// 72. Using weak encryption for session storage
+Pattern.compile("encryptionAlgorithm\\s*:\\s*['\"`]none['\"`]"), // Example: encryptionAlgorithm: "none"
+
+// 73. Exposing session state in API responses
+Pattern.compile("res\\.json\\(\\s*req\\.session"), // Example: res.json(req.session)
+
+// 74. Allowing automatic session renewal without validation
+Pattern.compile("autoRenewSession:\\s*true"), // Example: autoRenewSession: true
+
+// 75. Not verifying session origin before processing requests
+Pattern.compile("req\\.session\\.origin\\s*=\\s*['\"`]unverified['\"`]"), // Example: req.session.origin = "unverified"
+
+// 76. Allowing session extension without re-authentication
+Pattern.compile("extendSession:\\s*true"), // Example: extendSession: true
+
+// 77. Storing session-related tokens in unprotected global variables
+Pattern.compile("global\\.authToken\\s*=\\s*req\\.session\\.token"), // Example: global.authToken = req.session.token
+
+// 78. Not using refresh tokens for session management
+Pattern.compile("refreshToken\\s*=\\s*null"), // Example: refreshToken = null
+
+// 79. Allowing session tokens to be set via request parameters
+Pattern.compile("req\\.session\\.token\\s*=\\s*req\\.query\\.token"), // Example: req.session.token = req.query.token
+
+// 80. No logging of failed session authentication attempts
+Pattern.compile("console\\.log\\(\\s*['\"`]Session authentication failed['\"`]"), // Example: console.log("Session authentication failed")
+
+// 81. Allowing third-party domains to access session cookies
+Pattern.compile("document\\.cookie\\s*=\\s*['\"`]session=.*domain=\\*['\"`]"), // Example: document.cookie = "session=abc123; domain=*"
+
+// 82. Not checking user roles during session authentication
+Pattern.compile("if\\s*\\(\\s*!req\\.session\\.role\\s*\\)"), // Example: if (!req.session.role)
+
+// 83. Not checking if session has expired before using it
+Pattern.compile("if\\s*\\(\\s*req\\.session\\.expires\\s*>=\\s*Date\\.now\\(\\)\\s*\\)"), // Example: if (req.session.expires >= Date.now())
+
+// 84. Allowing session storage in insecure browser storage (e.g., window.name)
+Pattern.compile("window\\.name\\s*=\\s*['\"`]session=.*['\"`]"), // Example: window.name = "session=abc123"
+
+// 85. Using static session keys for all users
+Pattern.compile("sessionKey\\s*=\\s*['\"`]staticSessionKey['\"`]"), // Example: sessionKey = "staticSessionKey"
+
+);
+public static final List<Pattern> adAuthorizationIssues = Arrays.asList(
+
+// 1. No Active Directory group check in API endpoint
+Pattern.compile("\\bapp\\.(get|post|put|delete)\\s*\\(.*\\)\\s*=>\\s*\\{[^}]*\\}"), // No group validation in route
+
+// 2. Missing AD group check in middleware
+Pattern.compile("if\\s*\\(\\s*!req\\.user\\.groups\\.includes\\(.*\\)\\s*\\)\\s*\\{\\s*next\\(\\)"), // Example: if (!req.user.groups.includes("admin")) { next(); }
+
+// 3. Hardcoded Active Directory usernames
+Pattern.compile("user\\.name\\s*==\\s*['\"`]admin['\"`]"), // Example: if (user.name == "admin")
+
+// 4. Allowing any authenticated user without checking AD roles
+Pattern.compile("if\\s*\\(\\s*req\\.isAuthenticated\\(\\)\\s*\\)"), // Example: if (req.isAuthenticated())
+
+// 5. No Active Directory authentication in sensitive routes
+Pattern.compile("/admin/settings/user-management"), // Example: Exposed admin panel
+
+// 6. Using email instead of AD groups for authorization
+Pattern.compile("user\\.email\\s*==\\s*['\"`].+@domain\\.com['\"`]"), // Example: if (user.email == "admin@domain.com")
+
+// 7. Accepting any user with a valid JWT token
+Pattern.compile("jwt\\.verify\\(\\s*token\\s*,\\s*secret"), // Example: jwt.verify(token, secret)
+
+// 8. No check for AD group membership before granting access
+Pattern.compile("req\\.user\\.role\\s*==\\s*['\"`]user['\"`]"), // Example: if (req.user.role == "user")
+
+// 9. Hardcoded Active Directory credentials
+Pattern.compile("AD_CREDENTIALS\\s*=\\s*['\"`].+['\"`]"), // Example: const AD_CREDENTIALS = "password123"
+
+// 10. Using weak role checks
+Pattern.compile("roleCheck\\(\\s*req\\.user\\s*,\\s*['\"`]\\w+['\"`]\\s*\\)"), // Example: roleCheck(req.user, "admin")
+
+// 11. No Active Directory validation before executing privileged action
+Pattern.compile("if\\s*\\(\\s*req\\.user\\s*\\)"), // Example: if (req.user) { accessGranted(); }
+
+// 12. Allowing unrestricted access to AD users without authorization check
+Pattern.compile("if\\s*\\(\\s*req\\.user\\.adUser\\s*\\)"), // Example: if (req.user.adUser)
+
+// 13. Not validating AD user status before granting access
+Pattern.compile("if\\s*\\(\\s*req\\.user\\.status\\s*==\\s*['\"`]active['\"`]"), // Example: if (req.user.status == "active")
+
+// 14. Allowing self-assigned roles
+Pattern.compile("req\\.user\\.role\\s*=\\s*req\\.body\\.role"), // Example: req.user.role = req.body.role
+
+// 15. Not verifying AD groups in JWT payload
+Pattern.compile("jwt\\.decode\\(\\s*token\\s*\\)\\.group"), // Example: jwt.decode(token).group
+
+// 16. Allowing default access when AD lookup fails
+Pattern.compile("catch\\s*\\(\\s*error\\s*\\)\\s*\\{\\s*return\\s*true"), // Example: catch (error) { return true; }
+
+// 17. Not enforcing AD password policy
+Pattern.compile("password\\.length\\s*<\\s*6"), // Example: if (password.length < 6)
+
+// 18. Not enforcing MFA for AD users
+Pattern.compile("mfaEnabled\\s*:\\s*false"), // Example: mfaEnabled: false
+
+// 19. Using outdated AD authentication mechanisms
+Pattern.compile("useNTLM\\s*:\\s*true"), // Example: useNTLM: true
+
+// 20. Allowing wildcard role checks
+Pattern.compile("roleCheck\\(.*['\"`]\\*['\"`]\\)"), // Example: roleCheck(user, "*")
+
+// 21. Not verifying AD user identity before session creation
+Pattern.compile("session\\.set\\(\\s*['\"`]user['\"`]\\s*,\\s*req\\.user\\s*\\)"), // Example: session.set("user", req.user)
+
+// 22. Allowing login without checking AD group membership
+Pattern.compile("login\\(\\s*req\\.user\\s*\\)"), // Example: login(req.user)
+
+// 23. Allowing access based on username only
+Pattern.compile("if\\s*\\(\\s*req\\.user\\.username"), // Example: if (req.user.username == "admin")
+
+// 24. No Active Directory domain check
+Pattern.compile("req\\.user\\.domain\\s*==\\s*['\"`]default['\"`]"), // Example: if (req.user.domain == "default")
+
+// 25. Accepting expired AD tokens
+Pattern.compile("tokenExpiration\\s*:\\s*Infinity"), // Example: tokenExpiration: Infinity
+
+// 26. No audit logs for AD access
+Pattern.compile("logAccess\\s*:\\s*false"), // Example: logAccess: false
+
+// 27. Using client-side JavaScript for AD authentication
+Pattern.compile("fetch\\(\\s*['\"`]https:\\/\\/adserver\\.domain\\.com['\"`]"), // Example: fetch("https://adserver.domain.com")
+
+// 28. Not revoking AD sessions on logout
+Pattern.compile("req\\.session\\.destroy\\s*\\(\\s*\\)"), // Example: req.session.destroy()
+
+// 29. Allowing unauthenticated access to sensitive routes
+Pattern.compile("router\\.use\\(\\s*['\"`]/admin['\"`]"), // Example: router.use("/admin", adminHandler)
+
+// 30. Allowing users to modify their own AD permissions
+Pattern.compile("user\\.updatePermissions\\(\\s*req\\.body\\.permissions"), // Example: user.updatePermissions(req.body.permissions)
+
+// 31. Using plaintext passwords in AD authentication
+Pattern.compile("password\\s*=\\s*['\"`].{4,16}['\"`]"), // Example: password = "password123"
+
+// 32. Not restricting AD session duration
+Pattern.compile("sessionTimeout\\s*:\\s*null"), // Example: sessionTimeout: null
+
+// 33. No role-based access control in AD authentication
+Pattern.compile("rbac\\s*:\\s*false"), // Example: rbac: false
+
+// 34. Not checking AD account lock status
+Pattern.compile("if\\s*\\(\\s*req\\.user\\.locked\\s*==\\s*false"), // Example: if (req.user.locked == false)
+
+// 35. Allowing user enumeration via AD login error messages
+Pattern.compile("if\\s*\\(\\s*error\\.message\\s*==\\s*['\"`]User not found['\"`]"), // Example: if (error.message == "User not found")
+
+// 36. Using insecure AD authentication methods
+Pattern.compile("authMethod\\s*:\\s*['\"`]basicAuth['\"`]"), // Example: authMethod: "basicAuth"
+
+// 37. Allowing AD authentication with only an email address
+Pattern.compile("login\\(\\s*req\\.user\\.email\\s*\\)"), // Example: login(req.user.email)
+
+// 38. Not enforcing domain-specific AD authentication
+Pattern.compile("domainValidation\\s*:\\s*false"), // Example: domainValidation: false
+
+// 39. Allowing direct access to AD LDAP directory
+Pattern.compile("ldap\\.search\\(\\s*['\"`]dc=domain,dc=com['\"`]"), // Example: ldap.search("dc=domain,dc=com")
+
+// 40. Using weak session tokens for AD authentication
+Pattern.compile("sessionToken\\s*=\\s*['\"`].{4,8}['\"`]"), // Example: sessionToken = "abcd1234"
+
+// 41. Allowing guest users in AD authentication
+Pattern.compile("req\\.user\\.role\\s*==\\s*['\"`]guest['\"`]"), // Example: if (req.user.role == "guest")
+
+// 42. Accepting AD tokens without signature verification
+Pattern.compile("verifyToken\\s*:\\s*false"), // Example: verifyToken: false
+
+);
+public static final List<Pattern> adAuthorizationIssues = Arrays.asList(
+
+// 43. Hardcoded AD credentials in config files
+Pattern.compile("config\\.adPassword\\s*=\\s*['\"`].+['\"`]"), // Example: config.adPassword = "Secret123"
+
+// 44. No verification of AD group membership in API requests
+Pattern.compile("req\\.user\\.adGroups\\s*==\\s*undefined"), // Example: if (req.user.adGroups == undefined)
+
+// 45. Using non-encrypted AD tokens
+Pattern.compile("tokenEncryption\\s*:\\s*false"), // Example: tokenEncryption: false
+
+// 46. No check for AD account expiry
+Pattern.compile("if\\s*\\(\\s*req\\.user\\.accountExpiry\\s*==\\s*null"), // Example: if (req.user.accountExpiry == null)
+
+// 47. Allowing AD users to modify their own groups
+Pattern.compile("user\\.updateGroups\\(\\s*req\\.body\\.groups"), // Example: user.updateGroups(req.body.groups)
+
+// 48. Not enforcing AD group-based permissions
+Pattern.compile("permissionCheck\\(\\s*req\\.user\\s*,\\s*['\"`]\\*['\"`]"), // Example: permissionCheck(req.user, "*")
+
+// 49. Allowing privileged access without checking AD roles
+Pattern.compile("if\\s*\\(\\s*req\\.user\\.isAdmin\\s*\\)"), // Example: if (req.user.isAdmin) { grantAccess(); }
+
+// 50. Accepting tokens without validating AD domain
+Pattern.compile("validateDomain\\s*:\\s*false"), // Example: validateDomain: false
+
+// 51. Not verifying AD user identity before granting permissions
+Pattern.compile("if\\s*\\(\\s*req\\.user\\.permissions\\s*\\)"), // Example: if (req.user.permissions)
+
+// 52. Allowing any AD user to reset another user's password
+Pattern.compile("resetPassword\\(\\s*req\\.user\\.id\\s*,\\s*req\\.body\\.newPassword"), // Example: resetPassword(req.user.id, req.body.newPassword)
+
+// 53. Not checking AD group hierarchy before assigning roles
+Pattern.compile("assignRole\\(\\s*req\\.user\\.role"), // Example: assignRole(req.user.role)
+
+// 54. No logging of AD authorization failures
+Pattern.compile("logFailures\\s*:\\s*false"), // Example: logFailures: false
+
+// 55. Allowing users to authenticate using only their username
+Pattern.compile("login\\(\\s*req\\.user\\.username"), // Example: login(req.user.username)
+
+// 56. Not enforcing AD session timeout
+Pattern.compile("sessionTimeout\\s*:\\s*Infinity"), // Example: sessionTimeout: Infinity
+
+// 57. Using insecure AD authentication endpoints
+Pattern.compile("fetch\\(\\s*['\"`]http:\\/\\/adserver\\.domain\\.com['\"`]"), // Example: fetch("http://adserver.domain.com")
+
+// 58. Allowing session reuse without re-authentication
+Pattern.compile("sessionReuse\\s*:\\s*true"), // Example: sessionReuse: true
+
+// 59. No AD authorization checks before executing admin commands
+Pattern.compile("if\\s*\\(\\s*req\\.body\\.command\\s*==\\s*['\"`]deleteUser['\"`]"), // Example: if (req.body.command == "deleteUser")
+
+// 60. Allowing users to escalate privileges dynamically
+Pattern.compile("req\\.user\\.role\\s*=\\s*['\"`]admin['\"`]"), // Example: req.user.role = "admin"
+
+// 61. No verification of AD user’s department before granting access
+Pattern.compile("if\\s*\\(\\s*req\\.user\\.department\\s*\\)"), // Example: if (req.user.department)
+
+// 62. Hardcoding AD admin credentials in frontend JavaScript
+Pattern.compile("const adminPassword\\s*=\\s*['\"`].+['\"`]"), // Example: const adminPassword = "SuperSecret"
+
+// 63. No MFA enforcement for privileged AD accounts
+Pattern.compile("mfaRequired\\s*:\\s*false"), // Example: mfaRequired: false
+
+// 64. Allowing unauthenticated users to access sensitive endpoints
+Pattern.compile("if\\s*\\(\\s*req\\.user\\s*==\\s*null"), // Example: if (req.user == null)
+
+// 65. Accepting AD authentication tokens without expiration
+Pattern.compile("tokenExpiration\\s*:\\s*null"), // Example: tokenExpiration: null
+
+// 66. Not checking AD audit logs for suspicious activities
+Pattern.compile("auditLogging\\s*:\\s*false"), // Example: auditLogging: false
+
+// 67. Allowing direct access to AD administrative tools
+Pattern.compile("['\"`]\\/ad-admin\\/console['\"`]"), // Example: "/ad-admin/console"
+
+// 68. Not enforcing IP restrictions for AD administrative accounts
+Pattern.compile("allowedIPs\\s*:\\s*\\[\\]"), // Example: allowedIPs: []
+
+// 69. Allowing AD users to set their own expiration date
+Pattern.compile("req\\.user\\.expirationDate\\s*=\\s*req\\.body\\.expirationDate"), // Example: req.user.expirationDate = req.body.expirationDate
+
+// 70. Not verifying AD user’s security clearance
+Pattern.compile("if\\s*\\(\\s*req\\.user\\.clearance\\s*\\)"), // Example: if (req.user.clearance)
+
+// 71. No restrictions on password reuse in AD authentication
+Pattern.compile("allowPasswordReuse\\s*:\\s*true"), // Example: allowPasswordReuse: true
+
+// 72. Allowing any AD user to create an administrator account
+Pattern.compile("createUser\\(\\s*req\\.body\\.role\\s*,\\s*['\"`]admin['\"`]"), // Example: createUser(req.body.role, "admin")
+
+// 73. Accepting AD credentials from insecure sources
+Pattern.compile("req\\.body\\.password\\s*==\\s*['\"`].+['\"`]"), // Example: req.body.password == "WeakPass123"
+
+// 74. Not revoking access when an AD user is removed
+Pattern.compile("removeUser\\(\\s*req\\.user\\.id\\s*\\)"), // Example: removeUser(req.user.id)
+
+// 75. Allowing unlimited login attempts for AD accounts
+Pattern.compile("maxLoginAttempts\\s*:\\s*Infinity"), // Example: maxLoginAttempts: Infinity
+
+// 76. No validation of AD user role before executing privileged operations
+Pattern.compile("if\\s*\\(\\s*req\\.user\\.role\\s*\\)"), // Example: if (req.user.role)
+
+// 77. Allowing users to modify AD user attributes without restrictions
+Pattern.compile("modifyUserAttributes\\(\\s*req\\.body\\)"), // Example: modifyUserAttributes(req.body)
+
+// 78. Hardcoded AD server URLs in frontend JavaScript
+Pattern.compile("['\"`]ldap:\\/\\/adserver\\.domain\\.com['\"`]"), // Example: "ldap://adserver.domain.com"
+
+// 79. No validation of AD authentication response before granting access
+Pattern.compile("if\\s*\\(\\s*authResponse\\.success\\s*\\)"), // Example: if (authResponse.success)
+
+// 80. Allowing direct database queries without AD authorization
+Pattern.compile("db\\.query\\(\\s*['\"`]SELECT \\* FROM Users['\"`]"), // Example: db.query("SELECT * FROM Users")
+
+// 81. No verification of AD user’s employment status before granting access
+Pattern.compile("if\\s*\\(\\s*req\\.user\\.employmentStatus\\s*\\)"), // Example: if (req.user.employmentStatus)
+
+// 82. Using default credentials in AD authentication
+Pattern.compile("defaultCredentials\\s*:\\s*true"), // Example: defaultCredentials: true
+
+);
+public static final List<Pattern> adAuthorizationIssuesAdditional = Arrays.asList(
+
+// 83. Allowing AD users to modify their own privileges
+Pattern.compile("req\\.user\\.role\\s*=\\s*req\\.body\\.newRole"), // Example: req.user.role = req.body.newRole
+
+// 84. Not verifying AD group changes before applying
+Pattern.compile("updateGroupMembership\\(\\s*req\\.body\\.groups"), // Example: updateGroupMembership(req.body.groups)
+
+// 85. Exposing AD authentication tokens in client-side JavaScript
+Pattern.compile("localStorage\\.setItem\\(\\s*['\"`]authToken['\"`]"), // Example: localStorage.setItem('authToken', token)
+
+// 86. No check for AD user’s status before granting access
+Pattern.compile("if\\s*\\(\\s*req\\.user\\.status\\s*\\)"), // Example: if (req.user.status)
+
+// 87. Accepting any AD token without validating its integrity
+Pattern.compile("if\\s*\\(\\s*req\\.headers\\['Authorization'\\]\\s*\\)"), // Example: if (req.headers['Authorization'])
+
+// 88. Allowing non-AD users to access AD-restricted endpoints
+Pattern.compile("if\\s*\\(\\s*req\\.user\\s*==\\s*undefined"), // Example: if (req.user == undefined)
+
+// 89. Not verifying AD user's department before assigning permissions
+Pattern.compile("assignPermissions\\(\\s*req\\.user\\.department"), // Example: assignPermissions(req.user.department)
+
+// 90. No enforcement of AD group hierarchy in access control
+Pattern.compile("userPermissions\\[req\\.user\\.role\\]"), // Example: userPermissions[req.user.role]
+
+// 91. Allowing user enumeration via AD error messages
+Pattern.compile("res\\.json\\(\\s*{\\s*error:\\s*['\"`]User not found['\"`]"), // Example: res.json({ error: 'User not found' })
+
+// 92. No validation of AD token expiration before granting access
+Pattern.compile("if\\s*\\(\\s*req\\.user\\.token\\)"), // Example: if (req.user.token)
+
+// 93. Allowing AD users to escalate privileges via HTTP requests
+Pattern.compile("fetch\\(\\s*['\"`]\\/api\\/grant-admin['\"`]"), // Example: fetch("/api/grant-admin")
+
+// 94. No restriction on updating AD account settings
+Pattern.compile("updateAccount\\(\\s*req\\.body\\)"), // Example: updateAccount(req.body)
+
+// 95. Allowing weak AD password resets
+Pattern.compile("resetPassword\\(\\s*req\\.user\\.id\\s*,\\s*['\"`]password123['\"`]"), // Example: resetPassword(req.user.id, "password123")
+
+// 96. No validation of AD user’s organization before granting access
+Pattern.compile("if\\s*\\(\\s*req\\.user\\.organization\\)"), // Example: if (req.user.organization)
+
+// 97. Accepting plaintext AD credentials in API requests
+Pattern.compile("req\\.body\\.password\\s*=\\s*['\"`].+['\"`]"), // Example: req.body.password = "PlaintextPass"
+
+// 98. Allowing client-side modification of AD authentication state
+Pattern.compile("window\\.adUser\\s*=\\s*{"), // Example: window.adUser = { role: "admin" }
+
+// 99. No verification of AD login attempts before locking accounts
+Pattern.compile("loginAttempts\\s*:\\s*\\d+"), // Example: loginAttempts: 999
+
+// 100. No logging of unauthorized AD access attempts
+Pattern.compile("logUnauthorizedAccess\\s*:\\s*false"), // Example: logUnauthorizedAccess: false
+
+);
