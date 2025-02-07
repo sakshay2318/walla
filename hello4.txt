@@ -1,1 +1,620 @@
+public static final List<Pattern> sqlAuthorizationIssues = Arrays.asList(
 
+// 1. Direct SQL queries without authentication
+Pattern.compile("SELECT\\s+\\*\\s+FROM\\s+\\w+", Pattern.CASE_INSENSITIVE), // Example: SELECT * FROM users
+
+// 2. Hardcoded database credentials
+Pattern.compile("connectionString\\s*:\\s*['\"`].+['\"`]"), // Example: connectionString: "Server=myServer;Database=myDB;User Id=myUser;Password=myPass;"
+
+// 3. Using sa (system administrator) account in queries
+Pattern.compile("User\\s*Id\\s*=\\s*['\"`]sa['\"`]"), // Example: User Id='sa'
+
+// 4. No role-based access control (RBAC) in queries
+Pattern.compile("executeQuery\\(\\s*['\"`].+SELECT.+FROM.+['\"`]"), // Example: executeQuery("SELECT * FROM users")
+
+// 5. Allowing dynamic table/column selection in queries
+Pattern.compile("SELECT\\s+\\*\\s+FROM\\s+['\"`]\\+.*\\+['\"`]"), // Example: SELECT * FROM " + tableName
+
+// 6. No verification of SQL user permissions
+Pattern.compile("GRANT\\s+ALL\\s+ON\\s+\\w+"), // Example: GRANT ALL ON users
+
+// 7. Query execution without user authentication
+Pattern.compile("db\\.query\\(\\s*['\"`].+['\"`]\\s*\\)"), // Example: db.query("SELECT * FROM users")
+
+// 8. No check on who executes SQL queries
+Pattern.compile("EXECUTE\\s+['\"`]\\+.*\\+['\"`]"), // Example: EXECUTE " + storedProc
+
+// 9. SQL user roles not enforced
+Pattern.compile("SET\\s+ROLE\\s+['\"`]\\+.*\\+['\"`]"), // Example: SET ROLE " + userRole
+
+// 10. No validation of SQL permissions before executing queries
+Pattern.compile("IF\\s+EXISTS\\s*\\(\\s*SELECT\\s+1\\s+FROM\\s+users"), // Example: IF EXISTS (SELECT 1 FROM users)
+
+// 11. No check for stored procedure permissions
+Pattern.compile("EXEC\\s+\\w+"), // Example: EXEC sp_deleteUser
+
+// 12. No restriction on modifying database schema
+Pattern.compile("ALTER\\s+TABLE\\s+\\w+"), // Example: ALTER TABLE users
+
+// 13. Allowing direct deletion without permission validation
+Pattern.compile("DELETE\\s+FROM\\s+\\w+"), // Example: DELETE FROM users
+
+// 14. No authentication check for SQL bulk operations
+Pattern.compile("BULK\\s+INSERT\\s+\\w+"), // Example: BULK INSERT users
+
+// 15. No proper restriction on SQL joins
+Pattern.compile("SELECT\\s+\\*\\s+FROM\\s+\\w+\\s+JOIN\\s+\\w+"), // Example: SELECT * FROM users JOIN orders
+
+// 16. Allowing modification of user privileges
+Pattern.compile("UPDATE\\s+users\\s+SET\\s+role"), // Example: UPDATE users SET role='admin'
+
+// 17. No validation on SQL session variables
+Pattern.compile("SET\\s+SESSION\\s+['\"`]\\w+['\"`]"), // Example: SET SESSION autocommit=0
+
+// 18. No restriction on SQL login attempts
+Pattern.compile("ALTER\\s+LOGIN\\s+\\w+"), // Example: ALTER LOGIN sa
+
+// 19. No validation of SQL connection before execution
+Pattern.compile("db\\.connect\\(\\s*['\"`].+['\"`]\\s*\\)"), // Example: db.connect("Server=myServer;Database=myDB;")
+
+// 20. Using public database users for queries
+Pattern.compile("User\\s*Id\\s*=\\s*['\"`]public['\"`]"), // Example: User Id='public'
+
+// 21. No restriction on cross-database queries
+Pattern.compile("USE\\s+\\w+"), // Example: USE master
+
+// 22. No check on stored procedure execution context
+Pattern.compile("sp_executesql\\s+['\"`]\\+.*\\+['\"`]"), // Example: sp_executesql " + query
+
+// 23. No authorization checks before dropping tables
+Pattern.compile("DROP\\s+TABLE\\s+\\w+"), // Example: DROP TABLE users
+
+// 24. Allowing unlimited database connections
+Pattern.compile("MAX_CONNECTIONS\\s*=\\s*\\d+"), // Example: MAX_CONNECTIONS = 9999
+
+// 25. Allowing unrestricted updates to sensitive data
+Pattern.compile("UPDATE\\s+users\\s+SET\\s+password"), // Example: UPDATE users SET password='newpass'
+
+// 26. Allowing insecure SQL queries from external sources
+Pattern.compile("fetch\\(\\s*['\"`].+/sql['\"`]"), // Example: fetch("/api/sql?query=SELECT+*+FROM+users")
+
+// 27. Using wildcard queries without constraints
+Pattern.compile("SELECT\\s+\\*\\s+FROM"), // Example: SELECT * FROM users
+
+// 28. Not enforcing stored procedure permission levels
+Pattern.compile("GRANT\\s+EXEC\\s+ON\\s+sp_\\w+"), // Example: GRANT EXEC ON sp_getUsers
+
+// 29. Allowing SQL statements in URL parameters
+Pattern.compile("query\\s*=\\s*['\"`].+(SELECT|INSERT|DELETE|UPDATE).+['\"`]"), // Example: query="SELECT * FROM users"
+
+// 30. Using system database tables without restrictions
+Pattern.compile("sys\\.\\w+"), // Example: SELECT * FROM sys.objects
+
+// 31. Not limiting SQL query execution time
+Pattern.compile("SET\\s+QUERY_GOVERNOR_COST_LIMIT"), // Example: SET QUERY_GOVERNOR_COST_LIMIT 0
+
+// 32. No validation of user privileges before query execution
+Pattern.compile("db\\.query\\(\\s*['\"`].+(INSERT|UPDATE|DELETE).+['\"`]"), // Example: db.query("INSERT INTO users VALUES(...)")
+
+// 33. No user permission check for accessing database logs
+Pattern.compile("SELECT\\s+\\*\\s+FROM\\s+fn_dblog"), // Example: SELECT * FROM fn_dblog
+
+// 34. Allowing privilege escalation through SQL injection
+Pattern.compile("UNION\\s+SELECT\\s+.*admin.*"), // Example: UNION SELECT username, password FROM users WHERE role='admin'
+
+// 35. No proper handling of failed SQL authentication attempts
+Pattern.compile("res\\.json\\(\\s*{\\s*error:\\s*['\"`]Login failed['\"`]"), // Example: res.json({ error: "Login failed" })
+
+// 36. No encryption of sensitive SQL fields
+Pattern.compile("ENCRYPTION\\s*=\\s*OFF"), // Example: ENCRYPTION = OFF
+
+// 37. Allowing unauthorized access to SQL system configurations
+Pattern.compile("SELECT\\s+\\*\\s+FROM\\s+INFORMATION_SCHEMA"), // Example: SELECT * FROM INFORMATION_SCHEMA.TABLES
+
+// 38. Allowing unrestricted access to database backups
+Pattern.compile("BACKUP\\s+DATABASE"), // Example: BACKUP DATABASE myDB TO DISK='C:\\backup.bak'
+
+// 39. No restriction on reading SQL error logs
+Pattern.compile("xp_readerrorlog"), // Example: EXEC xp_readerrorlog
+
+// 40. No enforcement of minimum password length for SQL users
+Pattern.compile("CHECK_POLICY\\s*=\\s*OFF"), // Example: CHECK_POLICY = OFF
+
+// 41. No logging of failed authentication attempts
+Pattern.compile("logFailedAttempts\\s*:\\s*false"), // Example: logFailedAttempts: false
+
+// 42. No timeout for inactive SQL sessions
+Pattern.compile("SET\\s+IDLE_TIMEOUT"), // Example: SET IDLE_TIMEOUT 0
+
+// 43. No restriction on modifying database user privileges
+Pattern.compile("ALTER\\s+USER"), // Example: ALTER USER myUser WITH PASSWORD='newpass'
+
+// 44. No validation of user roles before executing SQL queries
+Pattern.compile("db\\.execute\\(\\s*['\"`]GRANT\\s+.*['\"`]"), // Example: db.execute("GRANT ALL ON users TO public")
+
+// 45. Allowing unlimited concurrent SQL queries
+Pattern.compile("SET\\s+MAX_DOP"), // Example: SET MAX_DOP 0
+
+// 46. Using weak hashing algorithms in SQL authentication
+Pattern.compile("HASHBYTES\\s*\\(\\s*['\"`]MD5['\"`]"), // Example: HASHBYTES('MD5', password)
+
+// 47. No restrictions on SQL database exports
+Pattern.compile("EXPORT\\s+DATABASE"), // Example: EXPORT DATABASE myDB
+
+// 48. Allowing execution of arbitrary SQL commands
+Pattern.compile("EXECUTE\\s+IMMEDIATE"), // Example: EXECUTE IMMEDIATE "DROP TABLE users"
+
+// 49. No restriction on SQL remote connections
+Pattern.compile("ENABLE_REMOTE_CONNECTIONS\\s*=\\s*1"), // Example: ENABLE_REMOTE_CONNECTIONS=1
+
+// 50. Allowing raw SQL execution in JavaScript
+Pattern.compile("db\\.executeRaw\\(\\s*['\"`]"), // Example: db.executeRaw("SELECT * FROM users")
+
+);
+public static final List<Pattern> sqlAuthIssues = Arrays.asList(
+
+// 1. Direct SQL queries with no user authentication
+Pattern.compile("\\bSELECT\\b\\s+\\*\\s+\\bFROM\\b\\s+\\w+", Pattern.CASE_INSENSITIVE),
+
+// 2. Hardcoded database passwords
+Pattern.compile("\\bpassword\\b\\s*=\\s*['\"`].+['\"`]"), 
+
+// 3. Using `sa` (superuser) account
+Pattern.compile("\\bUser Id\\b\\s*=\\s*['\"`]sa['\"`]"), 
+
+// 4. No parameterized queries (using string concatenation)
+Pattern.compile("['\"`]SELECT\\s+.+\\s+FROM\\s+['\"`]\\s*\\+"), 
+
+// 5. Unrestricted administrative queries
+Pattern.compile("\\bGRANT\\s+ALL\\s+ON\\s+\\w+"), 
+
+// 6. Executing queries without checking permissions
+Pattern.compile("\\bdb\\.query\\b\\s*\\(\\s*['\"`]SELECT.+['\"`]"), 
+
+// 7. Executing arbitrary SQL commands without validation
+Pattern.compile("\\bEXECUTE\\s+['\"`]\\+.*\\+['\"`]"), 
+
+// 8. No role-based authentication enforcement
+Pattern.compile("\\bSET\\s+ROLE\\s+['\"`]\\+.*\\+['\"`]"), 
+
+// 9. Lack of permission validation before SQL execution
+Pattern.compile("\\bIF\\s+EXISTS\\s*\\(\\s*SELECT\\s+1"), 
+
+// 10. Executing stored procedures without permission validation
+Pattern.compile("\\bEXEC\\s+\\w+"), 
+
+// 11. Unrestricted modifications to database schema
+Pattern.compile("\\bALTER\\s+TABLE\\s+\\w+"), 
+
+// 12. Allowing unrestricted data deletion
+Pattern.compile("\\bDELETE\\s+FROM\\s+\\w+"), 
+
+// 13. No authentication for bulk insert operations
+Pattern.compile("\\bBULK\\s+INSERT\\s+\\w+"), 
+
+// 14. No access control on database join queries
+Pattern.compile("\\bSELECT\\s+.+\\bJOIN\\b\\s+\\w+"), 
+
+// 15. Allowing updates to user roles without validation
+Pattern.compile("\\bUPDATE\\s+users\\s+SET\\s+role"), 
+
+// 16. No validation on session variables
+Pattern.compile("\\bSET\\s+SESSION\\s+['\"`]\\w+['\"`]"), 
+
+// 17. No restrictions on SQL login modifications
+Pattern.compile("\\bALTER\\s+LOGIN\\s+\\w+"), 
+
+// 18. Unauthenticated database connection initiation
+Pattern.compile("\\bdb\\.connect\\b\\s*\\(\\s*['\"`].+['\"`]"), 
+
+// 19. Using public database users for queries
+Pattern.compile("\\bUser Id\\b\\s*=\\s*['\"`]public['\"`]"), 
+
+// 20. Allowing cross-database access without checks
+Pattern.compile("\\bUSE\\s+\\w+"), 
+
+// 21. Executing stored procedures without authorization
+Pattern.compile("\\bsp_executesql\\b\\s+['\"`]\\+.*\\+['\"`]"), 
+
+// 22. Allowing table deletion without permissions
+Pattern.compile("\\bDROP\\s+TABLE\\s+\\w+"), 
+
+// 23. Unrestricted maximum connections to the database
+Pattern.compile("\\bMAX_CONNECTIONS\\s*=\\s*\\d+"), 
+
+// 24. No authorization checks on sensitive data updates
+Pattern.compile("\\bUPDATE\\s+users\\s+SET\\s+password"), 
+
+// 25. Exposing SQL execution in API endpoints
+Pattern.compile("\\bfetch\\b\\(\\s*['\"`].+/sql['\"`]"), 
+
+// 26. No access control on wildcard queries
+Pattern.compile("\\bSELECT\\s+\\*\\s+FROM"), 
+
+// 27. Granting stored procedure execution rights to all users
+Pattern.compile("\\bGRANT\\s+EXEC\\s+ON\\s+sp_\\w+"), 
+
+// 28. SQL statements inside URL parameters
+Pattern.compile("\\bquery\\b\\s*=\\s*['\"`].+(SELECT|INSERT|DELETE|UPDATE).+['\"`]"), 
+
+// 29. Exposing system database tables
+Pattern.compile("\\bsys\\.\\w+"), 
+
+// 30. No limits on SQL query execution time
+Pattern.compile("\\bSET\\s+QUERY_GOVERNOR_COST_LIMIT"), 
+
+// 31. Allowing unauthorized access to database logs
+Pattern.compile("\\bSELECT\\s+\\*\\s+FROM\\s+fn_dblog"), 
+
+// 32. SQL injection attempts via UNION SELECT
+Pattern.compile("\\bUNION\\s+SELECT\\s+.*admin.*"), 
+
+// 33. No logging of failed SQL authentication attempts
+Pattern.compile("\\blogFailedAttempts\\b\\s*:\\s*false"), 
+
+// 34. No encryption on sensitive database fields
+Pattern.compile("\\bENCRYPTION\\s*=\\s*OFF"), 
+
+// 35. Allowing unauthorized access to SQL system configurations
+Pattern.compile("\\bSELECT\\s+\\*\\s+FROM\\s+INFORMATION_SCHEMA"), 
+
+// 36. No restrictions on database backups
+Pattern.compile("\\bBACKUP\\s+DATABASE"), 
+
+// 37. No restriction on reading SQL error logs
+Pattern.compile("\\bxp_readerrorlog"), 
+
+// 38. Not enforcing minimum password length for SQL users
+Pattern.compile("\\bCHECK_POLICY\\s*=\\s*OFF"), 
+
+// 39. No timeout for inactive SQL sessions
+Pattern.compile("\\bSET\\s+IDLE_TIMEOUT"), 
+
+// 40. Unauthenticated modifications to database user privileges
+Pattern.compile("\\bALTER\\s+USER"), 
+
+// 41. Lack of role validation before query execution
+Pattern.compile("\\bdb\\.execute\\b\\(\\s*['\"`]GRANT\\s+.*['\"`]"), 
+
+// 42. Unrestricted concurrent SQL queries
+Pattern.compile("\\bSET\\s+MAX_DOP"), 
+
+// 43. Using weak hashing algorithms in SQL authentication
+Pattern.compile("\\bHASHBYTES\\b\\s*\\(\\s*['\"`]MD5['\"`]"), 
+
+// 44. No restrictions on database exports
+Pattern.compile("\\bEXPORT\\s+DATABASE"), 
+
+// 45. Allowing raw SQL execution in JavaScript
+Pattern.compile("\\bdb\\.executeRaw\\b\\(\\s*['\"`]"), 
+
+// 46. No restrictions on SQL remote connections
+Pattern.compile("\\bENABLE_REMOTE_CONNECTIONS\\s*=\\s*1"), 
+
+// 47. Exposing database structure via error messages
+Pattern.compile("\\berror\\b\\s*:\\s*['\"`].*SQL.*['\"`]"), 
+
+// 48. Executing arbitrary SQL commands via dynamic inputs
+Pattern.compile("\\bEXECUTE IMMEDIATE\\b"), 
+
+// 49. Allowing modification of SQL user passwords without authorization
+Pattern.compile("\\bALTER LOGIN\\s+\\w+\\s+WITH PASSWORD"), 
+
+// 50. Allowing unverified database operations through API endpoints
+Pattern.compile("\\bfetch\\b\\(\\s*['\"`].+/db-operation['\"`]") 
+
+);
+
+public static final List<Pattern> sourceCodeLeakage = Arrays.asList(
+
+// 1. Hardcoded AWS access key
+Pattern.compile("AKIA[0-9A-Z]{16}"), 
+
+// 2. Hardcoded AWS secret key
+Pattern.compile("(?i)aws[_-]?secret[_-]?access[_-]?key['\"`]?:\\s*['\"`][A-Za-z0-9/+]{40}['\"`]"), 
+
+// 3. Hardcoded API keys
+Pattern.compile("(?i)(api[_-]?key|secret[_-]?key)['\"`]?:\\s*['\"`][A-Za-z0-9/+]{32,}['\"`]"), 
+
+// 4. Hardcoded database credentials
+Pattern.compile("(?i)(db[_-]?password|database[_-]?password)['\"`]?:\\s*['\"`][A-Za-z0-9!@#$%^&*()_+-=]{8,}['\"`]"), 
+
+// 5. Exposed `.env` file references
+Pattern.compile("\\.env['\"`]?:\\s*['\"`].+['\"`]"), 
+
+// 6. Hardcoded OAuth tokens
+Pattern.compile("(?i)(oauth[_-]?token|bearer[_-]?token)['\"`]?:\\s*['\"`][A-Za-z0-9-_]{20,}['\"`]"), 
+
+// 7. Exposed JWT tokens
+Pattern.compile("eyJ[a-zA-Z0-9_-]{10,}\\.eyJ[a-zA-Z0-9_-]{10,}\\.eyJ[a-zA-Z0-9_-]{10,}"), 
+
+// 8. Hardcoded database connection strings
+Pattern.compile("jdbc:mysql://[\\w.-]+:\\d+/[\\w-]+\\?user=\\w+&password=\\w+"), 
+
+// 9. Hardcoded SSH private keys
+Pattern.compile("-----BEGIN (RSA|DSA|EC) PRIVATE KEY-----"), 
+
+// 10. Exposed Git credentials
+Pattern.compile("(?i)(git[_-]?token|github[_-]?key)['\"`]?:\\s*['\"`][A-Za-z0-9_-]{20,}['\"`]"), 
+
+// 11. Hardcoded Firebase database URL
+Pattern.compile("https://[\\w-]+\\.firebaseio\\.com"), 
+
+// 12. Exposed Google API keys
+Pattern.compile("AIza[0-9A-Za-z\\-_]{35}"), 
+
+// 13. Exposed Slack webhook URLs
+Pattern.compile("https://hooks\\.slack\\.com/services/[A-Za-z0-9]+/[A-Za-z0-9]+/[A-Za-z0-9]+"), 
+
+// 14. Hardcoded Twilio credentials
+Pattern.compile("(?i)twilio[_-]?account[_-]?sid['\"`]?:\\s*['\"`][A-Za-z0-9]{34}['\"`]"), 
+
+// 15. Unprotected internal API endpoints
+Pattern.compile("/api/internal/\\w+"), 
+
+// 16. Hardcoded payment gateway keys (Stripe, PayPal)
+Pattern.compile("(?i)(stripe[_-]?key|paypal[_-]?key)['\"`]?:\\s*['\"`][A-Za-z0-9_-]{32,}['\"`]"), 
+
+// 17. Private S3 bucket URLs
+Pattern.compile("s3://[a-zA-Z0-9-_.]+"), 
+
+// 18. Hardcoded SMTP credentials
+Pattern.compile("smtp\\.[a-zA-Z0-9.-]+[:\\d]+['\"`]?,\\s*['\"`]?username['\"`]?:\\s*['\"`]?[A-Za-z0-9_.-]+['\"`]?,\\s*['\"`]?password['\"`]?:\\s*['\"`]?.+['\"`]"), 
+
+// 19. Database dumps in code
+Pattern.compile("(?i)(DROP|CREATE|ALTER)\\s+(DATABASE|TABLE|USER)"), 
+
+// 20. Exposed private API documentation links
+Pattern.compile("(?i)docs\\.[a-zA-Z0-9-]+\\.internal"), 
+
+// 21. Hardcoded Active Directory credentials
+Pattern.compile("(?i)ldap://[\\w.-]+[:\\d]+"), 
+
+// 22. Exposed sensitive log files
+Pattern.compile("(?i)(log\\.(json|txt|log))['\"`]?:\\s*['\"`].+['\"`]"), 
+
+// 23. Hardcoded encryption keys
+Pattern.compile("(?i)(aes[_-]?key|encryption[_-]?key)['\"`]?:\\s*['\"`][A-Za-z0-9/+]{16,}['\"`]"), 
+
+// 24. Hardcoded reCAPTCHA site keys
+Pattern.compile("6L[0-9A-Za-z_-]{38,}"), 
+
+// 25. Publicly accessible Google Sheets URLs
+Pattern.compile("docs\\.google\\.com/spreadsheets/d/\\w+"), 
+
+// 26. Hardcoded Facebook App Secrets
+Pattern.compile("(?i)facebook[_-]?app[_-]?secret['\"`]?:\\s*['\"`][A-Za-z0-9]{32}['\"`]"), 
+
+// 27. Hardcoded Cloudflare API keys
+Pattern.compile("(?i)cloudflare[_-]?api[_-]?key['\"`]?:\\s*['\"`][A-Za-z0-9]{37}['\"`]"), 
+
+// 28. Hardcoded SSH passphrases
+Pattern.compile("(?i)ssh[_-]?passphrase['\"`]?:\\s*['\"`].+['\"`]"), 
+
+// 29. Hardcoded API authentication headers
+Pattern.compile("(?i)Authorization['\"`]?:\\s*['\"`](Bearer|Basic)\\s+[A-Za-z0-9._-]+['\"`]"), 
+
+// 30. Public Trello board links
+Pattern.compile("trello\\.com/b/[A-Za-z0-9]+"), 
+
+// 31. Hardcoded MongoDB credentials
+Pattern.compile("mongodb:\\/\\/[A-Za-z0-9_-]+:[A-Za-z0-9!@#$%^&*()_+-=]+@[A-Za-z0-9._-]+:\\d+/\\w+"), 
+
+// 32. Hardcoded Jenkins API tokens
+Pattern.compile("(?i)jenkins[_-]?api[_-]?token['\"`]?:\\s*['\"`][A-Za-z0-9]{32}['\"`]"), 
+
+// 33. Exposed `.gitignore` files
+Pattern.compile("\\.gitignore"), 
+
+// 34. Exposed `.htaccess` files
+Pattern.compile("\\.htaccess"), 
+
+// 35. Unprotected WebSockets exposing internal data
+Pattern.compile("wss?://[a-zA-Z0-9.-]+"), 
+
+// 36. Hardcoded ElasticSearch credentials
+Pattern.compile("(?i)elasticsearch[_-]?password['\"`]?:\\s*['\"`].+['\"`]"), 
+
+// 37. Hardcoded Microsoft Azure keys
+Pattern.compile("(?i)azure[_-]?api[_-]?key['\"`]?:\\s*['\"`][A-Za-z0-9]{32,}['\"`]"), 
+
+// 38. Exposed Firebase service account JSON files
+Pattern.compile("\"type\":\\s*\"service_account\""), 
+
+// 39. Hardcoded Google Cloud Storage keys
+Pattern.compile("(?i)google[_-]?cloud[_-]?key['\"`]?:\\s*['\"`][A-Za-z0-9_-]{32,}['\"`]"), 
+
+// 40. Hardcoded Netlify tokens
+Pattern.compile("(?i)netlify[_-]?auth[_-]?token['\"`]?:\\s*['\"`][A-Za-z0-9]{32,}['\"`]"), 
+
+// 41. Hardcoded Mailgun API keys
+Pattern.compile("(?i)mailgun[_-]?api[_-]?key['\"`]?:\\s*['\"`][A-Za-z0-9]{32,}['\"`]"), 
+
+// 42. Hardcoded SendGrid credentials
+Pattern.compile("(?i)sendgrid[_-]?api[_-]?key['\"`]?:\\s*['\"`][A-Za-z0-9]{32,}['\"`]"), 
+
+// 43-50. Similar patterns for other APIs and secrets...
+
+);
+public static final List<Pattern> sourceCodeLeakage = Arrays.asList(
+
+// 1. Hardcoded Azure Storage Account Key
+Pattern.compile("(?i)(azure[_-]?storage[_-]?key)['\"`]?:\\s*['\"`][A-Za-z0-9/+]{88}['\"`]"), 
+
+// 2. Hardcoded AWS session token
+Pattern.compile("(?i)aws[_-]?session[_-]?token['\"`]?:\\s*['\"`][A-Za-z0-9/+]{40,}['\"`]"), 
+
+// 3. Hardcoded Telegram bot token
+Pattern.compile("(?i)bot[0-9]{8,}:[a-zA-Z0-9_-]{35}"), 
+
+// 4. Hardcoded Facebook Client ID
+Pattern.compile("(?i)facebook[_-]?client[_-]?id['\"`]?:\\s*['\"`][0-9]{15,}['\"`]"), 
+
+// 5. Hardcoded Stripe secret key
+Pattern.compile("sk_live_[0-9a-zA-Z]{24}"), 
+
+// 6. Hardcoded Dropbox access token
+Pattern.compile("(?i)dropbox[_-]?access[_-]?token['\"`]?:\\s*['\"`][A-Za-z0-9-_]{40}['\"`]"), 
+
+// 7. Hardcoded GitHub personal access token
+Pattern.compile("ghp_[A-Za-z0-9]{36}"), 
+
+// 8. Hardcoded LinkedIn client secret
+Pattern.compile("(?i)linkedin[_-]?client[_-]?secret['\"`]?:\\s*['\"`][A-Za-z0-9]{32}['\"`]"), 
+
+// 9. Hardcoded Okta API token
+Pattern.compile("(?i)okta[_-]?api[_-]?token['\"`]?:\\s*['\"`][A-Za-z0-9-_]{42}['\"`]"), 
+
+// 10. Hardcoded SendGrid API key
+Pattern.compile("SG\\.[A-Za-z0-9_-]{22}\\.[A-Za-z0-9_-]{43}"), 
+
+// 11. Hardcoded Square access token
+Pattern.compile("sq0[a-zA-Z0-9]{30,}"), 
+
+// 12. Hardcoded PayPal client secret
+Pattern.compile("(?i)paypal[_-]?client[_-]?secret['\"`]?:\\s*['\"`][A-Za-z0-9]{32,}['\"`]"), 
+
+// 13. Hardcoded Salesforce client secret
+Pattern.compile("(?i)salesforce[_-]?client[_-]?secret['\"`]?:\\s*['\"`][A-Za-z0-9]{32}['\"`]"), 
+
+// 14. Hardcoded Heroku API key
+Pattern.compile("(?i)heroku[_-]?api[_-]?key['\"`]?:\\s*['\"`][A-Za-z0-9_-]{32}['\"`]"), 
+
+// 15. Hardcoded Twitter API secret
+Pattern.compile("(?i)twitter[_-]?api[_-]?secret['\"`]?:\\s*['\"`][A-Za-z0-9]{32,}['\"`]"), 
+
+// 16. Hardcoded DockerHub API token
+Pattern.compile("(?i)docker[_-]?token['\"`]?:\\s*['\"`][A-Za-z0-9]{40,}['\"`]"), 
+
+// 17. Hardcoded Firebase web API key
+Pattern.compile("AIza[0-9A-Za-z\\-_]{35}"), 
+
+// 18. Hardcoded Atlassian API token
+Pattern.compile("(?i)atlassian[_-]?api[_-]?token['\"`]?:\\s*['\"`][A-Za-z0-9]{24,}['\"`]"), 
+
+// 19. Exposed internal database connection strings
+Pattern.compile("jdbc:(mysql|postgresql|mssql|oracle):\\/\\/[^\\s]+:[^\\s]+@[^\\s]+"), 
+
+// 20. Hardcoded SSH authorized keys
+Pattern.compile("ssh-rsa AAAAB3Nza[0-9A-Za-z+\\/]{100,}"), 
+
+// 21. Exposed `.DS_Store` files
+Pattern.compile("\\.DS_Store"), 
+
+// 22. Exposed `.npmrc` files
+Pattern.compile("\\.npmrc"), 
+
+// 23. Exposed `.yarnrc` files
+Pattern.compile("\\.yarnrc"), 
+
+// 24. Hardcoded Cloudflare Bearer tokens
+Pattern.compile("(?i)cloudflare[_-]?bearer[_-]?token['\"`]?:\\s*['\"`][A-Za-z0-9]{37}['\"`]"), 
+
+// 25. Exposed AWS IAM policy files
+Pattern.compile("\\b[A-Za-z0-9_-]+\\.policy\\.json\\b"), 
+
+// 26. Exposed `.bash_history` files
+Pattern.compile("\\.bash_history"), 
+
+// 27. Exposed `.zsh_history` files
+Pattern.compile("\\.zsh_history"), 
+
+// 28. Hardcoded API authentication headers
+Pattern.compile("(?i)Authorization['\"`]?:\\s*['\"`](Bearer|Basic)\\s+[A-Za-z0-9._-]+['\"`]"), 
+
+// 29. Hardcoded Apple Pay Merchant ID
+Pattern.compile("(?i)apple[_-]?pay[_-]?merchant[_-]?id['\"`]?:\\s*['\"`][A-Za-z0-9]{16}['\"`]"), 
+
+// 30. Hardcoded Venmo API key
+Pattern.compile("(?i)venmo[_-]?api[_-]?key['\"`]?:\\s*['\"`][A-Za-z0-9]{32}['\"`]"), 
+
+// 31. Hardcoded Bitcoin private keys
+Pattern.compile("5[HJK][1-9A-Za-z][^OIl]{48}"), 
+
+// 32. Hardcoded Ethereum private keys
+Pattern.compile("0x[a-fA-F0-9]{64}"), 
+
+// 33. Hardcoded Binance Smart Chain private keys
+Pattern.compile("0x[a-fA-F0-9]{64}"), 
+
+// 34. Hardcoded Algorand private keys
+Pattern.compile("(?i)algorand[_-]?private[_-]?key['\"`]?:\\s*['\"`][A-Za-z0-9]{88}['\"`]"), 
+
+// 35. Hardcoded Solana private keys
+Pattern.compile("\\[\\s*(?:\\d+,\\s*){31}\\d+\\s*\\]"), 
+
+// 36. Hardcoded DigitalOcean API keys
+Pattern.compile("(?i)digitalocean[_-]?api[_-]?key['\"`]?:\\s*['\"`][A-Za-z0-9_-]{64}['\"`]"), 
+
+// 37. Hardcoded Google Maps API keys
+Pattern.compile("AIza[0-9A-Za-z\\-_]{35}"), 
+
+// 38. Hardcoded Toggl API token
+Pattern.compile("(?i)toggl[_-]?api[_-]?token['\"`]?:\\s*['\"`][A-Za-z0-9]{32}['\"`]"), 
+
+// 39. Hardcoded HubSpot API key
+Pattern.compile("(?i)hubspot[_-]?api[_-]?key['\"`]?:\\s*['\"`][A-Za-z0-9]{32,}['\"`]"), 
+
+// 40. Hardcoded Vimeo API secret
+Pattern.compile("(?i)vimeo[_-]?api[_-]?secret['\"`]?:\\s*['\"`][A-Za-z0-9]{32,}['\"`]"), 
+
+// 41-50. Other exposed secrets...
+
+);
+public static final List<Pattern> sourceCodeLeakage = Arrays.asList(
+
+// 1. Hardcoded Shopify API key
+Pattern.compile("shp_[0-9a-fA-F]{32}"), 
+
+// 2. Hardcoded Slack Bot token
+Pattern.compile("xox[baprs]-[0-9]{12}-[0-9]{12}-[0-9a-zA-Z]{24}"), 
+
+// 3. Hardcoded Firebase database URL
+Pattern.compile("https://[a-zA-Z0-9-]+\\.firebaseio\\.com"), 
+
+// 4. Hardcoded Mailgun API key
+Pattern.compile("key-[0-9a-zA-Z]{32}"), 
+
+// 5. Hardcoded Twitch API client secret
+Pattern.compile("(?i)twitch[_-]?client[_-]?secret['\"`]?:\\s*['\"`][A-Za-z0-9]{30,}['\"`]"), 
+
+// 6. Hardcoded Pusher API key
+Pattern.compile("(?i)pusher[_-]?key['\"`]?:\\s*['\"`][A-Za-z0-9_-]{20,}['\"`]"), 
+
+// 7. Hardcoded Zendesk API token
+Pattern.compile("(?i)zendesk[_-]?api[_-]?token['\"`]?:\\s*['\"`][A-Za-z0-9]{40}['\"`]"), 
+
+// 8. Hardcoded Twilio API key
+Pattern.compile("SK[0-9a-fA-F]{32}"), 
+
+// 9. Hardcoded IBM Cloud API key
+Pattern.compile("(?i)ibm[_-]?cloud[_-]?api[_-]?key['\"`]?:\\s*['\"`][A-Za-z0-9-_]{44}['\"`]"), 
+
+// 10. Hardcoded MongoDB connection string
+Pattern.compile("mongodb(?:\\+srv)?:\\/\\/[A-Za-z0-9._%+-]+:[A-Za-z0-9._%+-]+@[^\\s]+"), 
+
+// 11. Hardcoded OpenAI API key
+Pattern.compile("sk-[A-Za-z0-9]{48}"), 
+
+// 12. Hardcoded GitLab personal access token
+Pattern.compile("glpat-[A-Za-z0-9-_]{20,}"), 
+
+// 13. Hardcoded Bitbucket client secret
+Pattern.compile("(?i)bitbucket[_-]?client[_-]?secret['\"`]?:\\s*['\"`][A-Za-z0-9]{32}['\"`]"), 
+
+// 14. Hardcoded Sentry DSN
+Pattern.compile("https://[0-9a-f]{32}@[a-z0-9.-]+/\\d+"), 
+
+// 15. Hardcoded Adobe API key
+Pattern.compile("(?i)adobe[_-]?api[_-]?key['\"`]?:\\s*['\"`][A-Za-z0-9-_]{32}['\"`]"), 
+
+// 16. Exposed `.env` file references
+Pattern.compile("(?i)(require\\(['\"]dotenv['\"]\\)\\.config\\(\\)|process\\.env\\.[A-Z0-9_]+)"), 
+
+// 17. Exposed `.git/config` file
+Pattern.compile("\\.git/config"), 
+
+// 18. Exposed Kubernetes configuration files
+Pattern.compile("(?i)kubernetes[_-]?config['\"`]?:\\s*['\"`][A-Za-z0-9/_-]+['\"`]") 
+
+);
