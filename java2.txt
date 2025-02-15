@@ -1,0 +1,456 @@
+public static final List<Pattern> objectOwnershipPatterns = Arrays.asList(
+
+    // 1. No ownership check before fetching user data
+    Pattern.compile("userRepository\\.findById\\(request\\.getParameter\\(\"userId\"\\)\\)"),
+
+    // 2. No validation of authenticated user before accessing resource
+    Pattern.compile("repository\\.findById\\(.*\\)\\.orElseThrow\\(.*\\)"),
+
+    // 3. Missing ownership check in `@GetMapping` for user-related data
+    Pattern.compile("\\@GetMapping\\(\"/user/.*\"\\)"),
+
+    // 4. Allowing unrestricted modification of user details
+    Pattern.compile("\\@PostMapping\\(\"/user/update\"\\)"),
+
+    // 5. No ownership check when deleting a record
+    Pattern.compile("\\@DeleteMapping\\(\"/delete/.*\"\\)"),
+
+    // 6. Allowing users to modify another user's profile without validation
+    Pattern.compile("profileService\\.updateProfile\\(.*\\)"),
+
+    // 7. Missing security validation in `JpaRepository` operations
+    Pattern.compile("JpaRepository\\.<.*>.*save\\(.*\\)"),
+
+    // 8. No validation for retrieving another user's transactions
+    Pattern.compile("\\@GetMapping\\(\"/transactions/user/.*\"\\)"),
+
+    // 9. Allowing direct retrieval of another user's email without verification
+    Pattern.compile("\\@GetMapping\\(\"/users/email/.*\"\\)"),
+
+    // 10. No ownership check before updating payment method
+    Pattern.compile("\\@PostMapping\\(\"/payment-methods/update\"\\)"),
+
+    // 11. Unrestricted modification of organization details by any user
+    Pattern.compile("\\@PostMapping\\(\"/organization/update\"\\)"),
+
+    // 12. No verification of ownership when deleting API keys
+    Pattern.compile("\\@DeleteMapping\\(\"/api-keys/delete/.*\"\\)"),
+
+    // 13. Missing ownership validation in session termination
+    Pattern.compile("\\@PostMapping\\(\"/sessions/terminate\"\\)"),
+
+    // 14. Unrestricted retrieval of another user's contact details
+    Pattern.compile("\\@GetMapping\\(\"/contacts/user/.*\"\\)"),
+
+    // 15. No verification of user before updating notification settings
+    Pattern.compile("\\@PostMapping\\(\"/notifications/update\"\\)"),
+
+    // 16. Missing ownership validation before retrieving user logs
+    Pattern.compile("\\@GetMapping\\(\"/user/logs\"\\)"),
+
+    // 17. Unrestricted deletion of another user's files
+    Pattern.compile("\\@DeleteMapping\\(\"/files/delete/.*\"\\)"),
+
+    // 18. No user ownership verification before exporting account data
+    Pattern.compile("\\@GetMapping\\(\"/export/user-data\"\\)"),
+
+    // 19. Missing ownership validation before retrieving chat history
+    Pattern.compile("\\@GetMapping\\(\"/chats/.*\"\\)"),
+
+    // 20. Allowing unrestricted reset of another user's password
+    Pattern.compile("\\@PostMapping\\(\"/reset-password/.*\"\\)"),
+
+    // 21. No validation of user ID before updating access permissions
+    Pattern.compile("\\@PostMapping\\(\"/permissions/update\"\\)"),
+
+    // 22. Unrestricted deletion of another user's comments
+    Pattern.compile("\\@DeleteMapping\\(\"/comments/delete/.*\"\\)"),
+
+    // 23. No ownership check in retrieving order history
+    Pattern.compile("\\@GetMapping\\(\"/orders/user/.*\"\\)"),
+
+    // 24. Unverified access to another user's invoices
+    Pattern.compile("\\@GetMapping\\(\"/billing/invoice/.*\"\\)"),
+
+    // 25. No ownership validation when modifying admin roles
+    Pattern.compile("\\@PostMapping\\(\"/admin/roles/update\"\\)"),
+
+    // 26. Allowing users to modify another user’s security settings
+    Pattern.compile("\\@PostMapping\\(\"/security-settings/update\"\\)"),
+
+    // 27. No ownership check when retrieving saved addresses
+    Pattern.compile("\\@GetMapping\\(\"/addresses/user/.*\"\\)"),
+
+    // 28. Allowing unrestricted modification of account preferences
+    Pattern.compile("\\@PostMapping\\(\"/preferences/update\"\\)"),
+
+    // 29. No validation before modifying stored payment details
+    Pattern.compile("\\@PostMapping\\(\"/payments/update\"\\)"),
+
+    // 30. Unverified deletion of user-generated content
+    Pattern.compile("\\@DeleteMapping\\(\"/content/delete/.*\"\\)"),
+
+    // 31. No ownership verification when retrieving API usage statistics
+    Pattern.compile("\\@GetMapping\\(\"/api-usage/user/.*\"\\)"),
+
+    // 32. Allowing unrestricted modification of another user's roles
+    Pattern.compile("\\@PostMapping\\(\"/roles/assign\"\\)"),
+
+    // 33. No ownership validation when modifying account subscriptions
+    Pattern.compile("\\@PostMapping\\(\"/subscription/update\"\\)"),
+
+    // 34. Allowing users to update another user's access control settings
+    Pattern.compile("\\@PostMapping\\(\"/access-control/update\"\\)"),
+
+    // 35. No user ownership check when deleting saved searches
+    Pattern.compile("\\@DeleteMapping\\(\"/saved-searches/delete/.*\"\\)"),
+
+    // 36. Missing ownership verification when fetching audit logs
+    Pattern.compile("\\@GetMapping\\(\"/audit-logs/user/.*\"\\)"),
+
+    // 37. No validation before retrieving private user messages
+    Pattern.compile("\\@GetMapping\\(\"/messages/private/.*\"\\)"),
+
+    // 38. Unrestricted modifications of another user's security settings
+    Pattern.compile("\\@PostMapping\\(\"/security/update\"\\)"),
+
+    // 39. No ownership verification before exporting financial reports
+    Pattern.compile("\\@GetMapping\\(\"/finance/export\"\\)"),
+
+    // 40. Allowing users to modify another user's data backup settings
+    Pattern.compile("\\@PostMapping\\(\"/backup/update\"\\)"),
+
+    // 41. Missing verification before retrieving sensitive user analytics
+    Pattern.compile("\\@GetMapping\\(\"/analytics/user/.*\"\\)"),
+
+    // 42. No ownership validation when updating social media links
+    Pattern.compile("\\@PostMapping\\(\"/social-links/update\"\\)"),
+
+    // 43. Unrestricted deletion of another user's shopping cart items
+    Pattern.compile("\\@DeleteMapping\\(\"/cart/remove/.*\"\\)"),
+
+    // 44. No ownership validation in retrieving private forum posts
+    Pattern.compile("\\@GetMapping\\(\"/forum/posts/.*\"\\)"),
+
+    // 45. Missing security validation before deleting stored credentials
+    Pattern.compile("\\@DeleteMapping\\(\"/credentials/delete\"\\)"),
+
+    // 46. Unrestricted deletion of another user's profile picture
+    Pattern.compile("\\@DeleteMapping\\(\"/profile/delete-picture\"\\)"),
+
+    // 47. No validation of user ownership when resetting MFA settings
+    Pattern.compile("\\@PostMapping\\(\"/mfa/reset\"\\)"),
+
+    // 48. Unrestricted deletion of another user's subscriptions
+    Pattern.compile("\\@DeleteMapping\\(\"/subscription/cancel/.*\"\\)"),
+
+    // 49. No ownership check when modifying connected third-party accounts
+    Pattern.compile("\\@PostMapping\\(\"/third-party/update\"\\)"),
+
+    // 50. Allowing users to delete another user's API credentials
+    Pattern.compile("\\@DeleteMapping\\(\"/api-credentials/delete/.*\"\\)")
+);
+public static final List<Pattern> objectOwnershipPatterns = Arrays.asList(
+
+    // 51. No ownership check before modifying user profile
+    Pattern.compile("\\@PostMapping\\(\"/user/profile/update\"\\)"),
+
+    // 52. Unrestricted access to another user's payment history
+    Pattern.compile("\\@GetMapping\\(\"/payments/history/.*\"\\)"),
+
+    // 53. Missing ownership check when updating a user's address
+    Pattern.compile("\\@PostMapping\\(\"/user/address/update\"\\)"),
+
+    // 54. No validation before modifying another user's saved items
+    Pattern.compile("\\@PostMapping\\(\"/saved-items/update\"\\)"),
+
+    // 55. Allowing unauthorized users to retrieve personal data backups
+    Pattern.compile("\\@GetMapping\\(\"/backup/download\"\\)"),
+
+    // 56. No verification before updating an email linked to an account
+    Pattern.compile("\\@PostMapping\\(\"/user/email/update\"\\)"),
+
+    // 57. Allowing modification of another user's reward points
+    Pattern.compile("\\@PostMapping\\(\"/rewards/update\"\\)"),
+
+    // 58. No validation before deleting another user's gift cards
+    Pattern.compile("\\@DeleteMapping\\(\"/gift-cards/delete/.*\"\\)"),
+
+    // 59. Allowing direct update of another user's settings
+    Pattern.compile("userSettingsRepository\\.save\\(.*\\)"),
+
+    // 60. No ownership check before fetching private project details
+    Pattern.compile("\\@GetMapping\\(\"/projects/private/.*\"\\)"),
+
+    // 61. Unrestricted access to modifying security questions
+    Pattern.compile("\\@PostMapping\\(\"/security-questions/update\"\\)"),
+
+    // 62. No ownership validation before linking bank accounts
+    Pattern.compile("\\@PostMapping\\(\"/bank-account/link\"\\)"),
+
+    // 63. Allowing unrestricted deletion of another user's feedback
+    Pattern.compile("\\@DeleteMapping\\(\"/feedback/delete/.*\"\\)"),
+
+    // 64. No verification before modifying stored device information
+    Pattern.compile("\\@PostMapping\\(\"/devices/update\"\\)"),
+
+    // 65. Unchecked access to modifying product reviews
+    Pattern.compile("\\@PostMapping\\(\"/reviews/update\"\\)"),
+
+    // 66. Missing ownership check in accessing shared documents
+    Pattern.compile("\\@GetMapping\\(\"/documents/shared/.*\"\\)"),
+
+    // 67. No validation before modifying another user's calendar events
+    Pattern.compile("\\@PostMapping\\(\"/calendar/events/update\"\\)"),
+
+    // 68. Unrestricted access to delete another user's uploaded images
+    Pattern.compile("\\@DeleteMapping\\(\"/images/delete/.*\"\\)"),
+
+    // 69. No ownership check when viewing another user's draft posts
+    Pattern.compile("\\@GetMapping\\(\"/posts/drafts/.*\"\\)"),
+
+    // 70. Allowing users to modify another user's forum threads
+    Pattern.compile("\\@PostMapping\\(\"/forum/threads/update\"\\)"),
+
+    // 71. No verification before modifying application settings
+    Pattern.compile("\\@PostMapping\\(\"/app-settings/update\"\\)"),
+
+    // 72. Missing validation when modifying employee performance records
+    Pattern.compile("\\@PostMapping\\(\"/performance/update\"\\)"),
+
+    // 73. Unrestricted modification of someone else's employment details
+    Pattern.compile("\\@PostMapping\\(\"/employment/update\"\\)"),
+
+    // 74. Allowing unauthorized users to modify e-commerce orders
+    Pattern.compile("\\@PostMapping\\(\"/orders/update\"\\)"),
+
+    // 75. No ownership validation before modifying subscription preferences
+    Pattern.compile("\\@PostMapping\\(\"/subscriptions/update\"\\)"),
+
+    // 76. Unchecked modification of content publishing settings
+    Pattern.compile("\\@PostMapping\\(\"/content/publish/update\"\\)"),
+
+    // 77. No validation before deleting another user's ad campaigns
+    Pattern.compile("\\@DeleteMapping\\(\"/ads/delete/.*\"\\)"),
+
+    // 78. Allowing unrestricted modifications of payment invoices
+    Pattern.compile("\\@PostMapping\\(\"/invoices/update\"\\)"),
+
+    // 79. No ownership verification when downloading another user's report
+    Pattern.compile("\\@GetMapping\\(\"/reports/download/.*\"\\)"),
+
+    // 80. Unrestricted access to another user's audit log
+    Pattern.compile("\\@GetMapping\\(\"/audit-logs/user/.*\"\\)"),
+
+    // 81. Missing verification when modifying connected devices
+    Pattern.compile("\\@PostMapping\\(\"/connected-devices/update\"\\)"),
+
+    // 82. No validation before changing customer support tickets
+    Pattern.compile("\\@PostMapping\\(\"/support/tickets/update\"\\)"),
+
+    // 83. Unchecked access to modifying payment terms
+    Pattern.compile("\\@PostMapping\\(\"/payment-terms/update\"\\)"),
+
+    // 84. Allowing unrestricted access to modify warehouse inventory
+    Pattern.compile("\\@PostMapping\\(\"/inventory/update\"\\)"),
+
+    // 85. No ownership check before deleting another user's project files
+    Pattern.compile("\\@DeleteMapping\\(\"/project-files/delete/.*\"\\)"),
+
+    // 86. Allowing users to modify another organization's policies
+    Pattern.compile("\\@PostMapping\\(\"/organization/policies/update\"\\)"),
+
+    // 87. No validation before modifying shipment details
+    Pattern.compile("\\@PostMapping\\(\"/shipment/update\"\\)"),
+
+    // 88. Unrestricted modification of other users' app themes
+    Pattern.compile("\\@PostMapping\\(\"/themes/update\"\\)"),
+
+    // 89. No ownership validation before updating loyalty program status
+    Pattern.compile("\\@PostMapping\\(\"/loyalty/update\"\\)"),
+
+    // 90. Allowing unrestricted deletion of customer data
+    Pattern.compile("\\@DeleteMapping\\(\"/customers/delete/.*\"\\)"),
+
+    // 91. No validation before modifying organization billing information
+    Pattern.compile("\\@PostMapping\\(\"/billing/update\"\\)"),
+
+    // 92. Missing ownership check before modifying user email templates
+    Pattern.compile("\\@PostMapping\\(\"/email/templates/update\"\\)"),
+
+    // 93. Unrestricted deletion of another user's social media posts
+    Pattern.compile("\\@DeleteMapping\\(\"/social-posts/delete/.*\"\\)"),
+
+    // 94. No ownership validation when accessing restricted datasets
+    Pattern.compile("\\@GetMapping\\(\"/datasets/restricted/.*\"\\)"),
+
+    // 95. Allowing unrestricted edits of user API keys
+    Pattern.compile("\\@PostMapping\\(\"/api-keys/edit\"\\)"),
+
+    // 96. No ownership check before changing report visibility
+    Pattern.compile("\\@PostMapping\\(\"/reports/visibility/update\"\\)"),
+
+    // 97. Unrestricted modifications of another user's saved search filters
+    Pattern.compile("\\@PostMapping\\(\"/search-filters/update\"\\)"),
+
+    // 98. No validation before changing meeting schedules
+    Pattern.compile("\\@PostMapping\\(\"/meetings/update\"\\)"),
+
+    // 99. Unchecked updates to membership statuses
+    Pattern.compile("\\@PostMapping\\(\"/membership/update\"\\)"),
+
+    // 100. Missing validation when modifying app configurations
+    Pattern.compile("\\@PostMapping\\(\"/app/config/update\"\\)")
+);
+public static final List<Pattern> objectOwnershipPatterns = Arrays.asList(
+
+    // 101. No ownership check before fetching another user's uploaded videos
+    Pattern.compile("\\@GetMapping\\(\"/videos/user/.*\"\\)"),
+
+    // 102. Unrestricted modification of another user's wish list
+    Pattern.compile("\\@PostMapping\\(\"/wishlist/update\"\\)"),
+
+    // 103. No ownership validation before deleting a team project
+    Pattern.compile("\\@DeleteMapping\\(\"/team/projects/delete/.*\"\\)"),
+
+    // 104. Allowing users to modify another user's shipping preferences
+    Pattern.compile("\\@PostMapping\\(\"/shipping/preferences/update\"\\)"),
+
+    // 105. No validation before accessing another user's tax details
+    Pattern.compile("\\@GetMapping\\(\"/tax-details/user/.*\"\\)"),
+
+    // 106. Unchecked modification of another user's forum replies
+    Pattern.compile("\\@PostMapping\\(\"/forum/replies/update\"\\)"),
+
+    // 107. Missing ownership validation before deleting a scheduled event
+    Pattern.compile("\\@DeleteMapping\\(\"/events/delete/.*\"\\)"),
+
+    // 108. No ownership check before modifying employee payroll details
+    Pattern.compile("\\@PostMapping\\(\"/payroll/update\"\\)"),
+
+    // 109. Allowing unrestricted deletion of another user's notifications
+    Pattern.compile("\\@DeleteMapping\\(\"/notifications/delete/.*\"\\)"),
+
+    // 110. No validation before modifying another user's saved payment methods
+    Pattern.compile("\\@PostMapping\\(\"/payment-methods/update\"\\)"),
+
+    // 111. Unrestricted access to another user's document history
+    Pattern.compile("\\@GetMapping\\(\"/document-history/.*\"\\)"),
+
+    // 112. No ownership check when updating access tokens
+    Pattern.compile("\\@PostMapping\\(\"/access-tokens/update\"\\)"),
+
+    // 113. Missing validation before deleting another user's comments on a blog
+    Pattern.compile("\\@DeleteMapping\\(\"/blog/comments/delete/.*\"\\)"),
+
+    // 114. Allowing users to modify another user's business account details
+    Pattern.compile("\\@PostMapping\\(\"/business/account/update\"\\)"),
+
+    // 115. No verification before accessing restricted reports
+    Pattern.compile("\\@GetMapping\\(\"/reports/restricted/.*\"\\)"),
+
+    // 116. Unrestricted update of another user's software licenses
+    Pattern.compile("\\@PostMapping\\(\"/licenses/update\"\\)"),
+
+    // 117. No ownership check when revoking OAuth access for another user
+    Pattern.compile("\\@PostMapping\\(\"/oauth/revoke\"\\)"),
+
+    // 118. Allowing unrestricted access to modify user avatars
+    Pattern.compile("\\@PostMapping\\(\"/avatar/update\"\\)"),
+
+    // 119. No ownership validation before modifying group memberships
+    Pattern.compile("\\@PostMapping\\(\"/groups/membership/update\"\\)"),
+
+    // 120. Unchecked deletion of another user's external integrations
+    Pattern.compile("\\@DeleteMapping\\(\"/integrations/delete/.*\"\\)"),
+
+    // 121. No validation before modifying project visibility settings
+    Pattern.compile("\\@PostMapping\\(\"/project-visibility/update\"\\)"),
+
+    // 122. Allowing unrestricted modification of email notification settings
+    Pattern.compile("\\@PostMapping\\(\"/email-notifications/update\"\\)"),
+
+    // 123. No ownership validation before deleting order transactions
+    Pattern.compile("\\@DeleteMapping\\(\"/order-transactions/delete/.*\"\\)"),
+
+    // 124. Unrestricted access to modify contact lists
+    Pattern.compile("\\@PostMapping\\(\"/contacts/update\"\\)"),
+
+    // 125. No validation before removing devices from a trusted list
+    Pattern.compile("\\@DeleteMapping\\(\"/trusted-devices/remove/.*\"\\)"),
+
+    // 126. Allowing unrestricted updates to admin panel settings
+    Pattern.compile("\\@PostMapping\\(\"/admin/settings/update\"\\)"),
+
+    // 127. No ownership validation before modifying social media integrations
+    Pattern.compile("\\@PostMapping\\(\"/social-media/update\"\\)"),
+
+    // 128. Unrestricted modification of another user's team roles
+    Pattern.compile("\\@PostMapping\\(\"/team/roles/update\"\\)"),
+
+    // 129. No ownership check before changing saved database queries
+    Pattern.compile("\\@PostMapping\\(\"/saved-queries/update\"\\)"),
+
+    // 130. Allowing unrestricted updates to authentication preferences
+    Pattern.compile("\\@PostMapping\\(\"/auth-preferences/update\"\\)"),
+
+    // 131. No validation before deleting support chat messages
+    Pattern.compile("\\@DeleteMapping\\(\"/support/messages/delete/.*\"\\)"),
+
+    // 132. Unchecked modifications of API rate limits for another user
+    Pattern.compile("\\@PostMapping\\(\"/api-rate-limits/update\"\\)"),
+
+    // 133. No ownership validation before modifying advertising campaigns
+    Pattern.compile("\\@PostMapping\\(\"/ads/campaigns/update\"\\)"),
+
+    // 134. Allowing unrestricted modification of another user's direct messages
+    Pattern.compile("\\@PostMapping\\(\"/messages/update\"\\)"),
+
+    // 135. No ownership verification before modifying user-created templates
+    Pattern.compile("\\@PostMapping\\(\"/templates/update\"\\)"),
+
+    // 136. Unrestricted modification of user metadata in analytics dashboards
+    Pattern.compile("\\@PostMapping\\(\"/analytics-metadata/update\"\\)"),
+
+    // 137. No validation before changing DNS records for a user's domain
+    Pattern.compile("\\@PostMapping\\(\"/dns/update\"\\)"),
+
+    // 138. Allowing unrestricted deletion of user-generated surveys
+    Pattern.compile("\\@DeleteMapping\\(\"/surveys/delete/.*\"\\)"),
+
+    // 139. No ownership check before modifying API key access levels
+    Pattern.compile("\\@PostMapping\\(\"/api-keys/permissions/update\"\\)"),
+
+    // 140. Unrestricted modification of another user's Git repository settings
+    Pattern.compile("\\@PostMapping\\(\"/git/settings/update\"\\)"),
+
+    // 141. No validation before retrieving sensitive backup logs
+    Pattern.compile("\\@GetMapping\\(\"/backup/logs/.*\"\\)"),
+
+    // 142. Unchecked updates to another user's real-time notifications
+    Pattern.compile("\\@PostMapping\\(\"/real-time-notifications/update\"\\)"),
+
+    // 143. No ownership verification before modifying blockchain wallet keys
+    Pattern.compile("\\@PostMapping\\(\"/wallet/keys/update\"\\)"),
+
+    // 144. Allowing unrestricted access to modify cloud storage folders
+    Pattern.compile("\\@PostMapping\\(\"/cloud-storage/folders/update\"\\)"),
+
+    // 145. No validation before removing another user's saved API tokens
+    Pattern.compile("\\@DeleteMapping\\(\"/api-tokens/delete/.*\"\\)"),
+
+    // 146. Unrestricted access to modify restricted access logs
+    Pattern.compile("\\@PostMapping\\(\"/access-logs/update\"\\)"),
+
+    // 147. No ownership check before modifying SSO settings
+    Pattern.compile("\\@PostMapping\\(\"/sso/update\"\\)"),
+
+    // 148. Unchecked modifications of firewall rules for another user
+    Pattern.compile("\\@PostMapping\\(\"/firewall/update\"\\)"),
+
+    // 149. No validation before modifying private knowledge base articles
+    Pattern.compile("\\@PostMapping\\(\"/knowledge-base/articles/update\"\\)"),
+
+    // 150. Allowing unrestricted deletion of encrypted vault data
+    Pattern.compile("\\@DeleteMapping\\(\"/vault-data/delete/.*\"\\)")
+);
