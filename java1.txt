@@ -455,3 +455,459 @@ public static final List<Pattern> idorPatternsMore = Arrays.asList(
     // 150. Not verifying `Origin` header in CORS policy
     Pattern.compile("cors\\.setAllowedOrigins\\(Collections\\.singletonList\\(\"*\"\\)\\)")
 );
+public static final List<Pattern> rbacPatterns = Arrays.asList(
+
+    // 1. No role check in API endpoint (publicly accessible)
+    Pattern.compile("\\@RequestMapping\\(\".*\"\\)\\s*public\\s+ResponseEntity"),
+
+    // 2. Exposed sensitive admin routes without RBAC enforcement
+    Pattern.compile("\\@RequestMapping\\(\"/admin/.*\"\\)"),
+
+    // 3. No `@PreAuthorize` or `@RolesAllowed` on critical actions
+    Pattern.compile("public\\s+ResponseEntity<.*>\\s+[a-zA-Z]+\\(.*@RequestParam"),
+
+    // 4. Unprotected user management endpoints
+    Pattern.compile("\\@RequestMapping\\(\"/user-management\"\\)"),
+
+    // 5. No `hasRole()` or `hasAuthority()` in security configuration
+    Pattern.compile("httpSecurity\\.authorizeRequests\\(\\)\\.anyRequest\\(\\)\\.authenticated\\(\\)"),
+
+    // 6. Allowing unauthenticated API access without any role enforcement
+    Pattern.compile("httpSecurity\\.authorizeRequests\\(\\)\\.antMatchers\\(\"/.*\"\\)\\.permitAll"),
+
+    // 7. No authentication required for accessing user profiles
+    Pattern.compile("\\@GetMapping\\(\"/profile\"\\)"),
+
+    // 8. Missing role validation in API requests
+    Pattern.compile("return ResponseEntity\\.ok\\(repository\\.findById\\("),
+
+    // 9. No role check when deleting users
+    Pattern.compile("\\@DeleteMapping\\(\"/users/.*\"\\)"),
+
+    // 10. Missing RBAC checks for modifying user permissions
+    Pattern.compile("\\@PostMapping\\(\"/users/updateRole\"\\)"),
+
+    // 11. No authorization checks when listing all users
+    Pattern.compile("\\@GetMapping\\(\"/users\"\\)"),
+
+    // 12. Exposing sensitive endpoints via GraphQL without access control
+    Pattern.compile("\\@QueryMapping\\(\".*\"\\)"),
+
+    // 13. Direct access to database records without RBAC filtering
+    Pattern.compile("repository\\.findById\\(request\\.getParameter"),
+
+    // 14. Not verifying user roles when performing sensitive actions
+    Pattern.compile("repository\\.delete\\(request\\.getParameter"),
+
+    // 15. Missing `@Secured` annotation on admin-only actions
+    Pattern.compile("public\\s+[a-zA-Z0-9<>]+\\s+[a-zA-Z0-9]+\\(.*\\)\\s*\\{"),
+
+    // 16. No explicit authentication enforcement in WebSocket endpoints
+    Pattern.compile("\\@ServerEndpoint\\(\".*\"\\)"),
+
+    // 17. Publicly exposed API endpoints with sensitive data
+    Pattern.compile("\\@GetMapping\\(\"/admin/settings\"\\)"),
+
+    // 18. Missing `@PreAuthorize` on repository methods
+    Pattern.compile("public\\s+[a-zA-Z0-9]+\\s+[a-zA-Z0-9]+\\(.*JpaRepository"),
+
+    // 19. Exposing user details via public API
+    Pattern.compile("\\@GetMapping\\(\"/user/details\"\\)"),
+
+    // 20. Unprotected file upload endpoint
+    Pattern.compile("\\@PostMapping\\(\"/upload\"\\)"),
+
+    // 21. Unrestricted file download access
+    Pattern.compile("\\@GetMapping\\(\"/download\"\\)"),
+
+    // 22. No authentication required for accessing logs
+    Pattern.compile("\\@GetMapping\\(\"/logs\"\\)"),
+
+    // 23. Allowing admin actions without role verification
+    Pattern.compile("repository\\.deleteById\\(request\\.getParameter"),
+
+    // 24. Unprotected endpoints allowing account deletion
+    Pattern.compile("\\@DeleteMapping\\(\"/account/delete\"\\)"),
+
+    // 25. Allowing access to admin dashboard without role enforcement
+    Pattern.compile("\\@GetMapping\\(\"/admin/dashboard\"\\)"),
+
+    // 26. Allowing unrestricted user role changes
+    Pattern.compile("\\@PostMapping\\(\"/updateRole\"\\)"),
+
+    // 27. Missing ownership validation when modifying user details
+    Pattern.compile("userRepository\\.save\\("),
+
+    // 28. Using `permitAll()` on sensitive actions
+    Pattern.compile("httpSecurity\\.authorizeRequests\\(\\)\\.antMatchers\\(\"/admin\"\\)\\.permitAll"),
+
+    // 29. No security checks when performing financial transactions
+    Pattern.compile("\\@PostMapping\\(\"/payment\"\\)"),
+
+    // 30. Allowing user enumeration via error messages
+    Pattern.compile("return ResponseEntity\\.status\\(HttpStatus\\.UNAUTHORIZED\\)\\.body\\(\"Invalid username\"\\)"),
+
+    // 31. No rate-limiting on authentication endpoints
+    Pattern.compile("return ResponseEntity\\.ok\\(.*\\)"),
+
+    // 32. Allowing unrestricted API token generation
+    Pattern.compile("Jwts\\.builder\\(\\)\\.signWith\\("),
+
+    // 33. Accepting user IDs as URL parameters without verification
+    Pattern.compile("\\@RequestParam\\(\"(id|userId|accountId)\"\\)"),
+
+    // 34. Exposing admin configurations via public API
+    Pattern.compile("\\@GetMapping\\(\"/config/admin\"\\)"),
+
+    // 35. Unrestricted access to password reset functionality
+    Pattern.compile("\\@PostMapping\\(\"/reset-password\"\\)"),
+
+    // 36. Allowing access to sensitive settings without authentication
+    Pattern.compile("\\@GetMapping\\(\"/settings\"\\)"),
+
+    // 37. Missing authentication for creating new users
+    Pattern.compile("\\@PostMapping\\(\"/users/create\"\\)"),
+
+    // 38. Allowing guest users to modify user details
+    Pattern.compile("\\@PutMapping\\(\"/users/update\"\\)"),
+
+    // 39. Exposing internal system logs to public API
+    Pattern.compile("\\@GetMapping\\(\"/system/logs\"\\)"),
+
+    // 40. No access control on deleting database records
+    Pattern.compile("\\@DeleteMapping\\(\"/delete\"\\)"),
+
+    // 41. Missing `@Secured` annotation on admin endpoints
+    Pattern.compile("public\\s+[a-zA-Z0-9<>]+\\s+delete.*\\(.*\\)\\s*\\{"),
+
+    // 42. No role validation in request handling
+    Pattern.compile("return ResponseEntity\\.ok\\(repository\\.getAll\\(\\)\\)"),
+
+    // 43. Allowing guest users to access admin endpoints
+    Pattern.compile("\\@GetMapping\\(\"/admin/reports\"\\)"),
+
+    // 44. No access control for sensitive documents
+    Pattern.compile("\\@GetMapping\\(\"/documents\"\\)"),
+
+    // 45. Allowing unrestricted account creation
+    Pattern.compile("\\@PostMapping\\(\"/signup\"\\)"),
+
+    // 46. No authentication required for modifying configurations
+    Pattern.compile("\\@PostMapping\\(\"/config/update\"\\)"),
+
+    // 47. Allowing unrestricted mass data deletion
+    Pattern.compile("\\@DeleteMapping\\(\"/deleteAll\"\\)"),
+
+    // 48. No authentication on critical actions
+    Pattern.compile("httpSecurity\\.authorizeRequests\\(\\)\\.antMatchers\\(\"/critical\"\\)\\.permitAll"),
+
+    // 49. No authorization enforcement in API controllers
+    Pattern.compile("public\\s+[a-zA-Z0-9<>]+\\s+processRequest\\(.*\\)\\s*\\{"),
+
+    // 50. Unrestricted access to database backups
+    Pattern.compile("\\@GetMapping\\(\"/backup\"\\)")
+);
+public static final List<Pattern> rbacPatterns = Arrays.asList(
+
+    // 51. No role verification on a REST controller method
+    Pattern.compile("\\@RestController\\s*public\\s+class\\s+.*\\{"),
+
+    // 52. Allowing all requests without role validation
+    Pattern.compile("httpSecurity\\.authorizeRequests\\(\\)\\.antMatchers\\(\"/.*\"\\)\\.permitAll\\(\\)"),
+
+    // 53. No access control applied in `@GetMapping`
+    Pattern.compile("\\@GetMapping\\(\"/.*\"\\)"),
+
+    // 54. Missing `@RolesAllowed` annotation for restricted actions
+    Pattern.compile("public\\s+[a-zA-Z0-9]+\\s+[a-zA-Z0-9]+\\(.*\\)\\s*\\{"),
+
+    // 55. No `@PreAuthorize` check on an important method
+    Pattern.compile("public\\s+[a-zA-Z0-9]+\\s+[a-zA-Z0-9]+\\(.*\\)\\s*\\{"),
+
+    // 56. Allowing unrestricted API access to system logs
+    Pattern.compile("\\@GetMapping\\(\"/system/logs\"\\)"),
+
+    // 57. No authentication required for API tokens
+    Pattern.compile("Jwts\\.builder\\(\\)\\.signWith\\("),
+
+    // 58. Missing `hasAuthority()` in Spring Security
+    Pattern.compile("httpSecurity\\.authorizeRequests\\(\\)\\.anyRequest\\(\\)\\.authenticated\\(\\)"),
+
+    // 59. Unrestricted data retrieval from repositories
+    Pattern.compile("repository\\.findAll\\(\\)"),
+
+    // 60. No RBAC validation for deleting records
+    Pattern.compile("\\@DeleteMapping\\(\"/delete/.*\"\\)"),
+
+    // 61. Missing ownership validation in REST controllers
+    Pattern.compile("repository\\.findById\\(request\\.getParameter\\(\"userId\"\\)\\)"),
+
+    // 62. Exposing API without RBAC filtering
+    Pattern.compile("\\@RequestMapping\\(\"/api/.*\"\\)"),
+
+    // 63. Direct access to session attributes without validation
+    Pattern.compile("session\\.getAttribute\\(\".*\"\\)"),
+
+    // 64. No `@Secured` annotation on protected methods
+    Pattern.compile("public\\s+[a-zA-Z0-9<>]+\\s+[a-zA-Z0-9]+\\(.*\\)\\s*\\{"),
+
+    // 65. Allowing unrestricted admin panel access
+    Pattern.compile("\\@GetMapping\\(\"/admin\"\\)"),
+
+    // 66. Missing authentication in WebSocket endpoints
+    Pattern.compile("\\@ServerEndpoint\\(\"/.*\"\\)"),
+
+    // 67. No restrictions on downloading sensitive files
+    Pattern.compile("\\@GetMapping\\(\"/files/download\"\\)"),
+
+    // 68. Allowing unrestricted access to backup files
+    Pattern.compile("\\@GetMapping\\(\"/backup/.*\"\\)"),
+
+    // 69. No authentication checks for system settings modifications
+    Pattern.compile("\\@PostMapping\\(\"/settings/update\"\\)"),
+
+    // 70. Using `.anyRequest().authenticated()` without specific role checks
+    Pattern.compile("httpSecurity\\.authorizeRequests\\(\\)\\.anyRequest\\(\\)\\.authenticated\\(\\)"),
+
+    // 71. Publicly accessible API key management
+    Pattern.compile("\\@GetMapping\\(\"/api-keys\"\\)"),
+
+    // 72. Allowing unrestricted file uploads
+    Pattern.compile("\\@PostMapping\\(\"/upload\"\\)"),
+
+    // 73. No security enforcement on account deletion
+    Pattern.compile("\\@DeleteMapping\\(\"/account/delete\"\\)"),
+
+    // 74. Allowing any user to access payment processing endpoints
+    Pattern.compile("\\@PostMapping\\(\"/payment/process\"\\)"),
+
+    // 75. No ownership verification in repository operations
+    Pattern.compile("repository\\.findById\\(request\\.getParameter\\(\"id\"\\)\\)"),
+
+    // 76. Exposing database configuration endpoints without security
+    Pattern.compile("\\@GetMapping\\(\"/db/config\"\\)"),
+
+    // 77. Allowing unrestricted password changes
+    Pattern.compile("\\@PostMapping\\(\"/change-password\"\\)"),
+
+    // 78. Missing authentication in OAuth authorization endpoints
+    Pattern.compile("\\@GetMapping\\(\"/oauth/authorize\"\\)"),
+
+    // 79. Allowing unrestricted bulk user updates
+    Pattern.compile("\\@PostMapping\\(\"/users/update\"\\)"),
+
+    // 80. No role-based restrictions on API key usage
+    Pattern.compile("return ResponseEntity\\.ok\\(apiKeyRepository\\.findAll\\(\\)\\)"),
+
+    // 81. Missing `@PreAuthorize` in sensitive entity operations
+    Pattern.compile("JpaRepository\\.<.*>.*save\\(.*\\)"),
+
+    // 82. Allowing unrestricted access to user contact details
+    Pattern.compile("\\@GetMapping\\(\"/users/contacts\"\\)"),
+
+    // 83. No security validation on email change requests
+    Pattern.compile("\\@PostMapping\\(\"/change-email\"\\)"),
+
+    // 84. No role-based validation on session management
+    Pattern.compile("\\@GetMapping\\(\"/sessions\"\\)"),
+
+    // 85. Exposing internal API endpoints to unauthorized users
+    Pattern.compile("\\@RequestMapping\\(\"/internal/.*\"\\)"),
+
+    // 86. Allowing unrestricted password recovery requests
+    Pattern.compile("\\@PostMapping\\(\"/recover-password\"\\)"),
+
+    // 87. No access control for user role modifications
+    Pattern.compile("\\@PostMapping\\(\"/roles/update\"\\)"),
+
+    // 88. Missing authentication in API rate-limiting endpoints
+    Pattern.compile("\\@GetMapping\\(\"/rate-limit\"\\)"),
+
+    // 89. Unrestricted access to audit logs
+    Pattern.compile("\\@GetMapping\\(\"/audit-logs\"\\)"),
+
+    // 90. Missing security restrictions on token refresh endpoints
+    Pattern.compile("\\@PostMapping\\(\"/refresh-token\"\\)"),
+
+    // 91. Allowing unrestricted admin password resets
+    Pattern.compile("\\@PostMapping\\(\"/admin/reset-password\"\\)"),
+
+    // 92. No access control for updating application settings
+    Pattern.compile("\\@PostMapping\\(\"/app-settings/update\"\\)"),
+
+    // 93. Allowing unrestricted deletion of API keys
+    Pattern.compile("\\@DeleteMapping\\(\"/api-keys/delete\"\\)"),
+
+    // 94. No authentication required for exporting data
+    Pattern.compile("\\@GetMapping\\(\"/export\"\\)"),
+
+    // 95. Allowing unrestricted access to admin reports
+    Pattern.compile("\\@GetMapping\\(\"/admin/reports\"\\)"),
+
+    // 96. No authentication for external integrations
+    Pattern.compile("\\@GetMapping\\(\"/integrations\"\\)"),
+
+    // 97. Unrestricted access to user notifications
+    Pattern.compile("\\@GetMapping\\(\"/notifications\"\\)"),
+
+    // 98. Allowing unrestricted application logs retrieval
+    Pattern.compile("\\@GetMapping\\(\"/app-logs\"\\)"),
+
+    // 99. No security validation when retrieving user roles
+    Pattern.compile("\\@GetMapping\\(\"/roles\"\\)"),
+
+    // 100. Exposing financial transaction history without RBAC
+    Pattern.compile("\\@GetMapping\\(\"/transactions\"\\)")
+);
+public static final List<Pattern> rbacPatterns = Arrays.asList(
+
+    // 101. Missing `@PreAuthorize` on controller methods
+    Pattern.compile("public\\s+[a-zA-Z0-9<>]+\\s+[a-zA-Z0-9]+\\(.*\\)\\s*\\{"),
+
+    // 102. No authentication required for API access
+    Pattern.compile("httpSecurity\\.authorizeRequests\\(\\)\\.anyRequest\\(\\)\\.permitAll\\(\\)"),
+
+    // 103. Missing `hasRole()` or `hasAuthority()` in security configurations
+    Pattern.compile("httpSecurity\\.authorizeRequests\\(\\)\\.anyRequest\\(\\)\\.authenticated\\(\\)"),
+
+    // 104. Exposing sensitive endpoints without authorization
+    Pattern.compile("\\@GetMapping\\(\"/admin/settings\"\\)"),
+
+    // 105. No security validation in file access controllers
+    Pattern.compile("\\@GetMapping\\(\"/files/.*\"\\)"),
+
+    // 106. Allowing unrestricted API key retrieval
+    Pattern.compile("\\@GetMapping\\(\"/api-keys\"\\)"),
+
+    // 107. No access control for user role modifications
+    Pattern.compile("\\@PostMapping\\(\"/roles/update\"\\)"),
+
+    // 108. Missing `@Secured` annotation for admin endpoints
+    Pattern.compile("public\\s+[a-zA-Z0-9]+\\s+adminFunction\\(.*\\)\\s*\\{"),
+
+    // 109. Unrestricted password resets without authentication
+    Pattern.compile("\\@PostMapping\\(\"/reset-password\"\\)"),
+
+    // 110. No security validation for user deletion
+    Pattern.compile("\\@DeleteMapping\\(\"/users/delete/.*\"\\)"),
+
+    // 111. Missing ownership verification when modifying user data
+    Pattern.compile("userRepository\\.save\\(.*\\)"),
+
+    // 112. Allowing guest users to access user profile endpoints
+    Pattern.compile("\\@GetMapping\\(\"/profile\"\\)"),
+
+    // 113. Unprotected endpoints allowing role assignment
+    Pattern.compile("\\@PostMapping\\(\"/users/assign-role\"\\)"),
+
+    // 114. No role-based access control in repository methods
+    Pattern.compile("JpaRepository\\.<.*>.*save\\(.*\\)"),
+
+    // 115. Exposing session information via unsecured API
+    Pattern.compile("\\@GetMapping\\(\"/session/info\"\\)"),
+
+    // 116. Allowing unrestricted modification of security settings
+    Pattern.compile("\\@PostMapping\\(\"/security/update\"\\)"),
+
+    // 117. No authentication required for data exports
+    Pattern.compile("\\@GetMapping\\(\"/data/export\"\\)"),
+
+    // 118. Allowing unrestricted deletion of database records
+    Pattern.compile("\\@DeleteMapping\\(\"/deleteAll\"\\)"),
+
+    // 119. Missing security validation on WebSocket connections
+    Pattern.compile("\\@ServerEndpoint\\(\"/ws\"\\)"),
+
+    // 120. No access restrictions on retrieving user lists
+    Pattern.compile("\\@GetMapping\\(\"/users\"\\)"),
+
+    // 121. Exposing transaction history without security checks
+    Pattern.compile("\\@GetMapping\\(\"/transactions\"\\)"),
+
+    // 122. Unrestricted session termination
+    Pattern.compile("\\@PostMapping\\(\"/sessions/terminate\"\\)"),
+
+    // 123. No authentication for modifying API keys
+    Pattern.compile("\\@PostMapping\\(\"/api-keys/update\"\\)"),
+
+    // 124. Unrestricted deletion of user data
+    Pattern.compile("\\@DeleteMapping\\(\"/user/delete/.*\"\\)"),
+
+    // 125. Missing authentication for dashboard access
+    Pattern.compile("\\@GetMapping\\(\"/dashboard\"\\)"),
+
+    // 126. Unsecured endpoint for retrieving user logs
+    Pattern.compile("\\@GetMapping\\(\"/user/logs\"\\)"),
+
+    // 127. Allowing unrestricted password updates
+    Pattern.compile("\\@PostMapping\\(\"/user/update-password\"\\)"),
+
+    // 128. No validation when retrieving database backups
+    Pattern.compile("\\@GetMapping\\(\"/backup/files\"\\)"),
+
+    // 129. Missing authentication for creating API tokens
+    Pattern.compile("\\@PostMapping\\(\"/api-token/create\"\\)"),
+
+    // 130. No role-based restrictions on user status updates
+    Pattern.compile("\\@PostMapping\\(\"/user/status/update\"\\)"),
+
+    // 131. Unrestricted access to audit trails
+    Pattern.compile("\\@GetMapping\\(\"/audit-trails\"\\)"),
+
+    // 132. No authentication for accessing sensitive application logs
+    Pattern.compile("\\@GetMapping\\(\"/logs/application\"\\)"),
+
+    // 133. Unsecured access to email templates
+    Pattern.compile("\\@GetMapping\\(\"/email-templates\"\\)"),
+
+    // 134. Missing security checks for modifying user notifications
+    Pattern.compile("\\@PostMapping\\(\"/notifications/update\"\\)"),
+
+    // 135. No authentication required for retrieving organization details
+    Pattern.compile("\\@GetMapping\\(\"/organization/details\"\\)"),
+
+    // 136. Allowing unrestricted deletion of security policies
+    Pattern.compile("\\@DeleteMapping\\(\"/security-policy/delete\"\\)"),
+
+    // 137. No role-based validation for administrative actions
+    Pattern.compile("adminRepository\\.execute\\(.*\\)"),
+
+    // 138. Missing role validation in entity service methods
+    Pattern.compile("public\\s+[a-zA-Z0-9]+\\s+[a-zA-Z0-9]+Service\\(.*\\)\\s*\\{"),
+
+    // 139. Unprotected endpoints for retrieving private messages
+    Pattern.compile("\\@GetMapping\\(\"/messages/private\"\\)"),
+
+    // 140. No authentication required for downloading user-generated content
+    Pattern.compile("\\@GetMapping\\(\"/user-content/download\"\\)"),
+
+    // 141. Allowing unrestricted modification of payment methods
+    Pattern.compile("\\@PostMapping\\(\"/payment-methods/update\"\\)"),
+
+    // 142. No access control for modifying administrator roles
+    Pattern.compile("\\@PostMapping\\(\"/admin/roles/update\"\\)"),
+
+    // 143. Unrestricted access to customer support conversations
+    Pattern.compile("\\@GetMapping\\(\"/support/chats\"\\)"),
+
+    // 144. Missing role validation for modifying email configurations
+    Pattern.compile("\\@PostMapping\\(\"/email/config/update\"\\)"),
+
+    // 145. No authentication for retrieving analytics reports
+    Pattern.compile("\\@GetMapping\\(\"/analytics/reports\"\\)"),
+
+    // 146. Allowing unrestricted deletion of public API endpoints
+    Pattern.compile("\\@DeleteMapping\\(\"/public-api/delete\"\\)"),
+
+    // 147. Unrestricted API calls to access billing history
+    Pattern.compile("\\@GetMapping\\(\"/billing/history\"\\)"),
+
+    // 148. No authentication required for updating subscription plans
+    Pattern.compile("\\@PostMapping\\(\"/subscription/update\"\\)"),
+
+    // 149. Allowing unrestricted modification of system configurations
+    Pattern.compile("\\@PostMapping\\(\"/system/config/update\"\\)"),
+
+    // 150. No role validation when accessing private system endpoints
+    Pattern.compile("\\@RequestMapping\\(\"/system/private\"\\)")
+);
