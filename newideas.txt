@@ -20,3 +20,11 @@ Low-risk commits get auto-approved, while high-risk commits trigger in-depth sec
 Example:
 ✅ Changing CSS files? Auto-approve.
 ❌ Modifying authentication logic? Auto-escalate for manual review.
+
+6. Automated Secure Code Fixes & Patch Generation
+🔹 Auto-Fix for Security Issues with AI Patches
+If a security issue is found in code review, automatically generate a secure patch and suggest it in the PR.
+Example: If SQL Injection is detected, the system auto-rewrites the query with parameterized statements.
+🔹 Zero-Touch Vulnerability Fix Deployment
+If a vulnerability is found, trigger an automated hotfix deployment into staging.
+Verify fixes automatically before merging into production.
