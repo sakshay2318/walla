@@ -1,0 +1,308 @@
+public static final List<Pattern> missingWhitelistValidIdsPatterns = Arrays.asList(
+
+    // 1. No verification if user-provided ID exists in the database
+    Pattern.compile("\\@RequestParam\\(.*id.*\\)\\s+String\\s+id(?!.*repository\\.existsById\\()"), 
+
+    // 2. Directly using user-provided ID in queries without checking its validity
+    Pattern.compile("findById\\(\\s*request\\.getParameter\\(.*id.*\\)\\s*\\)"),
+
+    // 3. No ID validation for path variable endpoints
+    Pattern.compile("\\@PathVariable\\s+String\\s+id(?!.*repository\\.existsById\\()"), 
+
+    // 4. No existence check before modifying a record
+    Pattern.compile("repository\\.save\\(.*new\\s+Entity\\(.*id.*,.*\\)"),
+
+    // 5. Allowing direct ID access without ownership verification
+    Pattern.compile("findById\\(.*userId.*\\)\\.get\\(\\)"), 
+
+    // 6. No whitelist filtering for batch processing
+    Pattern.compile("List<.*>.*findAllById\\(\\s*request\\.(getParameter|getBody)\\(.*ids.*\\)\\)"), 
+
+    // 7. No repository check before deleting records
+    Pattern.compile("deleteById\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 8. No repository existence check before updating
+    Pattern.compile("updateById\\(.*request\\.getParameter\\(.*id.*\\)\\)"), 
+
+    // 9. No database lookup before processing request data
+    Pattern.compile("process\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 10. No explicit mapping of allowed IDs to a user
+    Pattern.compile("findById\\(\\s*request\\.getParameter\\(.*id.*\\)\\s*\\)\\.orElse\\(null\\)"),
+
+    // 11. No access control check when retrieving ID-related data
+    Pattern.compile("return\\s+repository\\.findById\\(.*id.*\\)"),
+
+    // 12. No authorization check when accessing a specific resource
+    Pattern.compile("return\\s+resourceRepository\\.findById\\(.*id.*\\)"),
+
+    // 13. Using unchecked UUID values in queries
+    Pattern.compile("UUID\\.fromString\\(request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 14. Using unchecked integer IDs in queries
+    Pattern.compile("Integer\\.parseInt\\(request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 15. No explicit ownership verification
+    Pattern.compile("repository\\.findById\\(.*id.*\\)\\.map\\(user::process\\)"),
+
+    // 16. Allowing unrestricted access to sensitive ID endpoints
+    Pattern.compile("findAllByUserId\\(\\s*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 17. No validation for dynamically constructed query parameters
+    Pattern.compile("where\\s+id\\s+=\\s*'\"\\s*\\+\\s*request\\.getParameter\\(.*id.*\\)"),
+
+    // 18. Accepting user-provided IDs without verification
+    Pattern.compile("getUserById\\(request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 19. Allowing API calls with arbitrary user IDs
+    Pattern.compile("apiClient\\.getUserById\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 20. No whitelist check for external system ID validation
+    Pattern.compile("externalService\\.findById\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 21. No constraint validation on ID fields
+    Pattern.compile("private\\s+String\\s+id\\s*;\\s*(?!.*@Pattern)"),
+
+    // 22. No range limit on numeric ID fields
+    Pattern.compile("private\\s+int\\s+id\\s*;\\s*(?!.*@Min)"),
+
+    // 23. Using unchecked ID input in SQL statements
+    Pattern.compile("SELECT\\s+.*\\s+FROM\\s+.*\\s+WHERE\\s+id\\s*=\\s*'\\+\\s*request\\.getParameter\\(.*id.*\\)"),
+
+    // 24. No verification of ID length before database queries
+    Pattern.compile("if\\s*\\(.*id.*\\.length\\(\\)\\s*>\\s*36\\)"),
+
+    // 25. No validation of expected format for ID fields
+    Pattern.compile("private\\s+String\\s+id\\s*;\\s*(?!.*@Pattern\\(regexp.*\\))"),
+
+    // 26. Allowing arbitrary changes to user profiles
+    Pattern.compile("updateUserProfile\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 27. No lookup validation before assigning IDs to objects
+    Pattern.compile("new\\s+User\\(.*id.*,.*\\)"),
+
+    // 28. Allowing direct database modification without user confirmation
+    Pattern.compile("update\\(request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 29. No authorization check when modifying ID-bound resources
+    Pattern.compile("modifyById\\(request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 30. Accepting raw user-provided IDs in entity updates
+    Pattern.compile("setId\\(request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 31. No security control for sensitive ID-related functions
+    Pattern.compile("deleteUserById\\(request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 32. No ID verification when setting account privileges
+    Pattern.compile("setPrivileges\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 33. Allowing unrestricted batch deletion of records
+    Pattern.compile("deleteByIdIn\\(request\\.getParameter\\(.*ids.*\\)\\)"),
+
+    // 34. No cross-checking user session with provided ID
+    Pattern.compile("session\\.getAttribute\\(.*id.*\\)"),
+
+    // 35. Using unchecked ID input in admin panels
+    Pattern.compile("adminService\\.findById\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 36. Using unchecked ID input for financial transactions
+    Pattern.compile("transactionService\\.processPayment\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 37. No validation for accessing shared workspace resources
+    Pattern.compile("workspaceRepository\\.findById\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 38. No whitelist enforcement for internal service calls
+    Pattern.compile("internalApi\\.getById\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 39. No business rule enforcement for ID uniqueness
+    Pattern.compile("repository\\.existsById\\(.*id.*\\)"),
+
+    // 40. Allowing modification of protected system IDs
+    Pattern.compile("updateSystemSettings\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 41. No validation for event listener ID parameters
+    Pattern.compile("eventListener\\.process\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 42. Using unchecked ID parameters in email services
+    Pattern.compile("emailService\\.sendToUserId\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 43. No verification of referenced objects in lookup tables
+    Pattern.compile("lookupRepository\\.findById\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 44. No ID validation in audit logging
+    Pattern.compile("auditLogger\\.logAccess\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 45. No ownership validation in comment sections
+    Pattern.compile("commentRepository\\.findById\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 46. No validation for push notification recipients
+    Pattern.compile("pushNotificationService\\.sendToId\\(.*request\\.getParameter\\(.*id.*\\)\\)")
+
+);
+public static final List<Pattern> missingWhitelistValidIdsPatterns = Arrays.asList(
+
+    // 47. Directly accessing database records without validation
+    Pattern.compile("entityRepository\\.getOne\\(request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 48. Using unchecked user ID in service calls
+    Pattern.compile("userService\\.getUser\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 49. Using unchecked IDs in controller methods
+    Pattern.compile("public ResponseEntity<.*>.*\\(@PathVariable\\(.*id.*\\)\\s+String\\s+id"),
+
+    // 50. No validation for batch delete operations
+    Pattern.compile("deleteAllByIdInBatch\\(request\\.getParameter\\(.*ids.*\\)\\)"),
+
+    // 51. Using unchecked values in authorization logic
+    Pattern.compile("authService\\.validate\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 52. No check before adding new entries with IDs
+    Pattern.compile("repository\\.save\\(new\\s+Entity\\(request\\.getParameter\\(.*id.*\\),"),
+
+    // 53. Allowing unrestricted access to admin endpoints
+    Pattern.compile("adminRepository\\.getById\\(request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 54. Using unchecked IDs in file access
+    Pattern.compile("fileService\\.getFileById\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 55. No validation in event-driven processing
+    Pattern.compile("eventService\\.trigger\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 56. Accepting raw ID inputs in query builder
+    Pattern.compile("queryBuilder\\.select\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 57. No validation for API pagination
+    Pattern.compile("apiService\\.fetchAll\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 58. No filtering for privileged operations
+    Pattern.compile("updateAdminUser\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 59. Allowing modification of security settings
+    Pattern.compile("securityConfigService\\.update\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 60. No verification in system logs
+    Pattern.compile("logService\\.record\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 61. No ownership validation for session-based access
+    Pattern.compile("sessionService\\.fetchSessionById\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 62. Using unchecked IDs in notification services
+    Pattern.compile("notificationService\\.send\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 63. No validation for cloud storage access
+    Pattern.compile("cloudStorageService\\.getFile\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 64. No restriction for bulk user updates
+    Pattern.compile("updateMultipleUsers\\(.*request\\.getParameter\\(.*ids.*\\)\\)"),
+
+    // 65. Using unchecked IDs in email services
+    Pattern.compile("emailNotificationService\\.sendEmail\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 66. No validation for API key assignments
+    Pattern.compile("apiKeyService\\.assignToUser\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 67. Using unchecked IDs in OAuth services
+    Pattern.compile("oauthService\\.getTokenByUserId\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 68. No validation before processing payments
+    Pattern.compile("paymentService\\.processTransaction\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 69. No authorization check when modifying user groups
+    Pattern.compile("userGroupService\\.updateGroup\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 70. No check before revoking access
+    Pattern.compile("accessControlService\\.revoke\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 71. Allowing unrestricted admin actions
+    Pattern.compile("adminService\\.modifyConfig\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 72. Using unchecked IDs in analytics reports
+    Pattern.compile("analyticsService\\.generateReport\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 73. No restriction on system-wide user actions
+    Pattern.compile("systemUserService\\.getSystemUser\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 74. Using unchecked IDs for permission modifications
+    Pattern.compile("permissionService\\.modifyPermissions\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 75. No verification for identity federation services
+    Pattern.compile("identityFederationService\\.getUserById\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 76. Using unchecked IDs in HR systems
+    Pattern.compile("hrService\\.fetchEmployeeRecord\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 77. No restriction on data exports
+    Pattern.compile("dataExportService\\.exportData\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 78. Allowing bulk deletion without ID verification
+    Pattern.compile("deleteUsersById\\(request\\.getParameter\\(.*ids.*\\)\\)"),
+
+    // 79. No check before modifying third-party integrations
+    Pattern.compile("thirdPartyIntegrationService\\.update\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 80. Using unchecked IDs in financial audit trails
+    Pattern.compile("auditTrailService\\.logTransaction\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 81. No restriction on high-privilege role modifications
+    Pattern.compile("roleService\\.changeRole\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 82. Using unchecked IDs for database migrations
+    Pattern.compile("databaseMigrationService\\.applyMigration\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 83. No validation for regulatory compliance reports
+    Pattern.compile("complianceReportService\\.generateReport\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 84. Allowing unrestricted access to software licenses
+    Pattern.compile("licenseService\\.getLicenseById\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 85. Using unchecked IDs in incident response logs
+    Pattern.compile("incidentResponseService\\.logIncident\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 86. No verification for cross-account service access
+    Pattern.compile("crossAccountService\\.getAccountById\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 87. Using unchecked IDs in API throttling mechanisms
+    Pattern.compile("apiThrottlingService\\.applyLimit\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 88. No validation for biometric authentication records
+    Pattern.compile("biometricAuthService\\.fetchRecord\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 89. Allowing modification of DNS records without verification
+    Pattern.compile("dnsService\\.modifyRecord\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 90. Using unchecked IDs in blockchain transactions
+    Pattern.compile("blockchainService\\.executeTransaction\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 91. No validation for IoT device configurations
+    Pattern.compile("iotService\\.updateDeviceSettings\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 92. Using unchecked IDs in digital identity verification
+    Pattern.compile("digitalIdentityService\\.verifyIdentity\\(.*request\\.getParameter\\(.*id.*\\)\\)")
+
+);
+public static final List<Pattern> missingWhitelistValidIdsPatterns = Arrays.asList(
+
+    // 93. No validation before updating user profile
+    Pattern.compile("userProfileService\\.updateProfile\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 94. Using unchecked IDs in security alert configurations
+    Pattern.compile("securityAlertService\\.configureAlert\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 95. No verification before accessing cloud API keys
+    Pattern.compile("cloudApiKeyService\\.getKeyById\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 96. Using unchecked IDs in customer support ticketing systems
+    Pattern.compile("supportTicketService\\.getTicketById\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 97. No validation before modifying system-wide configurations
+    Pattern.compile("systemConfigService\\.updateConfig\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 98. Allowing unrestricted access to cryptographic keys
+    Pattern.compile("cryptoKeyService\\.getKeyById\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 99. Using unchecked IDs in API gateway rules
+    Pattern.compile("apiGatewayService\\.modifyRule\\(.*request\\.getParameter\\(.*id.*\\)\\)"),
+
+    // 100. No verification before performing user impersonation
+    Pattern.compile("impersonationService\\.impersonateUser\\(.*request\\.getParameter\\(.*id.*\\)\\)")
+);
