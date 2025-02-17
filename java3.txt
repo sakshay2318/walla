@@ -1,0 +1,797 @@
+public static final List<Pattern> missingMiddlewarePatterns = Arrays.asList(
+
+    // 1. No @PreAuthorize annotation on sensitive API endpoints
+    Pattern.compile("\\@GetMapping\\(\"/admin/.*\"\\)(?!.*@PreAuthorize)"),
+
+    // 2. No @RolesAllowed annotation on financial transaction endpoints
+    Pattern.compile("\\@PostMapping\\(\"/transactions/.*\"\\)(?!.*@RolesAllowed)"),
+
+    // 3. Missing @PreAuthorize for account deletion API
+    Pattern.compile("\\@DeleteMapping\\(\"/account/delete\"\\)(?!.*@PreAuthorize)"),
+
+    // 4. Unprotected API route allowing unrestricted data export
+    Pattern.compile("\\@GetMapping\\(\"/export/data\"\\)(?!.*@PreAuthorize)"),
+
+    // 5. No centralized middleware for restricting access to user profiles
+    Pattern.compile("\\@GetMapping\\(\"/users/.*\"\\)(?!.*@PreAuthorize)"),
+
+    // 6. Missing global security filter on authentication endpoints
+    Pattern.compile("\\@PostMapping\\(\"/auth/.*\"\\)(?!.*@PreAuthorize)"),
+
+    // 7. No security middleware applied to session management APIs
+    Pattern.compile("\\@GetMapping\\(\"/sessions/.*\"\\)(?!.*@PreAuthorize)"),
+
+    // 8. Missing centralized security filter for modifying API keys
+    Pattern.compile("\\@PostMapping\\(\"/apikeys/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 9. No middleware restriction on password reset API
+    Pattern.compile("\\@PostMapping\\(\"/password/reset\"\\)(?!.*@PreAuthorize)"),
+
+    // 10. Missing security middleware for bulk user deletion
+    Pattern.compile("\\@DeleteMapping\\(\"/users/bulk-delete\"\\)(?!.*@PreAuthorize)"),
+
+    // 11. No @PreAuthorize check on employee data access
+    Pattern.compile("\\@GetMapping\\(\"/employees/.*\"\\)(?!.*@PreAuthorize)"),
+
+    // 12. Missing middleware verification for invoice downloads
+    Pattern.compile("\\@GetMapping\\(\"/invoices/download/.*\"\\)(?!.*@PreAuthorize)"),
+
+    // 13. No security decorator on sensitive report generation
+    Pattern.compile("\\@GetMapping\\(\"/reports/.*\"\\)(?!.*@PreAuthorize)"),
+
+    // 14. Missing security middleware for audit log access
+    Pattern.compile("\\@GetMapping\\(\"/audit/logs\"\\)(?!.*@PreAuthorize)"),
+
+    // 15. No decorator protection on external API integrations
+    Pattern.compile("\\@PostMapping\\(\"/integrations/.*\"\\)(?!.*@PreAuthorize)"),
+
+    // 16. Missing security middleware for modifying notification preferences
+    Pattern.compile("\\@PostMapping\\(\"/notifications/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 17. No centralized authorization for modifying user roles
+    Pattern.compile("\\@PostMapping\\(\"/roles/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 18. Missing middleware validation for system configuration updates
+    Pattern.compile("\\@PostMapping\\(\"/system/settings/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 19. No security middleware for cloud storage access
+    Pattern.compile("\\@GetMapping\\(\"/storage/files/.*\"\\)(?!.*@PreAuthorize)"),
+
+    // 20. Missing @PreAuthorize for administrative dashboard access
+    Pattern.compile("\\@GetMapping\\(\"/admin/dashboard\"\\)(?!.*@PreAuthorize)"),
+
+    // 21. No centralized authorization check for customer support tickets
+    Pattern.compile("\\@GetMapping\\(\"/support/tickets/.*\"\\)(?!.*@PreAuthorize)"),
+
+    // 22. Missing middleware for modifying webhooks
+    Pattern.compile("\\@PostMapping\\(\"/webhooks/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 23. No decorator protection for team collaboration tools
+    Pattern.compile("\\@PostMapping\\(\"/teams/.*\"\\)(?!.*@PreAuthorize)"),
+
+    // 24. Unrestricted document signing API without middleware
+    Pattern.compile("\\@PostMapping\\(\"/documents/sign\"\\)(?!.*@PreAuthorize)"),
+
+    // 25. No middleware security for private project repositories
+    Pattern.compile("\\@GetMapping\\(\"/projects/private/.*\"\\)(?!.*@PreAuthorize)"),
+
+    // 26. Missing centralized validation for modifying product inventory
+    Pattern.compile("\\@PostMapping\\(\"/inventory/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 27. No security enforcement on modifying access control policies
+    Pattern.compile("\\@PostMapping\\(\"/access-control/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 28. Missing middleware for modifying discount codes
+    Pattern.compile("\\@PostMapping\\(\"/discounts/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 29. No centralized middleware on deleting payment methods
+    Pattern.compile("\\@DeleteMapping\\(\"/payment-methods/delete\"\\)(?!.*@PreAuthorize)"),
+
+    // 30. Missing security decorator for private messaging systems
+    Pattern.compile("\\@PostMapping\\(\"/messages/send\"\\)(?!.*@PreAuthorize)"),
+
+    // 31. No @PreAuthorize on retrieving stored user session data
+    Pattern.compile("\\@GetMapping\\(\"/sessions/data\"\\)(?!.*@PreAuthorize)"),
+
+    // 32. Unprotected file upload APIs without security middleware
+    Pattern.compile("\\@PostMapping\\(\"/files/upload\"\\)(?!.*@PreAuthorize)"),
+
+    // 33. No security middleware validation for changing API rate limits
+    Pattern.compile("\\@PostMapping\\(\"/api/rate-limits/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 34. Missing centralized security check for modifying database credentials
+    Pattern.compile("\\@PostMapping\\(\"/database/credentials/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 35. No decorator for modifying sensitive environment variables
+    Pattern.compile("\\@PostMapping\\(\"/env/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 36. Missing security middleware for uploading confidential contracts
+    Pattern.compile("\\@PostMapping\\(\"/contracts/upload\"\\)(?!.*@PreAuthorize)"),
+
+    // 37. No centralized enforcement for modifying tax-related information
+    Pattern.compile("\\@PostMapping\\(\"/tax/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 38. Unprotected endpoints for downloading private customer invoices
+    Pattern.compile("\\@GetMapping\\(\"/invoices/private/download\"\\)(?!.*@PreAuthorize)"),
+
+    // 39. No security middleware validation on modifying private API endpoints
+    Pattern.compile("\\@PostMapping\\(\"/api/private/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 40. No centralized validation for modifying blockchain wallet permissions
+    Pattern.compile("\\@PostMapping\\(\"/wallet/permissions/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 41. Missing middleware protection for modifying user authentication settings
+    Pattern.compile("\\@PostMapping\\(\"/auth/settings/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 42. No decorator on API endpoints modifying system-wide logs
+    Pattern.compile("\\@PostMapping\\(\"/logs/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 43. No security middleware enforcing access to classified reports
+    Pattern.compile("\\@GetMapping\\(\"/classified-reports\"\\)(?!.*@PreAuthorize)"),
+
+    // 44. Missing enforcement on modifying Git repository branches
+    Pattern.compile("\\@PostMapping\\(\"/git/branches/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 45. No security decorator for modifying VPN access configurations
+    Pattern.compile("\\@PostMapping\\(\"/vpn/config/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 46. No middleware verification before modifying biometric authentication settings
+    Pattern.compile("\\@PostMapping\\(\"/biometric-auth/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 47. Unprotected admin endpoints without security middleware
+    Pattern.compile("\\@GetMapping\\(\"/admin/.*\"\\)(?!.*@PreAuthorize)"),
+
+    // 48. No centralized validation on removing user 2FA configurations
+    Pattern.compile("\\@DeleteMapping\\(\"/2fa/remove\"\\)(?!.*@PreAuthorize)"),
+
+    // 49. No decorator protection for modifying live streaming access
+    Pattern.compile("\\@PostMapping\\(\"/streaming/access/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 50. No centralized security for modifying corporate compliance settings
+    Pattern.compile("\\@PostMapping\\(\"/compliance/settings/update\"\\)(?!.*@PreAuthorize)")
+);
+public static final List<Pattern> missingMiddlewarePatterns = Arrays.asList(
+
+    // 51. Missing @PreAuthorize on user profile update API
+    Pattern.compile("\\@PutMapping\\(\"/users/profile/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 52. No middleware enforcement for deleting user addresses
+    Pattern.compile("\\@DeleteMapping\\(\"/users/addresses/.*\"\\)(?!.*@PreAuthorize)"),
+
+    // 53. Missing security middleware on credit card information retrieval
+    Pattern.compile("\\@GetMapping\\(\"/payment-methods/cards\"\\)(?!.*@PreAuthorize)"),
+
+    // 54. Unrestricted sensitive audit log export
+    Pattern.compile("\\@GetMapping\\(\"/audit/logs/export\"\\)(?!.*@PreAuthorize)"),
+
+    // 55. No centralized security check on API token generation
+    Pattern.compile("\\@PostMapping\\(\"/auth/generate-token\"\\)(?!.*@PreAuthorize)"),
+
+    // 56. No security middleware applied to application-wide settings modifications
+    Pattern.compile("\\@PostMapping\\(\"/settings/app\"\\)(?!.*@PreAuthorize)"),
+
+    // 57. Missing middleware validation for adding users to privileged groups
+    Pattern.compile("\\@PostMapping\\(\"/groups/privileged/add\"\\)(?!.*@PreAuthorize)"),
+
+    // 58. No decorator protection for modifying internal network configurations
+    Pattern.compile("\\@PostMapping\\(\"/network/config/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 59. No middleware verification for modifying access tokens
+    Pattern.compile("\\@PutMapping\\(\"/tokens/access/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 60. Unprotected admin-level configuration modifications
+    Pattern.compile("\\@PostMapping\\(\"/admin/config/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 61. No middleware validation for modifying API gateway rules
+    Pattern.compile("\\@PostMapping\\(\"/api-gateway/rules/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 62. Missing authorization decorator for internal server monitoring tools
+    Pattern.compile("\\@GetMapping\\(\"/monitoring/servers\"\\)(?!.*@PreAuthorize)"),
+
+    // 63. No centralized middleware for managing SSH key authentication
+    Pattern.compile("\\@PostMapping\\(\"/ssh/keys/add\"\\)(?!.*@PreAuthorize)"),
+
+    // 64. Unrestricted password policy updates
+    Pattern.compile("\\@PostMapping\\(\"/security/password-policy\"\\)(?!.*@PreAuthorize)"),
+
+    // 65. No security enforcement for database backups retrieval
+    Pattern.compile("\\@GetMapping\\(\"/database/backups\"\\)(?!.*@PreAuthorize)"),
+
+    // 66. No middleware validation for API client credential modifications
+    Pattern.compile("\\@PostMapping\\(\"/oauth/clients/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 67. Missing centralized authorization for payment refunds
+    Pattern.compile("\\@PostMapping\\(\"/payments/refund\"\\)(?!.*@PreAuthorize)"),
+
+    // 68. No security decorator for modifying financial transaction logs
+    Pattern.compile("\\@PostMapping\\(\"/transactions/logs/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 69. Missing enforcement for modifying data retention policies
+    Pattern.compile("\\@PostMapping\\(\"/data/retention/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 70. No security middleware for modifying audit logging settings
+    Pattern.compile("\\@PostMapping\\(\"/audit/logging/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 71. Unprotected OAuth token revocation endpoint
+    Pattern.compile("\\@PostMapping\\(\"/oauth/revoke\"\\)(?!.*@PreAuthorize)"),
+
+    // 72. No middleware validation for critical security event notifications
+    Pattern.compile("\\@PostMapping\\(\"/security/events/notify\"\\)(?!.*@PreAuthorize)"),
+
+    // 73. Missing security middleware for modifying load balancer configurations
+    Pattern.compile("\\@PostMapping\\(\"/load-balancer/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 74. Unrestricted access to business intelligence dashboards
+    Pattern.compile("\\@GetMapping\\(\"/bi/dashboard\"\\)(?!.*@PreAuthorize)"),
+
+    // 75. No decorator protection for modifying firewall rules
+    Pattern.compile("\\@PostMapping\\(\"/firewall/rules/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 76. No middleware enforcement on system-wide maintenance toggles
+    Pattern.compile("\\@PostMapping\\(\"/maintenance/mode/toggle\"\\)(?!.*@PreAuthorize)"),
+
+    // 77. Missing middleware validation for modifying DNS configurations
+    Pattern.compile("\\@PostMapping\\(\"/dns/config/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 78. No centralized authorization enforcement on admin API calls
+    Pattern.compile("\\@PostMapping\\(\"/admin/api/call\"\\)(?!.*@PreAuthorize)"),
+
+    // 79. Missing security middleware for accessing privileged API logs
+    Pattern.compile("\\@GetMapping\\(\"/api/logs/privileged\"\\)(?!.*@PreAuthorize)"),
+
+    // 80. No security decorator on modifying endpoint rate-limiting rules
+    Pattern.compile("\\@PostMapping\\(\"/rate-limits/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 81. Unprotected modification of session timeout policies
+    Pattern.compile("\\@PostMapping\\(\"/session/timeout/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 82. No security middleware verification for modifying federated identity provider configurations
+    Pattern.compile("\\@PostMapping\\(\"/idp/federation/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 83. No security decorator enforcement for enterprise API key management
+    Pattern.compile("\\@PostMapping\\(\"/enterprise/api-keys/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 84. Missing centralized security enforcement for exporting sensitive logs
+    Pattern.compile("\\@GetMapping\\(\"/logs/export\"\\)(?!.*@PreAuthorize)"),
+
+    // 85. No middleware validation for modifying virtual private network settings
+    Pattern.compile("\\@PostMapping\\(\"/vpn/settings/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 86. Unrestricted modification of SAML authentication settings
+    Pattern.compile("\\@PostMapping\\(\"/saml/auth/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 87. Missing centralized enforcement for disabling security alerts
+    Pattern.compile("\\@PostMapping\\(\"/alerts/security/disable\"\\)(?!.*@PreAuthorize)"),
+
+    // 88. No security middleware for modifying CI/CD deployment configurations
+    Pattern.compile("\\@PostMapping\\(\"/cicd/deployment/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 89. No decorator protection on cloud infrastructure access controls
+    Pattern.compile("\\@PostMapping\\(\"/cloud/access/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 90. Missing middleware for modifying enterprise authentication policies
+    Pattern.compile("\\@PostMapping\\(\"/enterprise/auth-policies/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 91. No security validation on external API callback handlers
+    Pattern.compile("\\@PostMapping\\(\"/api/callbacks/.*\"\\)(?!.*@PreAuthorize)"),
+
+    // 92. Unrestricted access to privileged IAM roles
+    Pattern.compile("\\@GetMapping\\(\"/iam/roles/privileged\"\\)(?!.*@PreAuthorize)"),
+
+    // 93. No centralized middleware validation for modifying customer billing settings
+    Pattern.compile("\\@PostMapping\\(\"/billing/settings/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 94. Missing security middleware for API key revocation
+    Pattern.compile("\\@PostMapping\\(\"/api-keys/revoke\"\\)(?!.*@PreAuthorize)"),
+
+    // 95. No security middleware for modifying IoT device configurations
+    Pattern.compile("\\@PostMapping\\(\"/iot/device/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 96. Missing centralized security validation for modifying distributed database access
+    Pattern.compile("\\@PostMapping\\(\"/database/access/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 97. No decorator enforcement for modifying backup encryption settings
+    Pattern.compile("\\@PostMapping\\(\"/backup/encryption/update\"\\)(?!.*@PreAuthorize)")
+);
+public static final List<Pattern> missingMiddlewarePatterns = Arrays.asList(
+
+    // 98. Missing @PreAuthorize on fetching confidential reports
+    Pattern.compile("\\@GetMapping\\(\"/reports/confidential\"\\)(?!.*@PreAuthorize)"),
+
+    // 99. No middleware enforcement for deleting privileged API clients
+    Pattern.compile("\\@DeleteMapping\\(\"/oauth/clients/.*\"\\)(?!.*@PreAuthorize)"),
+
+    // 100. Missing security middleware for updating enterprise account details
+    Pattern.compile("\\@PutMapping\\(\"/enterprise/accounts/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 101. Unprotected modification of system-wide API rate limits
+    Pattern.compile("\\@PostMapping\\(\"/system/rate-limits/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 102. No centralized middleware for managing privileged API keys
+    Pattern.compile("\\@PostMapping\\(\"/api-keys/privileged/manage\"\\)(?!.*@PreAuthorize)"),
+
+    // 103. Missing enforcement for modifying employee payroll records
+    Pattern.compile("\\@PostMapping\\(\"/payroll/records/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 104. No decorator protection for modifying privileged database roles
+    Pattern.compile("\\@PostMapping\\(\"/database/roles/privileged/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 105. Unprotected access to internal debug logs
+    Pattern.compile("\\@GetMapping\\(\"/logs/internal/debug\"\\)(?!.*@PreAuthorize)"),
+
+    // 106. No security middleware for modifying privileged SSH keys
+    Pattern.compile("\\@PostMapping\\(\"/ssh/keys/privileged/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 107. Missing centralized enforcement for modifying biometric authentication settings
+    Pattern.compile("\\@PostMapping\\(\"/auth/biometric/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 108. No middleware validation for updating system security patches
+    Pattern.compile("\\@PostMapping\\(\"/system/security-patches/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 109. Missing middleware for modifying privileged cloud IAM roles
+    Pattern.compile("\\@PostMapping\\(\"/cloud/iam/privileged/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 110. No centralized authorization for executing system-level batch jobs
+    Pattern.compile("\\@PostMapping\\(\"/system/batch-jobs/execute\"\\)(?!.*@PreAuthorize)"),
+
+    // 111. Unrestricted access to raw server log downloads
+    Pattern.compile("\\@GetMapping\\(\"/server/logs/download\"\\)(?!.*@PreAuthorize)"),
+
+    // 112. No security middleware for modifying privileged customer accounts
+    Pattern.compile("\\@PutMapping\\(\"/customers/privileged/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 113. Unprotected modification of system-wide audit policies
+    Pattern.compile("\\@PostMapping\\(\"/audit/policies/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 114. No centralized enforcement for disabling fraud detection mechanisms
+    Pattern.compile("\\@PostMapping\\(\"/fraud-detection/disable\"\\)(?!.*@PreAuthorize)"),
+
+    // 115. Missing decorator protection for granting superuser privileges
+    Pattern.compile("\\@PostMapping\\(\"/users/superuser/grant\"\\)(?!.*@PreAuthorize)"),
+
+    // 116. Unprotected modification of identity federation policies
+    Pattern.compile("\\@PostMapping\\(\"/identity/federation/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 117. No security enforcement for altering critical infrastructure configurations
+    Pattern.compile("\\@PostMapping\\(\"/infrastructure/config/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 118. Unrestricted deletion of encrypted system backups
+    Pattern.compile("\\@DeleteMapping\\(\"/backups/encrypted/delete\"\\)(?!.*@PreAuthorize)"),
+
+    // 119. Missing centralized validation for modifying privileged monitoring dashboards
+    Pattern.compile("\\@PostMapping\\(\"/monitoring/dashboards/privileged/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 120. No middleware validation for modifying user MFA (multi-factor authentication) settings
+    Pattern.compile("\\@PostMapping\\(\"/security/mfa/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 121. No decorator protection for modifying trusted network IPs
+    Pattern.compile("\\@PostMapping\\(\"/network/trusted-ips/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 122. Missing centralized middleware for executing admin commands
+    Pattern.compile("\\@PostMapping\\(\"/admin/execute-command\"\\)(?!.*@PreAuthorize)"),
+
+    // 123. Unprotected deletion of system-wide API keys
+    Pattern.compile("\\@DeleteMapping\\(\"/api-keys/delete\"\\)(?!.*@PreAuthorize)"),
+
+    // 124. No security enforcement for modifying encryption algorithms in use
+    Pattern.compile("\\@PostMapping\\(\"/encryption/algorithms/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 125. Missing centralized validation for editing privileged VPN tunnels
+    Pattern.compile("\\@PostMapping\\(\"/vpn/tunnels/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 126. No middleware validation for accessing raw database logs
+    Pattern.compile("\\@GetMapping\\(\"/database/logs/raw\"\\)(?!.*@PreAuthorize)"),
+
+    // 127. Unrestricted deletion of sensitive audit trail logs
+    Pattern.compile("\\@DeleteMapping\\(\"/audit/logs/delete\"\\)(?!.*@PreAuthorize)"),
+
+    // 128. No centralized authorization enforcement for modifying Kubernetes cluster security settings
+    Pattern.compile("\\@PostMapping\\(\"/kubernetes/security/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 129. No middleware enforcement for modifying cloud storage encryption policies
+    Pattern.compile("\\@PostMapping\\(\"/cloud/storage/encryption/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 130. Unprotected modification of privileged user access levels
+    Pattern.compile("\\@PutMapping\\(\"/users/access-levels/privileged/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 131. No centralized security validation for modifying CI/CD pipeline security settings
+    Pattern.compile("\\@PostMapping\\(\"/cicd/security/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 132. Missing middleware validation for modifying privileged customer support tickets
+    Pattern.compile("\\@PostMapping\\(\"/support/tickets/privileged/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 133. Unprotected modification of financial reporting configurations
+    Pattern.compile("\\@PostMapping\\(\"/financial/reports/config/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 134. No decorator enforcement for modifying privileged cloud function settings
+    Pattern.compile("\\@PostMapping\\(\"/cloud/functions/privileged/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 135. No middleware validation for modifying biometric access control policies
+    Pattern.compile("\\@PostMapping\\(\"/access-control/biometric/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 136. Unrestricted deletion of privileged user session logs
+    Pattern.compile("\\@DeleteMapping\\(\"/sessions/privileged/delete\"\\)(?!.*@PreAuthorize)"),
+
+    // 137. No centralized enforcement for modifying Kubernetes role-based access control settings
+    Pattern.compile("\\@PostMapping\\(\"/kubernetes/rbac/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 138. No security middleware for modifying enterprise single sign-on (SSO) configurations
+    Pattern.compile("\\@PostMapping\\(\"/sso/enterprise/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 139. Missing decorator protection for modifying physical security device configurations
+    Pattern.compile("\\@PostMapping\\(\"/physical-security/devices/update\"\\)(?!.*@PreAuthorize)")
+);
+public static final List<Pattern> missingMiddlewarePatterns = Arrays.asList(
+
+    // 140. No authorization middleware for exporting financial transactions
+    Pattern.compile("\\@GetMapping\\(\"/finance/transactions/export\"\\)(?!.*@PreAuthorize)"),
+
+    // 141. Missing middleware enforcement for revoking privileged user accounts
+    Pattern.compile("\\@PostMapping\\(\"/users/privileged/revoke\"\\)(?!.*@PreAuthorize)"),
+
+    // 142. No centralized security check for modifying system-wide email notifications
+    Pattern.compile("\\@PutMapping\\(\"/notifications/email/settings/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 143. Unprotected modification of privileged cloud API gateway configurations
+    Pattern.compile("\\@PostMapping\\(\"/cloud/api-gateway/config/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 144. Missing security enforcement for downloading raw personally identifiable information (PII) data
+    Pattern.compile("\\@GetMapping\\(\"/data/pii/download\"\\)(?!.*@PreAuthorize)"),
+
+    // 145. No middleware validation for modifying firewall rule sets
+    Pattern.compile("\\@PostMapping\\(\"/network/firewall/rules/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 146. Unrestricted deletion of cloud storage snapshots
+    Pattern.compile("\\@DeleteMapping\\(\"/cloud/storage/snapshots/delete\"\\)(?!.*@PreAuthorize)"),
+
+    // 147. Missing centralized authorization for modifying digital signature verification policies
+    Pattern.compile("\\@PostMapping\\(\"/security/digital-signature/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 148. No security middleware enforcement for modifying admin session timeout settings
+    Pattern.compile("\\@PostMapping\\(\"/admin/session-timeout/update\"\\)(?!.*@PreAuthorize)"),
+
+    // 149. Missing security validation for disabling anomaly detection algorithms
+    Pattern.compile("\\@PostMapping\\(\"/ai/anomaly-detection/disable\"\\)(?!.*@PreAuthorize)"),
+
+    // 150. No centralized middleware for modifying cloud-based forensic investigation settings
+    Pattern.compile("\\@PostMapping\\(\"/forensics/cloud-investigation/update\"\\)(?!.*@PreAuthorize)")
+);
+public static final List<Pattern> missingValidationPatterns = Arrays.asList(
+
+    // 1. No @Valid annotation for request body in POST method
+    Pattern.compile("\\@PostMapping\\(\".*\"\\)\\s+.*\\(.*(\\@RequestBody\\s+[a-zA-Z0-9_]+)\\)(?!.*\\@Valid)"),
+
+    // 2. No @Validated annotation on controller class
+    Pattern.compile("\\@RestController\\s+public\\s+class\\s+[A-Za-z0-9]+\\s*\\{(?!.*@Validated)"),
+
+    // 3. Missing validation for user input fields in DTO classes
+    Pattern.compile("public\\s+class\\s+.*DTO\\s*\\{(?!.*@(NotNull|NotEmpty|Size|Pattern|Min|Max))"),
+
+    // 4. Missing @Size constraint on String parameters
+    Pattern.compile("private\\s+String\\s+[a-zA-Z0-9_]+\\s*;\\s*(?!.*@Size)"),
+
+    // 5. No @Min/@Max constraint on integer fields
+    Pattern.compile("private\\s+(int|Integer)\\s+[a-zA-Z0-9_]+\\s*;\\s*(?!.*@(Min|Max))"),
+
+    // 6. No pattern restriction on email fields
+    Pattern.compile("private\\s+String\\s+email\\s*;\\s*(?!.*@Pattern\\(regexp\\s*=\\s*\\\".*@.*\\\\..*\\\"\\))"),
+
+    // 7. No @Pattern validation for alphanumeric fields
+    Pattern.compile("private\\s+String\\s+[a-zA-Z0-9_]+\\s*;\\s*(?!.*@Pattern)"),
+
+    // 8. Unrestricted file upload with no content type validation
+    Pattern.compile("\\@PostMapping\\(\".*upload.*\"\\)\\s+.*\\(.*MultipartFile.*\\)(?!.*@RequestParam\\(.*(required\\s*=\\s*true).*)"),
+
+    // 9. No validation for password complexity in DTO classes
+    Pattern.compile("private\\s+String\\s+password\\s*;\\s*(?!.*@Pattern\\(regexp\\s*=\\s*\\\".*(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&]).{8,}\\\"\\))"),
+
+    // 10. Unchecked query parameters without type constraints
+    Pattern.compile("\\@RequestParam\\(.*\\)\\s+String\\s+[a-zA-Z0-9_]+(?!.*@Pattern)"),
+
+    // 11. Missing validation for numeric inputs from query parameters
+    Pattern.compile("\\@RequestParam\\(.*\\)\\s+(int|Integer|long|Long)\\s+[a-zA-Z0-9_]+(?!.*@(Min|Max))"),
+
+    // 12. No regex validation on username fields
+    Pattern.compile("private\\s+String\\s+username\\s*;\\s*(?!.*@Pattern\\(regexp\\s*=\\s*\\\"^[a-zA-Z0-9_]{3,20}$\\\"\\))"),
+
+    // 13. Unrestricted URL parameters in controller methods
+    Pattern.compile("\\@GetMapping\\(\"/.*\\{.*\\}\"\\)(?!.*@PathVariable\\(.*@Pattern)"),
+
+    // 14. No validation for credit card number inputs
+    Pattern.compile("private\\s+String\\s+creditCardNumber\\s*;\\s*(?!.*@Pattern\\(regexp\\s*=\\s*\\\"\\d{16}\\\"\\))"),
+
+    // 15. Missing validation for phone numbers
+    Pattern.compile("private\\s+String\\s+phoneNumber\\s*;\\s*(?!.*@Pattern\\(regexp\\s*=\\s*\\\"^\\\\d{10}$\\\"\\))"),
+
+    // 16. No upper-bound limit for numeric user inputs
+    Pattern.compile("\\@RequestParam\\(.*\\)\\s+(int|Integer|long|Long)\\s+[a-zA-Z0-9_]+(?!.*@Max)"),
+
+    // 17. No input sanitization for special characters
+    Pattern.compile("\\@RequestParam\\(.*\\)\\s+String\\s+[a-zA-Z0-9_]+(?!.*@Pattern)"),
+
+    // 18. No length restriction for text fields
+    Pattern.compile("private\\s+String\\s+[a-zA-Z0-9_]+\\s*;\\s*(?!.*@Size)"),
+
+    // 19. Missing validation for JSON input fields
+    Pattern.compile("\\@RequestBody\\s+.*\\)(?!.*@Valid)"),
+
+    // 20. Unchecked list inputs in REST API requests
+    Pattern.compile("\\@RequestParam\\(.*\\)\\s+List<.*>(?!.*@Size)"),
+
+    // 21. No type constraints for enum fields in DTOs
+    Pattern.compile("private\\s+[A-Za-z0-9]+Enum\\s+[a-zA-Z0-9_]+\\s*;\\s*(?!.*@NotNull)"),
+
+    // 22. Missing required field constraints
+    Pattern.compile("private\\s+(String|int|Integer|long|Long)\\s+[a-zA-Z0-9_]+\\s*;\\s*(?!.*@NotNull)"),
+
+    // 23. No @DecimalMin or @DecimalMax for floating-point numbers
+    Pattern.compile("private\\s+(float|Float|double|Double)\\s+[a-zA-Z0-9_]+\\s*;\\s*(?!.*@(DecimalMin|DecimalMax))"),
+
+    // 24. Unrestricted JSON structure in request payloads
+    Pattern.compile("\\@RequestBody\\s+.*\\)(?!.*@Valid)"),
+
+    // 25. Unrestricted UUID input fields
+    Pattern.compile("private\\s+String\\s+uuid\\s*;\\s*(?!.*@Pattern\\(regexp\\s*=\\s*\\\"[a-fA-F0-9-]{36}\\\"\\))"),
+
+    // 26. No validation on user-provided file names
+    Pattern.compile("private\\s+String\\s+fileName\\s*;\\s*(?!.*@Pattern\\(regexp\\s*=\\s*\\\"^[a-zA-Z0-9_.-]+$\\\"\\))"),
+
+    // 27. No restrictions on array-based input parameters
+    Pattern.compile("\\@RequestParam\\(.*\\)\\s+(String|int|long|double)\\[\\]"),
+
+    // 28. Unchecked email domain verification
+    Pattern.compile("private\\s+String\\s+email\\s*;\\s*(?!.*@Pattern\\(regexp\\s*=\\s*\\\".*@(company\\.com|organization\\.org)\\\"\\))"),
+
+    // 29. Unrestricted ZIP code inputs
+    Pattern.compile("private\\s+String\\s+zipCode\\s*;\\s*(?!.*@Pattern\\(regexp\\s*=\\s*\\\"^\\\\d{5}$\\\"\\))"),
+
+    // 30. No validation for boolean fields in API requests
+    Pattern.compile("\\@RequestParam\\(.*\\)\\s+boolean\\s+[a-zA-Z0-9_]+(?!.*@NotNull)"),
+
+    // 31. Missing validation for IPv4 and IPv6 addresses
+    Pattern.compile("private\\s+String\\s+ipAddress\\s*;\\s*(?!.*@Pattern\\(regexp\\s*=\\s*\\\"^(?:[0-9]{1,3}\\\\.){3}[0-9]{1,3}$\\\"\\))"),
+
+    // 32. No validation for social security numbers
+    Pattern.compile("private\\s+String\\s+ssn\\s*;\\s*(?!.*@Pattern\\(regexp\\s*=\\s*\\\"^\\\\d{3}-\\\\d{2}-\\\\d{4}$\\\"\\))")
+
+);
+public static final List<Pattern> missingValidationPatterns = Arrays.asList(
+
+    // 33. Missing @Valid annotation for request bodies in PUT methods
+    Pattern.compile("\\@PutMapping\\(\".*\"\\)\\s+.*\\(.*(\\@RequestBody\\s+[a-zA-Z0-9_]+)\\)(?!.*\\@Valid)"),
+
+    // 34. No @Validated annotation on Service classes
+    Pattern.compile("\\@Service\\s+public\\s+class\\s+[A-Za-z0-9]+\\s*\\{(?!.*@Validated)"),
+
+    // 35. DTO missing @NotNull annotations
+    Pattern.compile("public\\s+class\\s+.*DTO\\s*\\{(?!.*@NotNull)"),
+
+    // 36. No @Digits annotation for numeric precision enforcement
+    Pattern.compile("private\\s+(BigDecimal|double|Double)\\s+[a-zA-Z0-9_]+\\s*;\\s*(?!.*@Digits)"),
+
+    // 37. No validation for request headers in API methods
+    Pattern.compile("\\@RequestHeader\\(.*\\)\\s+String\\s+[a-zA-Z0-9_]+(?!.*@Pattern)"),
+
+    // 38. No validation for ISO date format in DTOs
+    Pattern.compile("private\\s+String\\s+dateOfBirth\\s*;\\s*(?!.*@Pattern\\(regexp\\s*=\\s*\\\"^\\\\d{4}-\\\\d{2}-\\\\d{2}$\\\"\\))"),
+
+    // 39. No regex restriction on hexadecimal input values
+    Pattern.compile("private\\s+String\\s+hexValue\\s*;\\s*(?!.*@Pattern\\(regexp\\s*=\\s*\\\"^[0-9A-Fa-f]+$\\\"\\))"),
+
+    // 40. Missing @JsonFormat validation for date fields
+    Pattern.compile("private\\s+Date\\s+[a-zA-Z0-9_]+\\s*;\\s*(?!.*@JsonFormat)"),
+
+    // 41. Missing @NotBlank validation for important text fields
+    Pattern.compile("private\\s+String\\s+[a-zA-Z0-9_]+\\s*;\\s*(?!.*@NotBlank)"),
+
+    // 42. No validation on status fields (should be Enum)
+    Pattern.compile("private\\s+String\\s+status\\s*;\\s*(?!.*@Pattern)"),
+
+    // 43. Unrestricted Base64 input fields
+    Pattern.compile("private\\s+String\\s+base64Data\\s*;\\s*(?!.*@Pattern\\(regexp\\s*=\\s*\\\"^[A-Za-z0-9+/=]+$\\\"\\))"),
+
+    // 44. No validation on API keys input
+    Pattern.compile("private\\s+String\\s+apiKey\\s*;\\s*(?!.*@Pattern\\(regexp\\s*=\\s*\\\"^[A-Za-z0-9]{32,64}$\\\"\\))"),
+
+    // 45. No validation on JSON string input parameters
+    Pattern.compile("private\\s+String\\s+jsonPayload\\s*;\\s*(?!.*@Pattern)"),
+
+    // 46. No validation on Boolean request parameters
+    Pattern.compile("\\@RequestParam\\(.*\\)\\s+Boolean\\s+[a-zA-Z0-9_]+(?!.*@NotNull)"),
+
+    // 47. No @JsonIgnore for sensitive fields in DTOs
+    Pattern.compile("private\\s+String\\s+(password|secretKey|token)\\s*;\\s*(?!.*@JsonIgnore)"),
+
+    // 48. Unrestricted raw SQL query string as request parameter
+    Pattern.compile("private\\s+String\\s+query\\s*;\\s*(?!.*@Pattern)"),
+
+    // 49. Missing @JsonProperty validation for required JSON fields
+    Pattern.compile("private\\s+String\\s+[a-zA-Z0-9_]+\\s*;\\s*(?!.*@JsonProperty)"),
+
+    // 50. No @SafeHtml annotation to prevent XSS attacks
+    Pattern.compile("private\\s+String\\s+[a-zA-Z0-9_]+\\s*;\\s*(?!.*@SafeHtml)"),
+
+    // 51. No upper limit on list size in REST API request
+    Pattern.compile("\\@RequestParam\\(.*\\)\\s+List<.*>(?!.*@Size)"),
+
+    // 52. Missing @Pattern restriction on account number fields
+    Pattern.compile("private\\s+String\\s+accountNumber\\s*;\\s*(?!.*@Pattern\\(regexp\\s*=\\s*\\\"^\\\\d{10,12}$\\\"\\))"),
+
+    // 53. Unchecked timestamp fields in DTOs
+    Pattern.compile("private\\s+String\\s+timestamp\\s*;\\s*(?!.*@Pattern)"),
+
+    // 54. Missing validation for UUID request parameters
+    Pattern.compile("\\@RequestParam\\(.*\\)\\s+String\\s+uuid(?!.*@Pattern\\(regexp\\s*=\\s*\\\"[a-fA-F0-9-]{36}\\\"\\))"),
+
+    // 55. No regex validation for currency codes
+    Pattern.compile("private\\s+String\\s+currency\\s*;\\s*(?!.*@Pattern\\(regexp\\s*=\\s*\\\"^[A-Z]{3}$\\\"\\))"),
+
+    // 56. Missing @Range validation for percentage values
+    Pattern.compile("private\\s+(int|double|Double)\\s+percentage\\s*;\\s*(?!.*@Range)"),
+
+    // 57. Missing validation for URL fields
+    Pattern.compile("private\\s+String\\s+url\\s*;\\s*(?!.*@Pattern\\(regexp\\s*=\\s*\\\"^(https?|ftp)://.*$\\\"\\))"),
+
+    // 58. Missing validation for boolean flags
+    Pattern.compile("private\\s+Boolean\\s+[a-zA-Z0-9_]+\\s*;\\s*(?!.*@NotNull)"),
+
+    // 59. No regex validation for street address inputs
+    Pattern.compile("private\\s+String\\s+address\\s*;\\s*(?!.*@Pattern)"),
+
+    // 60. Unchecked JSON Web Token (JWT) string inputs
+    Pattern.compile("private\\s+String\\s+jwtToken\\s*;\\s*(?!.*@Pattern)"),
+
+    // 61. No validation for IP address range inputs
+    Pattern.compile("private\\s+String\\s+ipRange\\s*;\\s*(?!.*@Pattern)"),
+
+    // 62. Missing @Pattern validation for MAC address inputs
+    Pattern.compile("private\\s+String\\s+macAddress\\s*;\\s*(?!.*@Pattern\\(regexp\\s*=\\s*\\\"^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$\\\"\\))"),
+
+    // 63. Unchecked timezone inputs in DTOs
+    Pattern.compile("private\\s+String\\s+timezone\\s*;\\s*(?!.*@Pattern)"),
+
+    // 64. No validation for encoded query parameters
+    Pattern.compile("\\@RequestParam\\(.*\\)\\s+String\\s+[a-zA-Z0-9_]+(?!.*@Pattern)"),
+
+    // 65. Unchecked postal codes in DTOs
+    Pattern.compile("private\\s+String\\s+postalCode\\s*;\\s*(?!.*@Pattern)"),
+
+    // 66. No validation for language codes
+    Pattern.compile("private\\s+String\\s+languageCode\\s*;\\s*(?!.*@Pattern)"),
+
+    // 67. Missing @SafeHtml validation for HTML content
+    Pattern.compile("private\\s+String\\s+htmlContent\\s*;\\s*(?!.*@SafeHtml)")
+
+);
+public static final List<Pattern> missingValidationPatterns = Arrays.asList(
+
+    // 68. No @Min or @Max validation for age fields
+    Pattern.compile("private\\s+int\\s+age\\s*;\\s*(?!.*@(Min|Max))"),
+
+    // 69. No @Size restriction on usernames
+    Pattern.compile("private\\s+String\\s+username\\s*;\\s*(?!.*@Size)"),
+
+    // 70. No @Pattern validation for email fields
+    Pattern.compile("private\\s+String\\s+email\\s*;\\s*(?!.*@Pattern\\(regexp\\s*=\\s*\\\"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\\\.[A-Za-z]{2,6}$\\\"\\))"),
+
+    // 71. No @Pattern validation for phone numbers
+    Pattern.compile("private\\s+String\\s+phoneNumber\\s*;\\s*(?!.*@Pattern)"),
+
+    // 72. No validation for social security numbers (SSN)
+    Pattern.compile("private\\s+String\\s+ssn\\s*;\\s*(?!.*@Pattern)"),
+
+    // 73. No @NotNull for required request parameters
+    Pattern.compile("\\@RequestParam\\(.*\\)\\s+String\\s+[a-zA-Z0-9_]+(?!.*@NotNull)"),
+
+    // 74. No validation for uploaded file size
+    Pattern.compile("\\@RequestParam\\(.*MultipartFile.*\\)\\s+[a-zA-Z0-9_]+(?!.*@Size)"),
+
+    // 75. No validation on list size in DTOs
+    Pattern.compile("private\\s+List<.*>\\s+[a-zA-Z0-9_]+\\s*;\\s*(?!.*@Size)"),
+
+    // 76. No @Pattern validation for UUID fields
+    Pattern.compile("private\\s+String\\s+uuid\\s*;\\s*(?!.*@Pattern)"),
+
+    // 77. No validation for password complexity
+    Pattern.compile("private\\s+String\\s+password\\s*;\\s*(?!.*@Pattern)"),
+
+    // 78. No @Pattern validation for IP addresses
+    Pattern.compile("private\\s+String\\s+ipAddress\\s*;\\s*(?!.*@Pattern)"),
+
+    // 79. No validation for HTTP request method type in APIs
+    Pattern.compile("\\@RequestMapping\\(.*\\)\\s+public\\s+[a-zA-Z0-9]+\\s+[a-zA-Z0-9]+\\s*\\("),
+
+    // 80. No validation for Base64 encoded input fields
+    Pattern.compile("private\\s+String\\s+base64Data\\s*;\\s*(?!.*@Pattern)"),
+
+    // 81. No @SafeHtml validation for user-generated HTML content
+    Pattern.compile("private\\s+String\\s+htmlContent\\s*;\\s*(?!.*@SafeHtml)"),
+
+    // 82. No validation for file extension type in file uploads
+    Pattern.compile("private\\s+String\\s+fileName\\s*;\\s*(?!.*@Pattern)"),
+
+    // 83. No validation for financial transaction amounts
+    Pattern.compile("private\\s+(BigDecimal|double)\\s+amount\\s*;\\s*(?!.*@Digits)"),
+
+    // 84. No validation for currency symbols in transaction fields
+    Pattern.compile("private\\s+String\\s+currency\\s*;\\s*(?!.*@Pattern)"),
+
+    // 85. No @JsonIgnore on sensitive token fields
+    Pattern.compile("private\\s+String\\s+(authToken|refreshToken|apiKey)\\s*;\\s*(?!.*@JsonIgnore)"),
+
+    // 86. No @Pattern validation for ZIP/postal codes
+    Pattern.compile("private\\s+String\\s+zipCode\\s*;\\s*(?!.*@Pattern)"),
+
+    // 87. No @Pattern validation for credit card numbers
+    Pattern.compile("private\\s+String\\s+creditCardNumber\\s*;\\s*(?!.*@Pattern)"),
+
+    // 88. No validation for transaction reference IDs
+    Pattern.compile("private\\s+String\\s+transactionId\\s*;\\s*(?!.*@Pattern)"),
+
+    // 89. No @Pattern validation for two-factor authentication codes
+    Pattern.compile("private\\s+String\\s+otpCode\\s*;\\s*(?!.*@Pattern)"),
+
+    // 90. No @Range validation for latitude and longitude values
+    Pattern.compile("private\\s+(double|Double)\\s+(latitude|longitude)\\s*;\\s*(?!.*@Range)"),
+
+    // 91. No validation for JWT tokens in request headers
+    Pattern.compile("\\@RequestHeader\\(.*Authorization.*\\)\\s+String\\s+token(?!.*@Pattern)"),
+
+    // 92. No validation for invoice numbers
+    Pattern.compile("private\\s+String\\s+invoiceNumber\\s*;\\s*(?!.*@Pattern)"),
+
+    // 93. No @Pattern validation for vehicle registration numbers
+    Pattern.compile("private\\s+String\\s+vehicleNumber\\s*;\\s*(?!.*@Pattern)"),
+
+    // 94. No validation for binary data in Base64 format
+    Pattern.compile("private\\s+String\\s+binaryData\\s*;\\s*(?!.*@Pattern)"),
+
+    // 95. No validation for SSN fields in DTOs
+    Pattern.compile("private\\s+String\\s+socialSecurityNumber\\s*;\\s*(?!.*@Pattern)"),
+
+    // 96. No validation for discount percentage fields
+    Pattern.compile("private\\s+(double|Double)\\s+discountPercentage\\s*;\\s*(?!.*@Range)"),
+
+    // 97. No validation for event timestamps
+    Pattern.compile("private\\s+String\\s+eventTimestamp\\s*;\\s*(?!.*@Pattern)"),
+
+    // 98. No validation for encrypted data input fields
+    Pattern.compile("private\\s+String\\s+encryptedData\\s*;\\s*(?!.*@Pattern)"),
+
+    // 99. No validation for unique order numbers
+    Pattern.compile("private\\s+String\\s+orderNumber\\s*;\\s*(?!.*@Pattern)"),
+
+    // 100. No validation for geolocation coordinates
+    Pattern.compile("private\\s+String\\s+geoLocation\\s*;\\s*(?!.*@Pattern)"),
+
+    // 101. No validation for MAC addresses
+    Pattern.compile("private\\s+String\\s+macAddress\\s*;\\s*(?!.*@Pattern)"),
+
+    // 102. No @Pattern validation for user role strings
+    Pattern.compile("private\\s+String\\s+userRole\\s*;\\s*(?!.*@Pattern)"),
+
+    // 103. No validation for organization identifiers
+    Pattern.compile("private\\s+String\\s+organizationId\\s*;\\s*(?!.*@Pattern)"),
+
+    // 104. No validation for license plate numbers
+    Pattern.compile("private\\s+String\\s+licensePlate\\s*;\\s*(?!.*@Pattern)"),
+
+    // 105. No validation for cloud storage bucket names
+    Pattern.compile("private\\s+String\\s+bucketName\\s*;\\s*(?!.*@Pattern)"),
+
+    // 106. No validation for SSH key fingerprints
+    Pattern.compile("private\\s+String\\s+sshFingerprint\\s*;\\s*(?!.*@Pattern)"),
+
+    // 107. No validation for device serial numbers
+    Pattern.compile("private\\s+String\\s+deviceSerial\\s*;\\s*(?!.*@Pattern)"),
+
+    // 108. No validation for Git commit hashes
+    Pattern.compile("private\\s+String\\s+commitHash\\s*;\\s*(?!.*@Pattern)"),
+
+    // 109. No validation for API version numbers
+    Pattern.compile("private\\s+String\\s+apiVersion\\s*;\\s*(?!.*@Pattern)"),
+
+    // 110. No validation for software license keys
+    Pattern.compile("private\\s+String\\s+licenseKey\\s*;\\s*(?!.*@Pattern)")
+
+);
