@@ -1,0 +1,617 @@
+public static final List<Pattern> idorPatterns = Arrays.asList(
+
+    // 1. Direct object reference in URL without validation
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*url\\s*\\+\\s*\"/[^/]+/[a-zA-Z0-9]+\"\\})"), // Direct object reference in route URL
+
+    // 2. Exposed sensitive object data without permission check
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*object\\s*\\+\\s*\"[a-zA-Z0-9]+\"\\})"), // Sensitive object exposed in response
+
+    // 3. Missing user authentication and authorization check on resource access
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*userId\\s*\\+\\s*\"[a-zA-Z0-9]+\"\\})"), // Missing authentication for object access
+    
+    // 4. URL parameter directly mapped to internal resource
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*id\\s*\\+\\s*\"[a-zA-Z0-9]+\"\\})"), // ID directly passed from URL to internal resource
+
+    // 5. Object access without checking for user roles or permissions
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*role\\s*==\\s*\"[a-zA-Z]+\"\\})"), // Exposed endpoint with no RBAC validation
+
+    // 6. Exposed user-specific data via unverified URL parameter
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*userId\\s*==\\s*\"[a-zA-Z0-9]+\"\\})"), // Exposed user data in URL
+
+    // 7. Direct object manipulation through user input
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*id\\s*\\+\\s*\"[a-zA-Z0-9]+\"\\})"), // Direct object access from user input
+
+    // 8. No validation of user input for object access
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*request\\.params\\[\"id\"\\]"), // Missing validation of ID in request params
+
+    // 9. Sensitive object data returned in response without authorization
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*res\\.json\\(\\{\\s*userId\\s*:\\s*request\\.params\\[\"userId\"\\],"), // Sensitive data exposed in response
+    
+    // 10. Unauthorized access to user-specific resources
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*resourceId\\s*\\+\\s*\"[a-zA-Z0-9]+\"\\})"), // Unauthorized access to resources with ID
+
+    // 11. Lack of authorization check for accessing admin endpoints
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*if\\s*\\(!user\\.isAdmin\\)\\s*return\\s*Forbidden"), // Admin check missing
+
+    // 12. Using unfiltered URL parameters in database queries
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*db\\.find\\(\\{userId:\\s*request\\.params\\[\"userId\"\\],\\}),"), // Direct database query with unfiltered input
+    
+    // 13. Direct access to resources by passing user ID as a parameter
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*request\\.params\\[\"userId\"\\]"), // Direct access by user ID
+    
+    // 14. Missing validation for user input when accessing private routes
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*request\\.body\\[\"resourceId\"\\]"), // Missing validation for input on private route
+
+    // 15. Public route directly exposes sensitive object IDs
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*id\\s*\\+\\s*\"/api/objects/[a-zA-Z0-9]+\""), // Public route exposing sensitive object IDs
+
+    // 16. Lack of authentication or authorization check on object deletion
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*if\\s*\\(user\\.isAuthenticated\\)"), // Deletion without proper authorization
+
+    // 17. Direct object manipulation using untrusted inputs
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*resource\\s*\\+\\s*request\\.params\\[\"resourceId\"\\]"), // Direct manipulation with user input
+
+    // 18. User-based resource access without validating if the user owns the object
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*if\\s*\\(user\\.owns\\(resource\\)\\)\\s*return"), // Resource access without ownership validation
+
+    // 19. Accessing object by user ID with no checks on permissions
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*request\\.params\\[\"userId\"\\]"), // Access object by user ID
+
+    // 20. Exposed admin-specific data in response without authorization checks
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*adminData\\s*:\\s*\"[a-zA-Z0-9]+\"\\}") // Admin data exposed without validation
+
+    // Patterns 21 to 50: Follow similar patterns by checking for other cases of object access, sensitive data exposure, missing authorization checks, or direct manipulation of data through unfiltered user input
+);
+public static final List<Pattern> idorPatterns = Arrays.asList(
+
+    // 21. Direct object access without validating session user
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*session\\.userId\\s*:\\s*request\\.params\\[\"userId\"\\])"), 
+
+    // 22. Lack of ownership check for resource access
+    Pattern.compile("\\b(request\\.params\\[\"resourceId\"\\])[^}]*\\bfindById\\b"), 
+
+    // 23. Object retrieval without verifying request origin
+    Pattern.compile("\\b(app\\.(get|post|put|delete)\\s*\\(.\\)\\s*=>\\s*\\{[^}]*res\\.json\\(\\{[^}]*id: request\\.params\\[\"id\"\\])"), 
+
+    // 24. Insecure direct access to admin resources
+    Pattern.compile("\\b(/admin/\\w+)"), 
+
+    // 25. No user session check for sensitive object access
+    Pattern.compile("\\b(findById|getById)\\(request\\.params\\[\"userId\"\\]\\)"), 
+
+    // 26. Updating sensitive object without validating ownership
+    Pattern.compile("\\b(update|delete)\\([^)]*request\\.params\\[\"id\"\\])"), 
+
+    // 27. Direct use of request parameter in DB queries
+    Pattern.compile("\\bdb\\.(find|update|delete)\\([^)]*request\\.params\\[\"(id|userId)\"\\])"), 
+
+    // 28. Missing access check for user-specific data export
+    Pattern.compile("\\b(exportData|getExport)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 29. Bypassing authorization by manipulating query params
+    Pattern.compile("\\b(request\\.params\\[\"id\"\\])\\b.*\\bfindById\\b"), 
+
+    // 30. Allowing unauthenticated file downloads by user ID
+    Pattern.compile("\\b(downloadFile|getFile)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 31. No authorization check on batch object processing
+    Pattern.compile("\\b(batchProcess|bulkUpdate)\\([^)]*request\\.params\\[\"id\"\\])"), 
+
+    // 32. Accessing private resources without ownership check
+    Pattern.compile("\\b(privateResource)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 33. Failure to validate user identity in access control
+    Pattern.compile("\\b(validateAccess|checkAccess)\\([^)]*request\\.params\\[\"id\"\\])"), 
+
+    // 34. Insecure use of user input in object fetch methods
+    Pattern.compile("\\b(getObject|fetchResource)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 35. No proper permission check for object updates
+    Pattern.compile("\\b(update|modify)\\([^)]*request\\.params\\[\"id\"\\])"), 
+
+    // 36. Missing user-specific access control in logs
+    Pattern.compile("\\b(getLogs|fetchLogs)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 37. Object manipulation via untrusted request input
+    Pattern.compile("\\b(manipulate|modify)\\([^)]*request\\.params\\[\"id\"\\])"), 
+
+    // 38. No session verification for sensitive resource access
+    Pattern.compile("\\b(getSensitiveData)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 39. Unrestricted access to user configurations
+    Pattern.compile("\\b(getConfig|updateConfig)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 40. Failing to check user privileges on deletion
+    Pattern.compile("\\b(deleteResource)\\([^)]*request\\.params\\[\"id\"\\])"), 
+
+    // 41. Authorization bypass via unprotected endpoints
+    Pattern.compile("\\b(publicEndpoint)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 42. Allowing direct object enumeration in APIs
+    Pattern.compile("\\b(enumerateObjects)\\([^)]*request\\.params\\[\"id\"\\])"), 
+
+    // 43. Accessing sensitive records without session check
+    Pattern.compile("\\b(getRecord)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 44. No ownership check for sensitive updates
+    Pattern.compile("\\b(updateSensitiveData)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 45. Fetching confidential data without authorization
+    Pattern.compile("\\b(fetchConfidential)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 46. Allowing unauthorized object transfer
+    Pattern.compile("\\b(transferResource)\\([^)]*request\\.params\\[\"id\"\\])"), 
+
+    // 47. Direct manipulation of private resources
+    Pattern.compile("\\b(privateUpdate)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 48. Fetching private user data without validation
+    Pattern.compile("\\b(getPrivateData)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 49. Accessing audit logs without privilege checks
+    Pattern.compile("\\b(getAuditLogs)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 50. Insecure access to internal monitoring tools
+    Pattern.compile("\\b(internalMonitor)\\([^)]*request\\.params\\[\"userId\"\\])") 
+
+);
+public static final List<Pattern> idorPatterns = Arrays.asList(
+
+    // 51. Directly exposing sensitive user information without authorization
+    Pattern.compile("\\b(response\\.json\\(\\{.*\"userId\": request\\.params\\[\"userId\"\\])"), 
+
+    // 52. Fetching user data without validating session ownership
+    Pattern.compile("\\b(db\\.findOne\\(\\{\\s*userId:\\s*request\\.params\\[\"userId\"\\])"), 
+
+    // 53. Querying objects based on external user input without validation
+    Pattern.compile("\\b(db\\.find\\(\\{.*id:\\s*request\\.params\\[\"id\"\\])"), 
+
+    // 54. Missing authentication check when accessing private user data
+    Pattern.compile("\\b(getUserInfo|getProfile|getSettings)\\(request\\.params\\[\"userId\"\\])"), 
+
+    // 55. Failure to verify permissions before modifying an object
+    Pattern.compile("\\b(update|delete|modify)\\([^)]*request\\.params\\[\"id\"\\])"), 
+
+    // 56. Directly injecting user input into admin-only endpoints
+    Pattern.compile("\\b(/admin/[^ ]+\\?userId=\\w+)"), 
+
+    // 57. Missing validation when performing transactions with user input
+    Pattern.compile("\\b(executeTransaction|processPayment)\\(request\\.params\\[\"userId\"\\])"), 
+
+    // 58. Exposing internal IDs via query parameters in API responses
+    Pattern.compile("\\b(response\\.json\\(\\{.*\"id\": request\\.params\\[\"id\"\\])"), 
+
+    // 59. Public API allowing object modification without ownership verification
+    Pattern.compile("\\b(updateResource|modifyObject)\\([^)]*request\\.params\\[\"id\"\\])"), 
+
+    // 60. Allowing user ID enumeration through sequential identifiers
+    Pattern.compile("\\b(getUserById|getAccountDetails)\\(request\\.params\\[\"userId\"\\])"), 
+
+    // 61. Insecure retrieval of sensitive documents via direct ID input
+    Pattern.compile("\\b(getDocument|fetchFile)\\([^)]*request\\.params\\[\"documentId\"\\])"), 
+
+    // 62. No authorization check when deleting resources
+    Pattern.compile("\\b(deleteItem|removeEntry)\\([^)]*request\\.params\\[\"id\"\\])"), 
+
+    // 63. No permission validation for batch operations on objects
+    Pattern.compile("\\b(batchDelete|bulkUpdate)\\([^)]*request\\.params\\[\"id\"\\])"), 
+
+    // 64. Insecure access to stored user preferences
+    Pattern.compile("\\b(getPreferences|getUserSettings)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 65. Allowing ID-based mass assignment without verification
+    Pattern.compile("\\b(assignRole|changeOwnership)\\([^)]*request\\.params\\[\"id\"\\])"), 
+
+    // 66. Querying sensitive records without session validation
+    Pattern.compile("\\b(getPaymentHistory|getTransactionLogs)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 67. Allowing unrestricted role modification via user input
+    Pattern.compile("\\b(changeRole|updatePermissions)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 68. No validation before performing critical actions
+    Pattern.compile("\\b(executeAdminTask|runCommand)\\([^)]*request\\.params\\[\"id\"\\])"), 
+
+    // 69. Allowing direct access to API keys or tokens
+    Pattern.compile("\\b(getApiKey|getAccessToken)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 70. Bypassing authentication checks in sensitive operations
+    Pattern.compile("\\b(executeCommand|runScript)\\([^)]*request\\.params\\[\"id\"\\])"), 
+
+    // 71. Exposing unrestricted access to email addresses
+    Pattern.compile("\\b(getUserEmail|getEmails)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 72. Allowing access to internal system logs without verification
+    Pattern.compile("\\b(getSystemLogs|getAuditRecords)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 73. Fetching private user messages via direct ID reference
+    Pattern.compile("\\b(getMessages|getChatHistory)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 74. No authentication check before processing user payments
+    Pattern.compile("\\b(processTransaction|chargeAccount)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 75. Allowing direct access to stored credit card information
+    Pattern.compile("\\b(getCreditCard|getBillingDetails)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 76. Failure to restrict sensitive admin data exposure
+    Pattern.compile("\\b(getAdminInfo|getSuperuserData)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 77. Allowing unrestricted modification of account settings
+    Pattern.compile("\\b(updateAccountSettings|modifyUserPreferences)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 78. No validation before sending email notifications
+    Pattern.compile("\\b(sendEmail|triggerAlert)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 79. No authentication required to download protected files
+    Pattern.compile("\\b(downloadFile|getUserFile)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 80. Allowing direct modification of security settings
+    Pattern.compile("\\b(updateSecuritySettings|change2FA)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 81. No validation before resetting user passwords
+    Pattern.compile("\\b(resetPassword|updateCredentials)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 82. Allowing unrestricted access to detailed user reports
+    Pattern.compile("\\b(getUserReport|getUsageStats)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 83. Querying social media connections without access control
+    Pattern.compile("\\b(getFriendsList|getConnections)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 84. No restriction when accessing internal debugging tools
+    Pattern.compile("\\b(getDebugInfo|getServerStatus)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 85. Unrestricted retrieval of user geolocation data
+    Pattern.compile("\\b(getLocation|getUserCoordinates)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 86. Publicly exposing internal server API endpoints
+    Pattern.compile("\\b(/api/internal/[^ ]+)"), 
+
+    // 87. No authorization check before performing system updates
+    Pattern.compile("\\b(executeUpdate|runMigration)\\([^)]*request\\.params\\[\"id\"\\])"), 
+
+    // 88. Allowing users to escalate privileges via ID manipulation
+    Pattern.compile("\\b(escalatePrivilege|assignAdmin)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 89. Fetching private API logs without authentication
+    Pattern.compile("\\b(getApiLogs|getErrorReports)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 90. Directly accessing sensitive business analytics reports
+    Pattern.compile("\\b(getBusinessData|getMarketAnalysis)\\([^)]*request\\.params\\[\"userId\"\\])") 
+);
+public static final List<Pattern> idorPatterns = Arrays.asList(
+
+    // 91. Allowing unauthorized modification of financial records
+    Pattern.compile("\\b(updateFinancials|modifyTransaction)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 92. Fetching raw database records without authentication
+    Pattern.compile("\\b(getRawData|getDbEntries)\\([^)]*request\\.params\\[\"id\"\\])"), 
+
+    // 93. Allowing unrestricted access to API documentation meant for admins
+    Pattern.compile("\\b(/admin/docs/[^ ]+)"), 
+
+    // 94. No verification when retrieving private access logs
+    Pattern.compile("\\b(getAccessLogs|getLoginAttempts)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 95. Allowing user impersonation via unvalidated ID input
+    Pattern.compile("\\b(impersonateUser|switchAccount)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 96. Unrestricted access to protected routes via user ID
+    Pattern.compile("\\b(/protected/[^ ]+\\?userId=\\w+)"), 
+
+    // 97. Querying and displaying security events without permission checks
+    Pattern.compile("\\b(getSecurityEvents|getThreatReports)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 98. Allowing direct changes to authentication mechanisms
+    Pattern.compile("\\b(updateAuthMethod|changeLoginFlow)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 99. Fetching confidential business reports without access control
+    Pattern.compile("\\b(getRevenueReport|getSalesData)\\([^)]*request\\.params\\[\"userId\"\\])"), 
+
+    // 100. Bypassing 2FA enforcement by manipulating request parameters
+    Pattern.compile("\\b(bypass2FA|disableMFA)\\([^)]*request\\.params\\[\"userId\"\\])") 
+
+);
+public static final List<Pattern> rbacPatterns = Arrays.asList(
+
+    // 1. No role check in API endpoint
+    Pattern.compile("\\bapp\\.(get|post|put|delete)\\s*\\([^)]*\\)\\s*=>\\s*\\{[^}]*\\}"), 
+
+    // 2. Exposed sensitive routes with no RBAC
+    Pattern.compile("/admin/settings/user-management"), 
+
+    // 3. Unrestricted access to admin panel
+    Pattern.compile("/admin/dashboard"), 
+
+    // 4. No role verification before modifying user roles
+    Pattern.compile("\\b(updateUserRole|changeUserPermissions)\\([^)]*\\)"), 
+
+    // 5. Allowing any user to access sensitive logs
+    Pattern.compile("\\b(getSystemLogs|getAuditRecords)\\([^)]*\\)"), 
+
+    // 6. No role check when deleting a user
+    Pattern.compile("\\b(deleteUser|removeAccount)\\([^)]*\\)"), 
+
+    // 7. Modifying critical security settings without role validation
+    Pattern.compile("\\b(updateSecuritySettings|modify2FA)\\([^)]*\\)"), 
+
+    // 8. No RBAC enforcement when managing API keys
+    Pattern.compile("\\b(getApiKey|generateToken)\\([^)]*\\)"), 
+
+    // 9. Allowing role assignment without permission validation
+    Pattern.compile("\\b(assignRole|updateUserRole)\\([^)]*\\)"), 
+
+    // 10. No role validation when executing admin-only commands
+    Pattern.compile("\\b(runAdminTask|executeCommand)\\([^)]*\\)"), 
+
+    // 11. Directly exposing user permissions without RBAC
+    Pattern.compile("\\b(getUserPermissions|getRoles)\\([^)]*\\)"), 
+
+    // 12. Unrestricted modification of user accounts
+    Pattern.compile("\\b(updateUserProfile|editAccountSettings)\\([^)]*\\)"), 
+
+    // 13. Fetching private user details without authorization
+    Pattern.compile("\\b(getUserInfo|getAccountDetails)\\([^)]*\\)"), 
+
+    // 14. No RBAC validation when resetting user passwords
+    Pattern.compile("\\b(resetPassword|forcePasswordChange)\\([^)]*\\)"), 
+
+    // 15. Allowing user impersonation without restrictions
+    Pattern.compile("\\b(impersonateUser|switchAccount)\\([^)]*\\)"), 
+
+    // 16. No role check before processing financial transactions
+    Pattern.compile("\\b(processPayment|approveTransaction)\\([^)]*\\)"), 
+
+    // 17. Allowing unrestricted deletion of application data
+    Pattern.compile("\\b(deleteRecord|removeData)\\([^)]*\\)"), 
+
+    // 18. No role validation when modifying system configurations
+    Pattern.compile("\\b(updateConfig|modifySystemSettings)\\([^)]*\\)"), 
+
+    // 19. Unrestricted access to API usage statistics
+    Pattern.compile("\\b(getApiStats|getUsageReport)\\([^)]*\\)"), 
+
+    // 20. Exposed admin-only API endpoints without role checks
+    Pattern.compile("/api/admin/[^ ]+"), 
+
+    // 21. No RBAC in customer support ticket management
+    Pattern.compile("\\b(updateTicketStatus|resolveCustomerIssue)\\([^)]*\\)"), 
+
+    // 22. Allowing unrestricted access to audit logs
+    Pattern.compile("\\b(getAuditLog|getSecurityEvents)\\([^)]*\\)"), 
+
+    // 23. No role validation in batch operations
+    Pattern.compile("\\b(batchDelete|bulkUpdate)\\([^)]*\\)"), 
+
+    // 24. Unrestricted access to system debugging tools
+    Pattern.compile("\\b(getDebugInfo|getErrorLogs)\\([^)]*\\)"), 
+
+    // 25. No role verification before disabling accounts
+    Pattern.compile("\\b(disableAccount|suspendUser)\\([^)]*\\)"), 
+
+    // 26. Allowing unrestricted privilege escalation
+    Pattern.compile("\\b(assignAdminRole|grantSuperUser)\\([^)]*\\)"), 
+
+    // 27. No role validation when modifying authentication settings
+    Pattern.compile("\\b(updateAuthSettings|changeAuthConfig)\\([^)]*\\)"), 
+
+    // 28. Unrestricted retrieval of sensitive business data
+    Pattern.compile("\\b(getRevenueReports|getFinancialData)\\([^)]*\\)"), 
+
+    // 29. No RBAC in messaging or notifications system
+    Pattern.compile("\\b(sendSystemAlert|broadcastMessage)\\([^)]*\\)"), 
+
+    // 30. No permission check when modifying API rate limits
+    Pattern.compile("\\b(updateRateLimit|adjustThrottle)\\([^)]*\\)"), 
+
+    // 31. Allowing unrestricted access to private files
+    Pattern.compile("\\b(downloadFile|getPrivateDocument)\\([^)]*\\)"), 
+
+    // 32. No role validation before modifying role-based access settings
+    Pattern.compile("\\b(updateRBACSettings|modifyAccessRules)\\([^)]*\\)"), 
+
+    // 33. Allowing public access to private audit reports
+    Pattern.compile("\\b(getInternalReport|getConfidentialData)\\([^)]*\\)"), 
+
+    // 34. No authorization check when resetting API keys
+    Pattern.compile("\\b(resetApiKey|revokeToken)\\([^)]*\\)"), 
+
+    // 35. Allowing unrestricted server shutdown or restart
+    Pattern.compile("\\b(shutdownServer|restartSystem)\\([^)]*\\)"), 
+
+    // 36. No RBAC validation when assigning user roles dynamically
+    Pattern.compile("\\b(dynamicRoleAssignment|modifyPermissions)\\([^)]*\\)"), 
+
+    // 37. Unrestricted execution of server-side scripts
+    Pattern.compile("\\b(executeScript|runShellCommand)\\([^)]*\\)"), 
+
+    // 38. No authorization check before changing system-wide configurations
+    Pattern.compile("\\b(changeGlobalSettings|updateSystemFlags)\\([^)]*\\)"), 
+
+    // 39. Allowing any user to create or delete administrator accounts
+    Pattern.compile("\\b(createAdminAccount|removeSuperUser)\\([^)]*\\)"), 
+
+    // 40. No role verification in cloud storage access
+    Pattern.compile("\\b(getCloudStorage|getBackupFiles)\\([^)]*\\)"), 
+
+    // 41. No RBAC enforcement in API gateway configurations
+    Pattern.compile("\\b(modifyApiGateway|updateApiRouting)\\([^)]*\\)"), 
+
+    // 42. Allowing unrestricted access to analytics dashboards
+    Pattern.compile("\\b(viewAnalytics|getDashboardData)\\([^)]*\\)"), 
+
+    // 43. No RBAC in log export functions
+    Pattern.compile("\\b(exportLogs|downloadAuditRecords)\\([^)]*\\)"), 
+
+    // 44. No permission check when modifying security groups
+    Pattern.compile("\\b(updateSecurityGroups|changeFirewallRules)\\([^)]*\\)"), 
+
+    // 45. Allowing unrestricted access to encryption keys
+    Pattern.compile("\\b(getEncryptionKey|getMasterKey)\\([^)]*\\)"), 
+
+    // 46. No RBAC verification before modifying user sessions
+    Pattern.compile("\\b(invalidateSession|terminateAllSessions)\\([^)]*\\)"), 
+
+    // 47. Unrestricted modification of licensing and subscription data
+    Pattern.compile("\\b(updateLicense|modifySubscription)\\([^)]*\\)"), 
+
+    // 48. No role check when viewing confidential user agreements
+    Pattern.compile("\\b(getUserAgreements|getLegalDocs)\\([^)]*\\)"), 
+
+    // 49. Unrestricted access to administrator actions logs
+    Pattern.compile("\\b(getAdminActions|getPrivilegedLogs)\\([^)]*\\)"), 
+
+    // 50. No role validation when modifying multi-factor authentication settings
+    Pattern.compile("\\b(updateMFASettings|disable2FA)\\([^)]*\\)")
+
+);
+public static final List<Pattern> rbacPatterns = Arrays.asList(
+
+    // 51. No role verification before updating user profiles
+    Pattern.compile("\\b(updateUserProfile|editProfile)\\([^)]*\\)"), 
+
+    // 52. No RBAC enforcement when retrieving confidential system reports
+    Pattern.compile("\\b(getSystemReports|getSensitiveData)\\([^)]*\\)"), 
+
+    // 53. Unrestricted modification of admin settings
+    Pattern.compile("\\b(updateAdminConfig|modifySuperUserSettings)\\([^)]*\\)"), 
+
+    // 54. No role check before accessing private customer data
+    Pattern.compile("\\b(getCustomerInfo|getPrivateClientData)\\([^)]*\\)"), 
+
+    // 55. No permission validation before executing privileged commands
+    Pattern.compile("\\b(executePrivilegedCommand|runAdminScript)\\([^)]*\\)"), 
+
+    // 56. Unrestricted deletion of critical database entries
+    Pattern.compile("\\b(deleteCriticalData|removeSensitiveRecords)\\([^)]*\\)"), 
+
+    // 57. No RBAC validation when generating API credentials
+    Pattern.compile("\\b(generateApiCredentials|getAccessTokens)\\([^)]*\\)"), 
+
+    // 58. Exposing admin panel routes without role-based restrictions
+    Pattern.compile("/admin/panel/[^ ]+"), 
+
+    // 59. No role validation before making mass updates
+    Pattern.compile("\\b(bulkUpdateUsers|massRoleAssignment)\\([^)]*\\)"), 
+
+    // 60. Allowing unrestricted modification of multi-tenancy settings
+    Pattern.compile("\\b(updateTenantConfig|modifyTenantPermissions)\\([^)]*\\)"), 
+
+    // 61. No RBAC verification when fetching user session details
+    Pattern.compile("\\b(getSessionDetails|getActiveSessions)\\([^)]*\\)"), 
+
+    // 62. Allowing public access to secure audit logs
+    Pattern.compile("\\b(getSecureAuditLogs|getConfidentialRecords)\\([^)]*\\)"), 
+
+    // 63. No permission validation before performing user account takeovers
+    Pattern.compile("\\b(takeOverAccount|assumeUserIdentity)\\([^)]*\\)"), 
+
+    // 64. Unrestricted access to internal debugging endpoints
+    Pattern.compile("/internal/debug/[^ ]+"), 
+
+    // 65. No role validation before accessing privileged APIs
+    Pattern.compile("\\b(getPrivilegedApis|getAdminEndpoints)\\([^)]*\\)"), 
+
+    // 66. Allowing any user to trigger system backups
+    Pattern.compile("\\b(triggerBackup|createSystemSnapshot)\\([^)]*\\)"), 
+
+    // 67. No RBAC validation when handling private keys
+    Pattern.compile("\\b(getPrivateKeys|getEncryptionSecrets)\\([^)]*\\)"), 
+
+    // 68. No permission enforcement in cloud infrastructure changes
+    Pattern.compile("\\b(modifyCloudConfig|changeCloudSettings)\\([^)]*\\)"), 
+
+    // 69. No authorization check when modifying firewall configurations
+    Pattern.compile("\\b(updateFirewallRules|changeNetworkSecurity)\\([^)]*\\)"), 
+
+    // 70. Unrestricted access to premium content without role validation
+    Pattern.compile("\\b(getPremiumContent|accessRestrictedFeatures)\\([^)]*\\)"), 
+
+    // 71. No RBAC in server shutdown or restart commands
+    Pattern.compile("\\b(shutdownServer|restartInstance)\\([^)]*\\)"), 
+
+    // 72. Allowing unauthorized changes to user notifications settings
+    Pattern.compile("\\b(updateNotificationSettings|modifyAlerts)\\([^)]*\\)"), 
+
+    // 73. No role validation before accessing API gateway configurations
+    Pattern.compile("\\b(getApiGatewayConfig|getRoutingRules)\\([^)]*\\)"), 
+
+    // 74. Allowing public access to private admin reports
+    Pattern.compile("\\b(getAdminReports|getInternalMetrics)\\([^)]*\\)"), 
+
+    // 75. No RBAC in bulk data deletion actions
+    Pattern.compile("\\b(bulkDelete|batchRemoveRecords)\\([^)]*\\)"), 
+
+    // 76. No role validation before modifying authentication rules
+    Pattern.compile("\\b(updateAuthRules|modifyAuthPolicy)\\([^)]*\\)"), 
+
+    // 77. Unrestricted access to confidential financial reports
+    Pattern.compile("\\b(getFinancialReports|getInternalRevenueData)\\([^)]*\\)"), 
+
+    // 78. No role verification when assigning privileged roles
+    Pattern.compile("\\b(assignPrivilegedRole|elevateUserPermissions)\\([^)]*\\)"), 
+
+    // 79. Allowing unrestricted export of sensitive data
+    Pattern.compile("\\b(exportSensitiveData|downloadProtectedFiles)\\([^)]*\\)"), 
+
+    // 80. No RBAC validation when overriding session timeouts
+    Pattern.compile("\\b(updateSessionTimeout|modifySessionPolicy)\\([^)]*\\)"), 
+
+    // 81. Allowing public users to retrieve encryption keys
+    Pattern.compile("\\b(getEncryptionKeys|getKeyVaultSecrets)\\([^)]*\\)"), 
+
+    // 82. No role enforcement when managing system-wide access controls
+    Pattern.compile("\\b(updateAccessControl|modifySecurityPolicy)\\([^)]*\\)"), 
+
+    // 83. No RBAC validation before triggering critical alerts
+    Pattern.compile("\\b(triggerCriticalAlert|raiseSecurityWarning)\\([^)]*\\)"), 
+
+    // 84. Allowing unrestricted updates to identity provider configurations
+    Pattern.compile("\\b(updateIdPConfig|modifyOAuthSettings)\\([^)]*\\)"), 
+
+    // 85. No role validation before executing system maintenance tasks
+    Pattern.compile("\\b(runSystemMaintenance|executeServerCleanup)\\([^)]*\\)"), 
+
+    // 86. Unrestricted deletion of historical event logs
+    Pattern.compile("\\b(deleteEventLogs|purgeHistory)\\([^)]*\\)"), 
+
+    // 87. No RBAC enforcement when modifying cloud storage access policies
+    Pattern.compile("\\b(updateCloudStoragePolicy|modifyCloudPermissions)\\([^)]*\\)"), 
+
+    // 88. Allowing any user to modify network configuration settings
+    Pattern.compile("\\b(updateNetworkConfig|modifyRoutingTable)\\([^)]*\\)"), 
+
+    // 89. No role check before running system integrity checks
+    Pattern.compile("\\b(runIntegrityCheck|executeSystemDiagnostics)\\([^)]*\\)"), 
+
+    // 90. Allowing unrestricted removal of administrator accounts
+    Pattern.compile("\\b(removeAdminAccount|deleteSuperUser)\\([^)]*\\)"), 
+
+    // 91. No RBAC validation before editing system-wide policies
+    Pattern.compile("\\b(updateSystemPolicy|modifyGlobalSettings)\\([^)]*\\)"), 
+
+    // 92. Allowing unrestricted access to protected health records
+    Pattern.compile("\\b(getHealthRecords|getConfidentialMedicalData)\\([^)]*\\)"), 
+
+    // 93. No role validation when retrieving server environment variables
+    Pattern.compile("\\b(getServerEnvironment|getSensitiveConfig)\\([^)]*\\)"), 
+
+    // 94. Allowing unrestricted account verification bypass
+    Pattern.compile("\\b(bypassAccountVerification|disableUserValidation)\\([^)]*\\)"), 
+
+    // 95. No RBAC when modifying user-generated content
+    Pattern.compile("\\b(modifyUserContent|editPublicPosts)\\([^)]*\\)"), 
+
+    // 96. Unrestricted execution of critical system scripts
+    Pattern.compile("\\b(executeCriticalScript|runDangerousCommand)\\([^)]*\\)"), 
+
+    // 97. No role verification before initiating system-wide migrations
+    Pattern.compile("\\b(startSystemMigration|executeDatabaseTransfer)\\([^)]*\\)"), 
+
+    // 98. No RBAC validation when setting user quotas and limits
+    Pattern.compile("\\b(setUserQuota|updateUsageLimits)\\([^)]*\\)"), 
+
+    // 99. Allowing unrestricted modifications to logging configurations
+    Pattern.compile("\\b(updateLoggingConfig|modifyLogPolicy)\\([^)]*\\)"), 
+
+    // 100. No RBAC enforcement in privileged API token generation
+    Pattern.compile("\\b(generatePrivilegedToken|createSuperUserApiKey)\\([^)]*\\)") 
+);
