@@ -1,0 +1,456 @@
+public static final List<Pattern> activeDirectoryIssues = Arrays.asList(
+
+    // 1. No role check after AD authentication
+    Pattern.compile("SecurityContextHolder\\.getContext\\(\\)\\.setAuthentication\\(authentication\\)"),
+
+    // 2. Allowing any authenticated user without checking roles
+    Pattern.compile("hasAnyRole\\(\\)"),
+
+    // 3. Hardcoded AD credentials in source code
+    Pattern.compile("new\\s*DirContextAdapter\\(\"cn=admin,ou=users,dc=example,dc=com\",\\s*\"password\"\\)"),
+
+    // 4. LDAP authentication without TLS encryption
+    Pattern.compile("providerUrl\\s*=\\s*\"ldap://\""),
+
+    // 5. No group membership validation
+    Pattern.compile("user\\.getAuthorities\\(\\)\\s*\\.contains\\(.*\\)"),
+
+    // 6. Allowing anonymous LDAP authentication
+    Pattern.compile("context\\.environment\\.put\\(Context\\.SECURITY_AUTHENTICATION,\\s*\"none\"\\)"),
+
+    // 7. Using `hasAuthority("USER")` instead of dynamic role validation
+    Pattern.compile("hasAuthority\\(\"USER\"\\)"),
+
+    // 8. No validation of user roles in security filters
+    Pattern.compile("filterChain\\.doFilter\\(request,\\s*response\\)"),
+
+    // 9. Allowing login without checking AD user existence
+    Pattern.compile("authenticationManager\\.authenticate\\(new\\s*UsernamePasswordAuthenticationToken\\(.*\\)\\)"),
+
+    // 10. Using wildcard character `*` in AD group filter
+    Pattern.compile("userSearch\\.setSearchFilter\\(\".*=\\*\"\\)"),
+
+    // 11. Not checking if the AD user is disabled
+    Pattern.compile("user\\.isEnabled\\(\\)"),
+
+    // 12. Not enforcing password expiration policies from AD
+    Pattern.compile("passwordExpiryDate\\s*=\\s*null"),
+
+    // 13. LDAP bind without verifying the account status
+    Pattern.compile("ldapTemplate\\.bind\\(.*\\)"),
+
+    // 14. Allowing login with expired AD accounts
+    Pattern.compile("user\\.isAccountNonExpired\\(\\)"),
+
+    // 15. Accepting any user without checking organizational unit (OU)
+    Pattern.compile("searchFilter\\s*=\\s*\"\\(cn=.*\\)\""),
+
+    // 16. Not logging failed authentication attempts
+    Pattern.compile("logger\\.info\\(\"Authentication failed: \"\\+username\\)"),
+
+    // 17. LDAP injection vulnerability (user-controlled input in search filter)
+    Pattern.compile("searchFilter\\s*=\\s*\".*\"\\+request\\.getParameter\\(\"username\"\\)"),
+
+    // 18. Using simple authentication instead of SASL
+    Pattern.compile("Context\\.SECURITY_AUTHENTICATION,\\s*\"simple\""),
+
+    // 19. Not validating user’s distinguished name (DN) format
+    Pattern.compile("searchFilter\\s*=\\s*\"\\(dn=.*\\)\""),
+
+    // 20. No enforcement of MFA for AD authentication
+    Pattern.compile("multiFactorAuthEnabled\\s*=\\s*false"),
+
+    // 21. Storing AD session tokens insecurely in local storage
+    Pattern.compile("localStorage\\.setItem\\(\"authToken\",\\s*authToken\\)"),
+
+    // 22. Using `user.getUsername()` without cross-checking with AD
+    Pattern.compile("user\\.getUsername\\(\\)"),
+
+    // 23. Allowing bypass of AD authentication for admin endpoints
+    Pattern.compile("@PreAuthorize\\(\"hasRole\\('USER'\\)\"\\)"),
+
+    // 24. Not validating AD session expiration
+    Pattern.compile("session\\.setAttribute\\(\"expiryTime\",\\s*null\\)"),
+
+    // 25. Using a fixed search base DN without checking user roles
+    Pattern.compile("searchBase\\s*=\\s*\"ou=users,dc=example,dc=com\""),
+
+    // 26. Not enforcing reauthentication after role change
+    Pattern.compile("session\\.setAttribute\\(\"userRole\",\\s*newRole\\)"),
+
+    // 27. Allowing authentication with an empty password
+    Pattern.compile("if\\s*\\(password\\s*==\\s*null\\s*\\|\\|\\s*password\\.isEmpty\\(\\)\\)"),
+
+    // 28. Using default Spring Boot LDAP properties without customization
+    Pattern.compile("spring\\.ldap\\.base=dc=example,dc=com"),
+
+    // 29. No restriction on the number of failed login attempts
+    Pattern.compile("failedLoginAttempts\\s*<\\s*Integer\\.MAX_VALUE"),
+
+    // 30. Allowing AD group escalation without verification
+    Pattern.compile("user\\.setAuthorities\\(new\\s*ArrayList\\<\\>\\(Arrays\\.asList\\(.*\\)\\)\\)"),
+
+    // 31. Not logging AD group assignments on login
+    Pattern.compile("logger\\.info\\(\"User groups: \"\\+user\\.getAuthorities\\(\\)\\)"),
+
+    // 32. Allowing unauthenticated requests to sensitive endpoints
+    Pattern.compile("@GetMapping\\(\"/admin/settings\"\\)"),
+
+    // 33. No validation of AD user principal format
+    Pattern.compile("userPrincipalName\\s*=\\s*\".*@example.com\""),
+
+    // 34. No restriction on AD search results (unlimited search scope)
+    Pattern.compile("searchControls\\.setCountLimit\\(Integer\\.MAX_VALUE\\)"),
+
+    // 35. Not validating the domain in AD login attempts
+    Pattern.compile("username\\.contains\\(\"example.com\"\\)"),
+
+    // 36. Using outdated or deprecated Spring Security LDAP methods
+    Pattern.compile("LdapAuthenticationProviderConfigurer"),
+
+    // 37. No verification of AD session duration
+    Pattern.compile("session\\.setMaxInactiveInterval\\(Integer\\.MAX_VALUE\\)"),
+
+    // 38. Allowing session reuse across different IPs
+    Pattern.compile("session\\.setAttribute\\(\"clientIp\",\\s*null\\)"),
+
+    // 39. No restriction on AD queries (unfiltered user enumeration)
+    Pattern.compile("searchFilter\\s*=\\s*\"\\(objectClass=person\\)\""),
+
+    // 40. No CSRF protection in AD login forms
+    Pattern.compile("@PostMapping\\(\"/login\"\\)"),
+
+    // 41. Allowing wildcard (`*`) in AD searches
+    Pattern.compile("userSearch\\.setSearchFilter\\(\"\\*\"\\)"),
+
+    // 42. Using `bind()` without escaping special characters
+    Pattern.compile("ctx\\.bind\\(userDn,\\s*password\\)"),
+
+    // 43. Allowing role manipulation via user input
+    Pattern.compile("role\\s*=\\s*request\\.getParameter\\(\"role\"\\)"),
+
+    // 44. Not sanitizing AD user input before querying LDAP
+    Pattern.compile("searchFilter\\s*=\\s*\".*\"\\+username"),
+
+    // 45. Using `hasRole("ADMIN")` instead of checking dynamic roles
+    Pattern.compile("hasRole\\(\"ADMIN\"\\)"),
+
+    // 46. No check for AD user lockout status
+    Pattern.compile("user\\.isAccountNonLocked\\(\\)"),
+
+    // 47. Using default LDAP ports without TLS
+    Pattern.compile("providerUrl\\s*=\\s*\"ldap://localhost:389\""),
+
+    // 48. No MFA token validation for high-privilege AD accounts
+    Pattern.compile("mfaToken\\s*=\\s*null"),
+
+    // 49. Allowing guest users without validating AD group membership
+    Pattern.compile("hasAuthority\\(\"GUEST\"\\)"),
+
+    // 50. No restriction on high-privilege group assignments
+    Pattern.compile("groupMembership\\s*=\\s*\"Domain Admins\"")
+);
+public static final List<Pattern> activeDirectoryIssues = Arrays.asList(
+
+    // 51. Not verifying AD user existence before granting access
+    Pattern.compile("if\\s*\\(user\\s*==\\s*null\\)\\s*return\\s*true;"),
+
+    // 52. Using plaintext credentials in application.properties
+    Pattern.compile("spring\\.ldap\\.password\\s*=\\s*\".*\""),
+
+    // 53. No validation of AD token expiration time
+    Pattern.compile("token\\.getExpiration\\(\\)\\s*==\\s*null"),
+
+    // 54. Hardcoding AD group names in security checks
+    Pattern.compile("hasAuthority\\(\"ADMIN\"\\)"),
+
+    // 55. Allowing unauthenticated users to access AD login endpoints
+    Pattern.compile("@GetMapping\\(\"/auth/ldap\"\\)"),
+
+    // 56. Not checking if AD user is disabled before login
+    Pattern.compile("user\\.isEnabled\\(\\)\\s*==\\s*true"),
+
+    // 57. Using simple bind authentication instead of strong authentication
+    Pattern.compile("ldapContext\\.addToEnvironment\\(Context\\.SECURITY_AUTHENTICATION,\\s*\"simple\"\\)"),
+
+    // 58. Allowing wildcard (*) searches in LDAP queries
+    Pattern.compile("searchFilter\\s*=\\s*\".*=\\*\""),
+
+    // 59. No enforcement of AD password complexity rules
+    Pattern.compile("password\\.matches\\(\".*\"\\)"),
+
+    // 60. Missing logout functionality for AD sessions
+    Pattern.compile("session\\.invalidate\\(\\)"),
+
+    // 61. No restriction on AD user search scope
+    Pattern.compile("searchControls\\.setSearchScope\\(SearchControls\\.SUBTREE_SCOPE\\)"),
+
+    // 62. Allowing non-AD users to authenticate using LDAP
+    Pattern.compile("bindAuthenticator\\.authenticate\\(.*\\)"),
+
+    // 63. Not restricting sensitive API access to AD groups
+    Pattern.compile("@RequestMapping\\(\"/admin/.*\"\\)"),
+
+    // 64. Hardcoding AD server URLs
+    Pattern.compile("ldapUrl\\s*=\\s*\"ldap://.*\""),
+
+    // 65. Not checking AD user lockout status
+    Pattern.compile("user\\.isAccountNonLocked\\(\\)"),
+
+    // 66. Allowing AD authentication over HTTP instead of HTTPS
+    Pattern.compile("ldapTemplate\\.setIgnorePartialResultException\\(true\\)"),
+
+    // 67. Missing input validation in LDAP filter queries
+    Pattern.compile("searchFilter\\s*=\\s*\".*\"\\+request\\.getParameter\\(\"user\"\\)"),
+
+    // 68. No validation of AD group membership
+    Pattern.compile("user\\.getAuthorities\\(\\)\\.contains\\(.*\\)"),
+
+    // 69. Allowing self-registration without AD approval
+    Pattern.compile("@PostMapping\\(\"/register\"\\)"),
+
+    // 70. No logging of failed AD authentication attempts
+    Pattern.compile("logger\\.info\\(\"Failed login attempt: \"\\+username\\)"),
+
+    // 71. Allowing blank AD passwords
+    Pattern.compile("if\\s*\\(password\\.isEmpty\\(\\)\\)"),
+
+    // 72. Using case-insensitive username matching in AD authentication
+    Pattern.compile("user\\.getUsername\\(\\)\\.equalsIgnoreCase\\(.*\\)"),
+
+    // 73. No validation of AD distinguished names (DN)
+    Pattern.compile("user\\.getDn\\(\\)"),
+
+    // 74. Allowing session reuse across different devices
+    Pattern.compile("session\\.setAttribute\\(\"deviceId\",\\s*null\\)"),
+
+    // 75. Using default LDAP admin credentials
+    Pattern.compile("bindAuthenticator\\.setUserDn\\(\"cn=admin.*\"\\)"),
+
+    // 76. Not checking if user exists in AD before assigning roles
+    Pattern.compile("roles\\.add\\(.*\\)"),
+
+    // 77. Allowing duplicate AD accounts with the same email
+    Pattern.compile("email\\.equals\\(existingUser\\.getEmail\\(\\)\\)"),
+
+    // 78. No validation of AD user roles when generating JWT tokens
+    Pattern.compile("JwtTokenProvider\\.createToken\\(username,\\s*roles\\)"),
+
+    // 79. Using deprecated Spring Security methods for AD authentication
+    Pattern.compile("LdapAuthenticationProviderConfigurer"),
+
+    // 80. Not enforcing AD session timeouts
+    Pattern.compile("session\\.setMaxInactiveInterval\\(Integer\\.MAX_VALUE\\)"),
+
+    // 81. Allowing unauthenticated API requests for AD-protected endpoints
+    Pattern.compile("@RequestMapping\\(\"/user/profile\"\\)"),
+
+    // 82. Not checking AD account expiration date
+    Pattern.compile("user\\.isAccountNonExpired\\(\\)"),
+
+    // 83. Using a hardcoded encryption key for AD password storage
+    Pattern.compile("encryptionKey\\s*=\\s*\".*\""),
+
+    // 84. Allowing AD authentication bypass with default user accounts
+    Pattern.compile("if\\s*\\(username\\.equals\\(\"admin\"\\)\\)"),
+
+    // 85. Not validating MFA tokens for AD users
+    Pattern.compile("mfaToken\\s*=\\s*null"),
+
+    // 86. Storing AD credentials in plain text in logs
+    Pattern.compile("logger\\.info\\(\"LDAP Password: \"\\+password\\)"),
+
+    // 87. Allowing LDAP referral chasing without validation
+    Pattern.compile("environment\\.put\\(Context\\.REFERRAL,\\s*\"follow\"\\)"),
+
+    // 88. Using an overly permissive AD search base
+    Pattern.compile("searchBase\\s*=\\s*\"dc=example,dc=com\""),
+
+    // 89. Allowing username enumeration through error messages
+    Pattern.compile("response\\.sendError\\(HttpServletResponse\\.SC_UNAUTHORIZED,\\s*\"Invalid username\"\\)"),
+
+    // 90. Not checking AD group hierarchy for role inheritance
+    Pattern.compile("user\\.getGroups\\(\\)"),
+
+    // 91. Allowing password reset without verifying AD user identity
+    Pattern.compile("if\\s*\\(passwordResetToken\\.isValid\\(\\)\\)"),
+
+    // 92. Using outdated authentication mechanisms for AD login
+    Pattern.compile("useDeprecatedAuthenticationMethod\\(true\\)"),
+
+    // 93. No enforcement of AD session reauthentication
+    Pattern.compile("session\\.setAttribute\\(\"authRecheck\",\\s*false\\)"),
+
+    // 94. Allowing direct LDAP modifications without validation
+    Pattern.compile("ldapTemplate\\.modifyAttributes\\(.*\\)"),
+
+    // 95. Using `hasRole("ADMIN")` instead of a dynamic role check
+    Pattern.compile("hasRole\\(\"ADMIN\"\\)"),
+
+    // 96. Not checking for inactive AD user accounts
+    Pattern.compile("user\\.isEnabled\\(\\)"),
+
+    // 97. Allowing role escalation through request parameters
+    Pattern.compile("request\\.getParameter\\(\"role\"\\)"),
+
+    // 98. No verification of AD group assignments before allowing access
+    Pattern.compile("user\\.getAuthorities\\(\\)"),
+
+    // 99. Allowing unrestricted AD user searches
+    Pattern.compile("searchFilter\\s*=\\s*\"\\(objectClass=user\\)\""),
+
+    // 100. Using weak encryption for AD password storage
+    Pattern.compile("cipher\\.getInstance\\(\"AES/ECB/PKCS5Padding\"\\)")
+);
+public static final List<Pattern> activeDirectoryIssues = Arrays.asList(
+
+    // 101. Allowing login without checking AD group membership
+    Pattern.compile("user\\.getAuthorities\\(\\)\\.isEmpty\\(\\)"),
+
+    // 102. Using static AD credentials instead of environment variables
+    Pattern.compile("ldapPassword\\s*=\\s*\".*\""),
+
+    // 103. No validation of AD user's organizational unit (OU)
+    Pattern.compile("user\\.getOu\\(\\)"),
+
+    // 104. Using anonymous binds in LDAP authentication
+    Pattern.compile("env\\.put\\(Context\\.SECURITY_AUTHENTICATION,\\s*\"none\"\\)"),
+
+    // 105. Allowing AD authentication via GET requests instead of POST
+    Pattern.compile("@GetMapping\\(\"/auth/ldap\"\\)"),
+
+    // 106. Not enforcing reauthentication before sensitive actions
+    Pattern.compile("if\\s*\\(lastLoginTime\\s*>\\s*System\\.currentTimeMillis"),
+
+    // 107. Using weak LDAP filter expressions for user lookup
+    Pattern.compile("searchFilter\\s*=\\s*\"\\(uid=.*\\)\""),
+
+    // 108. Allowing authentication bypass through default AD users
+    Pattern.compile("if\\s*\\(username\\.equals\\(\"guest\"\\)\\)"),
+
+    // 109. No restriction on AD password reset endpoints
+    Pattern.compile("@PostMapping\\(\"/password/reset\"\\)"),
+
+    // 110. Storing AD user session tokens without expiration
+    Pattern.compile("session\\.setAttribute\\(\"authToken\",\\s*token\\)"),
+
+    // 111. Using weak encryption methods for AD communication
+    Pattern.compile("SSLContext\\.getInstance\\(\"TLSv1\"\\)"),
+
+    // 112. Not validating AD user roles before generating JWT tokens
+    Pattern.compile("JwtTokenProvider\\.createToken\\(username,\\s*null\\)"),
+
+    // 113. Allowing username/password authentication for AD without MFA
+    Pattern.compile("mfaRequired\\s*=\\s*false"),
+
+    // 114. No restriction on failed AD login attempts
+    Pattern.compile("failedAttempts\\s*<\\s*10"),
+
+    // 115. Allowing direct LDAP modification without role verification
+    Pattern.compile("ldapTemplate\\.modifyAttributes\\(.*\\)"),
+
+    // 116. Not checking AD user status before role assignment
+    Pattern.compile("user\\.getStatus\\(\\)"),
+
+    // 117. Using outdated Spring Security configurations for AD authentication
+    Pattern.compile("httpSecurity\\.ldapAuthentication\\(\\)"),
+
+    // 118. Allowing self-service AD user registration
+    Pattern.compile("@PostMapping\\(\"/register\"\\)"),
+
+    // 119. No validation of AD user attributes before authorization
+    Pattern.compile("user\\.getAttribute\\(.*\\)"),
+
+    // 120. Allowing AD users to escalate privileges via request parameters
+    Pattern.compile("request\\.getParameter\\(\"role\"\\)"),
+
+    // 121. No enforcement of AD password history
+    Pattern.compile("passwordHistory\\.contains\\(password\\)"),
+
+    // 122. Hardcoding AD domain in LDAP configuration
+    Pattern.compile("ldapDomain\\s*=\\s*\"example.com\""),
+
+    // 123. Allowing direct assignment of admin privileges
+    Pattern.compile("user\\.setRole\\(\"ADMIN\"\\)"),
+
+    // 124. No validation of AD user’s email before access
+    Pattern.compile("user\\.getEmail\\(\\)"),
+
+    // 125. Using outdated cryptographic algorithms for AD authentication
+    Pattern.compile("cipher\\.getInstance\\(\"DES/CBC/PKCS5Padding\"\\)"),
+
+    // 126. No verification of AD user session expiration
+    Pattern.compile("session\\.getAttribute\\(\"expiresAt\"\\)"),
+
+    // 127. Allowing wildcard character searches in LDAP queries
+    Pattern.compile("searchFilter\\s*=\\s*\".*=.*\\*\""),
+
+    // 128. No validation of AD user's department before access
+    Pattern.compile("user\\.getDepartment\\(\\)"),
+
+    // 129. Using default LDAP administrator accounts for authentication
+    Pattern.compile("ldapUser\\s*=\\s*\"cn=admin,dc=example,dc=com\""),
+
+    // 130. Allowing unauthenticated API requests to AD-protected endpoints
+    Pattern.compile("@RequestMapping\\(\"/secure/.*\"\\)"),
+
+    // 131. No validation of AD user's account expiration
+    Pattern.compile("user\\.isAccountNonExpired\\(\\)"),
+
+    // 132. Hardcoding AD server IP addresses in the application
+    Pattern.compile("ldapUrl\\s*=\\s*\"ldap://192\\.168\\..*\""),
+
+    // 133. Allowing session reuse without validation
+    Pattern.compile("session\\.getAttribute\\(\"authToken\"\\)"),
+
+    // 134. Using insecure communication protocols for AD authentication
+    Pattern.compile("Context\\.SECURITY_PROTOCOL,\\s*\"none\""),
+
+    // 135. Allowing LDAP searches outside of authorized organizational units
+    Pattern.compile("searchBase\\s*=\\s*\"dc=example,dc=com\""),
+
+    // 136. No logging of AD authentication failures
+    Pattern.compile("logger\\.info\\(\"AD login failed for user: \"\\+username\\)"),
+
+    // 137. Allowing session fixation attacks in AD authentication
+    Pattern.compile("session\\.setAttribute\\(\"JSESSIONID\",.*\\)"),
+
+    // 138. Using weak password hashing algorithms for AD user storage
+    Pattern.compile("PasswordEncoder\\(new BCryptPasswordEncoder\\(4\\)\\)"),
+
+    // 139. No enforcement of password rotation policies for AD users
+    Pattern.compile("passwordLastChanged\\s*>\\s*365"),
+
+    // 140. Allowing authentication bypass with empty credentials
+    Pattern.compile("if\\s*\\(password\\.equals\\(\"\"\\)\\)"),
+
+    // 141. Not verifying AD token integrity before authentication
+    Pattern.compile("jwt\\.decode\\(token\\)"),
+
+    // 142. Allowing direct modification of AD user roles
+    Pattern.compile("user\\.setRoles\\(.*\\)"),
+
+    // 143. Using deprecated LDAP authentication mechanisms
+    Pattern.compile("bindAuthenticator\\.setUserDn\\(\".*\"\\)"),
+
+    // 144. No validation of AD user session renewal
+    Pattern.compile("session\\.setAttribute\\(\"renewed\",\\s*false\\)"),
+
+    // 145. Allowing direct access to AD authentication endpoints
+    Pattern.compile("@RequestMapping\\(\"/ad/authenticate\"\\)"),
+
+    // 146. Using plaintext passwords for AD authentication logs
+    Pattern.compile("logger\\.debug\\(\"Password: \"\\+password\\)"),
+
+    // 147. No validation of AD user's last login time
+    Pattern.compile("user\\.getLastLogin\\(\\)"),
+
+    // 148. Allowing unrestricted AD user searches in the system
+    Pattern.compile("searchFilter\\s*=\\s*\".*\""),
+
+    // 149. No enforcement of session inactivity timeouts
+    Pattern.compile("session\\.setMaxInactiveInterval\\(Integer\\.MAX_VALUE\\)"),
+
+    // 150. Allowing unauthorized access to AD group management APIs
+    Pattern.compile("@PostMapping\\(\"/group/manage\"\\)")
+);
