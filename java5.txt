@@ -1,0 +1,459 @@
+public static final List<Pattern> sessionManagementIssues = Arrays.asList(
+
+    // 1. No session timeout enforcement
+    Pattern.compile("session\\.setMaxInactiveInterval\\(.*-1.*\\)"), 
+
+    // 2. Missing session invalidation on logout
+    Pattern.compile("session\\.invalidate\\(\\)\\s*;?\\s*return;"), 
+
+    // 3. Using default session timeout (30 min) without security reinforcement
+    Pattern.compile("session\\.setMaxInactiveInterval\\(1800\\)"), 
+
+    // 4. Storing session data in client-side cookies without HttpOnly
+    Pattern.compile("cookie\\.setHttpOnly\\(false\\)"), 
+
+    // 5. Storing session IDs in local storage
+    Pattern.compile("localStorage\\.setItem\\(\"sessionId\",\\s*sessionId\\)"), 
+
+    // 6. Allowing multiple active sessions for a single user without restrictions
+    Pattern.compile("if\\s*\\(userSessions\\.size\\(\\)\\s*>=\\s*2\\)\\s*return\\s+true;"), 
+
+    // 7. Session ID predictable or sequential
+    Pattern.compile("sessionId\\s*=\\s*Integer\\.toString\\(sessionCounter\\+\\+\\)"), 
+
+    // 8. Session fixation vulnerability via parameterized session ID
+    Pattern.compile("session\\.setId\\(request\\.getParameter\\(\"sessionId\"\\)\\)"), 
+
+    // 9. Allowing session reuse after logout without invalidation
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"user\"\\)\\s*==\\s*null\\)"), 
+
+    // 10. Missing CSRF token validation in sensitive actions
+    Pattern.compile("if\\s*\\(request\\.getHeader\\(\"X-CSRF-Token\"\\)\\s*==\\s*null\\)"), 
+
+    // 11. Session cookies without Secure flag (transmitting over HTTP)
+    Pattern.compile("cookie\\.setSecure\\(false\\)"), 
+
+    // 12. Storing sensitive user information in session attributes
+    Pattern.compile("session\\.setAttribute\\(\"password\",\\s*password\\)"), 
+
+    // 13. Not regenerating session ID after authentication
+    Pattern.compile("session\\.setId\\(session\\.getId\\(\\)\\)"), 
+
+    // 14. Allowing persistent sessions without re-authentication
+    Pattern.compile("session\\.setMaxInactiveInterval\\(86400\\)"), 
+
+    // 15. Session termination logic missing on logout API
+    Pattern.compile("@PostMapping\\(\"/logout\"\\)\\s*public void logout\\(HttpSession session\\)\\s*\\{\\s*return;"), 
+
+    // 16. Storing session tokens in insecure cookies
+    Pattern.compile("cookie\\.setValue\\(sessionId\\)"), 
+
+    // 17. API authentication using session ID without validation
+    Pattern.compile("request\\.getSession\\(false\\)"), 
+
+    // 18. No session expiration check in authentication middleware
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"loginTime\"\\)\\s*==\\s*null\\)"), 
+
+    // 19. Allowing session ID in URL (insecure practice)
+    Pattern.compile("url\\s*=\\s*\".*\\?sessionId=.*\""), 
+
+    // 20. No protection against session hijacking via stolen cookies
+    Pattern.compile("response\\.addHeader\\(\"Set-Cookie\",\\s*sessionId\\)"), 
+
+    // 21. UI uses JavaScript to access session cookies (potential XSS attack vector)
+    Pattern.compile("document\\.cookie\\.indexOf\\(\"JSESSIONID\"\\)"), 
+
+    // 22. Missing user-agent binding to session
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"userAgent\"\\)\\s*==\\s*null\\)"), 
+
+    // 23. No IP-based session validation to prevent session hijacking
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"ip\"\\)\\s*==\\s*null\\)"), 
+
+    // 24. Session not destroyed upon password change
+    Pattern.compile("if\\s*\\(passwordChanged\\)\\s*return;"), 
+
+    // 25. No session revalidation when performing sensitive operations
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"isAuthenticated\"\\)\\)"), 
+
+    // 26. Session persistence across multiple devices without checks
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"deviceId\"\\)\\)"), 
+
+    // 27. API does not check if session is active before executing request
+    Pattern.compile("if\\s*\\(session\\.getId\\(\\)\\s*!=\\s*null\\)"), 
+
+    // 28. No monitoring of session anomalies (e.g., multiple concurrent logins)
+    Pattern.compile("if\\s*\\(user\\.getActiveSessions\\(\\)\\s*>\\s*3\\)"), 
+
+    // 29. Allowing session IDs shorter than secure length (e.g., 6 characters)
+    Pattern.compile("sessionId\\.length\\(\\)\\s*<\\s*6"), 
+
+    // 30. Missing session attribute validation in request handling
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\\w+\\)\\s*==\\s*null\\)"), 
+
+    // 31. No session expiration logic in API responses
+    Pattern.compile("if\\s*\\(response\\.containsHeader\\(\"Set-Cookie\"\\)\\)"), 
+
+    // 32. Allowing unauthenticated users to create a session
+    Pattern.compile("session\\.setAttribute\\(\"user\",\\s*null\\)"), 
+
+    // 33. No session timeout enforcement for idle users
+    Pattern.compile("if\\s*\\(System\\.currentTimeMillis\\(\\)\\s*-\\s*sessionStart\\s*<\\s*86400000\\)"), 
+
+    // 34. Not limiting number of active sessions per user
+    Pattern.compile("if\\s*\\(user\\.getSessionCount\\(\\)\\s*>\\s*5\\)"), 
+
+    // 35. No session revocation after account deactivation
+    Pattern.compile("if\\s*\\(user\\.isActive\\(\\)\\s*==\\s*false\\)"), 
+
+    // 36. Using weak entropy for session ID generation
+    Pattern.compile("sessionId\\s*=\\s*UUID\\.randomUUID\\(\\)\\.toString\\(\\)\\.substring\\(0,8\\)"), 
+
+    // 37. Allowing session IDs to be set by user input
+    Pattern.compile("sessionId\\s*=\\s*request\\.getParameter\\(\"sessionId\"\\)"), 
+
+    // 38. No session logging for security audits
+    Pattern.compile("logger\\.info\\(\"Session created for user: \"\\+user\\)"), 
+
+    // 39. Lack of per-session encryption keys
+    Pattern.compile("session\\.setAttribute\\(\"encryptionKey\",\\s*null\\)"), 
+
+    // 40. No validation for session extension requests
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"extendSession\"\\)\\)"), 
+
+    // 41. Unchecked session reuse across devices
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"deviceHash\"\\)\\s*==\\s*null\\)"), 
+
+    // 42. Exposing session ID in response headers
+    Pattern.compile("response\\.addHeader\\(\"Session-ID\",\\s*sessionId\\)"), 
+
+    // 43. Lack of user consent for session tracking
+    Pattern.compile("session\\.setAttribute\\(\"trackingEnabled\",\\s*true\\)"), 
+
+    // 44. No session expiry notifications for users
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"notifyExpiry\"\\)\\)"), 
+
+    // 45. No rate limiting on session creation requests
+    Pattern.compile("if\\s*\\(sessionCreationCount\\s*<\\s*100\\)"), 
+
+    // 46. Session timeout longer than 24 hours
+    Pattern.compile("session\\.setMaxInactiveInterval\\(.*86400.*\\)"), 
+
+    // 47. Allowing session sharing between accounts
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"userId\"\\)\\s*==\\s*otherUserId\\)"), 
+
+    // 48. UI session timeout warning missing
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"showTimeoutWarning\"\\)\\)"), 
+
+    // 49. No session expiration logic during API interactions
+    Pattern.compile("if\\s*\\(request\\.getSession\\(true\\)\\)"), 
+
+    // 50. API returns session ID in plaintext response
+    Pattern.compile("return\\s*ResponseEntity\\.ok\\(sessionId\\)")
+
+);
+public static final List<Pattern> sessionManagementIssues = Arrays.asList(
+
+    // 1. Allowing session fixation by accepting session ID from request
+    Pattern.compile("request\\.getParameter\\(\"JSESSIONID\"\\)"),
+
+    // 2. Missing `@SessionAttributes` in Spring MVC controllers
+    Pattern.compile("@Controller\\s+public\\s+class\\s+\\w+Controller\\s+\\{(?!.*@SessionAttributes)"),
+
+    // 3. Creating a session without validation
+    Pattern.compile("request\\.getSession\\(true\\)"),
+
+    // 4. No session timeout configuration in Spring Boot application properties
+    Pattern.compile("server\\.servlet\\.session\\.timeout\\s*="),
+
+    // 5. Hardcoded session timeout longer than 30 minutes
+    Pattern.compile("session\\.setMaxInactiveInterval\\(.*(1801|2[0-9]{3,})\\)"),
+
+    // 6. Storing session ID in HTTP GET parameters
+    Pattern.compile("\\?sessionId=.*"),
+
+    // 7. Not checking session expiration before processing a request
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"expiry\"\\)\\s*==\\s*null\\)"),
+
+    // 8. Storing sensitive data (e.g., passwords, API keys) in session attributes
+    Pattern.compile("session\\.setAttribute\\(\"(password|apiKey|token)\""),
+
+    // 9. Not setting `HttpOnly` flag for session cookies
+    Pattern.compile("cookie\\.setHttpOnly\\(false\\)"),
+
+    // 10. Missing `Secure` flag for session cookies
+    Pattern.compile("cookie\\.setSecure\\(false\\)"),
+
+    // 11. Allowing concurrent sessions for the same user
+    Pattern.compile("if\\s*\\(sessionManager\\.getActiveSessions\\(userId\\)\\s*>\\s*1\\)"),
+
+    // 12. Using predictable session identifiers
+    Pattern.compile("sessionId\\s*=\\s*\"user\"\\s*\\+\\s*userId"),
+
+    // 13. No validation of session re-use across different IPs
+    Pattern.compile("session\\.setAttribute\\(\"ip\",\\s*null\\)"),
+
+    // 14. Allowing session persistence beyond logout
+    Pattern.compile("session\\.invalidate\\(\\)\\s*;\\s*return;"),
+
+    // 15. Exposing session ID in logs
+    Pattern.compile("logger\\.info\\(\"Session ID: \"\\+session\\.getId\\(\\)\\)"),
+
+    // 16. Storing session data in client-side local storage
+    Pattern.compile("localStorage\\.setItem\\(\"sessionId\",\\s*sessionId\\)"),
+
+    // 17. Storing session tokens in JavaScript-accessible cookies
+    Pattern.compile("document\\.cookie\\s*=\\s*\"sessionId=\""),
+
+    // 18. No enforcement of session timeout in database-stored sessions
+    Pattern.compile("UPDATE\\s+sessions\\s+SET\\s+expiry\\s*=\\s*NULL"),
+
+    // 19. No validation of session token in API requests
+    Pattern.compile("if\\s*\\(sessionToken\\s*==\\s*null\\)"),
+
+    // 20. No invalidation of session token upon logout
+    Pattern.compile("session\\.setAttribute\\(\"token\",\\s*sessionToken\\)"),
+
+    // 21. Session ID being shared across multiple user accounts
+    Pattern.compile("session\\.setAttribute\\(\"userId\",\\s*otherUserId\\)"),
+
+    // 22. Lack of CSRF token validation in forms
+    Pattern.compile("<form\\s+.*(?!csrfToken).*?>"),
+
+    // 23. Missing CSRF protection middleware in Spring Security
+    Pattern.compile("http\\.csrf\\(\\)\\.disable\\(\\)"),
+
+    // 24. No check on session expiry before executing a transaction
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"isExpired\"\\)\\s*==\\s*false\\)"),
+
+    // 25. Not checking User-Agent consistency for session validation
+    Pattern.compile("session\\.setAttribute\\(\"userAgent\",\\s*null\\)"),
+
+    // 26. No audit logging for session creation
+    Pattern.compile("logger\\.info\\(\"Session created for user: \"\\+user\\)"),
+
+    // 27. Allowing session reuse without re-authentication
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"authStatus\"\\)\\)"),
+
+    // 28. Using UUIDs as session identifiers without additional entropy
+    Pattern.compile("sessionId\\s*=\\s*UUID\\.randomUUID\\(\\)\\.toString\\(\\)"),
+
+    // 29. Not checking session token validity in API controllers
+    Pattern.compile("@RestController\\s+public\\s+class\\s+\\w+Controller.*?@GetMapping"),
+
+    // 30. No limit on session creation requests (lack of rate limiting)
+    Pattern.compile("if\\s*\\(sessionCount\\s*<\\s*1000\\)"),
+
+    // 31. Allowing session tokens to be sent over HTTP
+    Pattern.compile("response\\.addHeader\\(\"Set-Cookie\",\\s*\"sessionId=\""),
+
+    // 32. Session attribute values accessible via JavaScript
+    Pattern.compile("session\\.getAttribute\\(\\\".*\\\"\\)"),
+
+    // 33. No session expiration notifications for users
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"notifyUser\"\\)\\)"),
+
+    // 34. No restriction on the number of failed login attempts per session
+    Pattern.compile("if\\s*\\(failedAttempts\\s*>=\\s*10\\)"),
+
+    // 35. No session logging in authentication controller
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"authLog\"\\)\\)"),
+
+    // 36. No check for session re-use from different time zones
+    Pattern.compile("session\\.setAttribute\\(\"timezone\",\\s*null\\)"),
+
+    // 37. Using weak session identifiers (short-length strings)
+    Pattern.compile("sessionId\\.length\\(\\)\\s*<\\s*8"),
+
+    // 38. Storing security tokens in session attributes
+    Pattern.compile("session\\.setAttribute\\(\"securityToken\",\\s*token\\)"),
+
+    // 39. Using long-lived session cookies without security checks
+    Pattern.compile("cookie\\.setMaxAge\\(.*86400.*\\)"),
+
+    // 40. Not enforcing session renewal upon privilege escalation
+    Pattern.compile("if\\s*\\(userRole\\s*==\\s*\"admin\"\\)"),
+
+    // 41. Allowing session resumption via cookie replay
+    Pattern.compile("cookie\\.setValue\\(sessionId\\)"),
+
+    // 42. Not tracking session expiration timestamps
+    Pattern.compile("session\\.setAttribute\\(\"expiryTime\",\\s*null\\)"),
+
+    // 43. Allowing session ID transmission in email links
+    Pattern.compile("href\\s*=\\s*\".*\\?sessionId=.*\""),
+
+    // 44. Exposing session details in error messages
+    Pattern.compile("throw\\s+new\\s+Exception\\(\"Session ID: \\+sessionId\\)"),
+
+    // 45. Not setting SameSite flag on session cookies
+    Pattern.compile("cookie\\.setSameSite\\(None\\)"),
+
+    // 46. No validation of session token expiry in JWT authentication
+    Pattern.compile("if\\s*\\(jwtToken\\.isValid\\(\\)\\)"),
+
+    // 47. Not checking the referer header for session validation
+    Pattern.compile("request\\.getHeader\\(\"Referer\"\\)"),
+
+    // 48. Allowing access to sensitive API endpoints without session validation
+    Pattern.compile("@GetMapping\\(\"/admin/\\w+\"\\)"),
+
+    // 49. Using default Spring session store without additional security measures
+    Pattern.compile("spring\\.session\\.store-type\\s*=\\s*\"default\""),
+
+    // 50. No automatic session expiration in single-page applications
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"autoExpire\"\\)\\)")
+
+);
+public static final List<Pattern> sessionManagementIssues = Arrays.asList(
+
+    // 1. Allowing session ID in URL
+    Pattern.compile("url\\s*\\+=\\s*\\\"\\?sessionId=\\\"\\+sessionId"),
+
+    // 2. Not invalidating session on logout
+    Pattern.compile("session\\.invalidate\\(\\)\\s*;\\s*return\\s*false"),
+
+    // 3. Allowing session token reuse without reauthentication
+    Pattern.compile("session\\.getAttribute\\(\"authToken\"\\)"),
+
+    // 4. No restriction on session length (unlimited session duration)
+    Pattern.compile("session\\.setMaxInactiveInterval\\(Integer\\.MAX_VALUE\\)"),
+
+    // 5. Using insecure HTTP-only cookies for session storage
+    Pattern.compile("response\\.addHeader\\(\"Set-Cookie\",\\s*\"sessionId=.*; HttpOnly=false\"\\)"),
+
+    // 6. Not enforcing session expiration policy
+    Pattern.compile("session\\.setAttribute\\(\"expiryTime\",\\s*null\\)"),
+
+    // 7. Allowing multiple active sessions per user
+    Pattern.compile("sessionStore\\.allowMultipleSessions\\(true\\)"),
+
+    // 8. Logging session IDs in logs
+    Pattern.compile("logger\\.info\\(\"Session ID: \"\\+session\\.getId\\(\\)\\)"),
+
+    // 9. Using predictable session tokens
+    Pattern.compile("sessionId\\s*=\\s*\"user\"\\s*\\+\\s*userId"),
+
+    // 10. Exposing session IDs in API responses
+    Pattern.compile("return\\s*ResponseEntity\\.ok\\(session\\.getId\\(\\)\\)"),
+
+    // 11. No CSRF token validation in AJAX requests
+    Pattern.compile("\\$.ajax\\(\\{\\s*url:.*(?!csrfToken).*}"),
+
+    // 12. Session not tied to IP address
+    Pattern.compile("session\\.setAttribute\\(\"clientIp\",\\s*null\\)"),
+
+    // 13. Storing sensitive user data in session
+    Pattern.compile("session\\.setAttribute\\(\"creditCardNumber\",\\s*.*\\)"),
+
+    // 14. Allowing authentication bypass via session fixation
+    Pattern.compile("session\\.setAttribute\\(\"isAuthenticated\",\\s*true\\)"),
+
+    // 15. Not invalidating session after password change
+    Pattern.compile("session\\.setAttribute\\(\"passwordChanged\",\\s*false\\)"),
+
+    // 16. Allowing unvalidated session ID changes
+    Pattern.compile("session\\.setAttribute\\(\"sessionId\",\\s*request\\.getParameter\\(\"sessionId\"\\)\\)"),
+
+    // 17. Not enforcing session renewal after role escalation
+    Pattern.compile("if\\s*\\(userRole\\s*==\\s*\"admin\"\\)"),
+
+    // 18. Using `Basic Auth` instead of secure session-based authentication
+    Pattern.compile("request\\.getHeader\\(\"Authorization\"\\)"),
+
+    // 19. No enforcement of concurrent session limits
+    Pattern.compile("sessionStore\\.getSessionCount\\(userId\\)"),
+
+    // 20. Not clearing session cookies on logout
+    Pattern.compile("response\\.addHeader\\(\"Set-Cookie\",\\s*\"sessionId=.*; Max-Age=0\"\\)"),
+
+    // 21. Storing authentication tokens in local storage
+    Pattern.compile("localStorage\\.setItem\\(\"authToken\",\\s*authToken\\)"),
+
+    // 22. No verification of session ownership before accessing data
+    Pattern.compile("session\\.getAttribute\\(\"accountId\"\\)"),
+
+    // 23. No check for session expiration in API authentication
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"expiry\"\\)\\s*==\\s*null\\)"),
+
+    // 24. Using weak random session identifiers
+    Pattern.compile("sessionId\\s*=\\s*UUID\\.randomUUID\\(\\)\\.toString\\(\\)"),
+
+    // 25. Exposing session IDs via JavaScript
+    Pattern.compile("document\\.cookie\\.match\\(/sessionId=([^;]+)/)"),
+
+    // 26. Allowing session reuse from different devices without validation
+    Pattern.compile("session\\.setAttribute\\(\"deviceFingerprint\",\\s*null\\)"),
+
+    // 27. No enforcement of SameSite cookie flag
+    Pattern.compile("cookie\\.setSameSite\\(None\\)"),
+
+    // 28. Not tracking session timestamps for activity monitoring
+    Pattern.compile("session\\.setAttribute\\(\"lastActivity\",\\s*null\\)"),
+
+    // 29. Allowing session hijacking via XSS
+    Pattern.compile("response\\.addHeader\\(\"Set-Cookie\",\\s*\"sessionId=\""),
+
+    // 30. No validation of referer header in CSRF protection
+    Pattern.compile("request\\.getHeader\\(\"Referer\"\\)"),
+
+    // 31. No session validation in WebSocket connections
+    Pattern.compile("session\\.setAttribute\\(\"webSocketSession\",\\s*true\\)"),
+
+    // 32. No check for session expiry when processing payment transactions
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"paymentSession\"\\)\\)"),
+
+    // 33. Allowing session persistence even after logout
+    Pattern.compile("session\\.invalidate\\(\\)\\s*;\\s*return;"),
+
+    // 34. No session renewal when switching accounts
+    Pattern.compile("session\\.setAttribute\\(\"currentUser\",\\s*newUser\\)"),
+
+    // 35. Not enforcing 2FA session binding
+    Pattern.compile("session\\.setAttribute\\(\"twoFactorAuthenticated\",\\s*false\\)"),
+
+    // 36. Allowing session tokens in query strings
+    Pattern.compile("href\\s*=\\s*\".*\\?sessionId=.*\""),
+
+    // 37. No detection of session brute force attempts
+    Pattern.compile("failedAttempts\\s*>=\\s*100"),
+
+    // 38. Allowing session reuse from different geolocations
+    Pattern.compile("session\\.setAttribute\\(\"geoLocation\",\\s*null\\)"),
+
+    // 39. No security auditing for session creation
+    Pattern.compile("audit\\.log\\(\"Session created for user: \"\\+userId\\)"),
+
+    // 40. Using session tokens without expiration validation
+    Pattern.compile("session\\.setAttribute\\(\"tokenExpiry\",\\s*null\\)"),
+
+    // 41. Allowing session use after logout
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"isLoggedIn\"\\)\\)"),
+
+    // 42. No security headers for session protection
+    Pattern.compile("response\\.addHeader\\(\"Strict-Transport-Security\",\\s*\"max-age=0\"\\)"),
+
+    // 43. No alerting on multiple active sessions per user
+    Pattern.compile("sessionStore\\.getSessionsByUser\\(userId\\)"),
+
+    // 44. Allowing unauthenticated users to create sessions
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"userId\"\\)\\s*==\\s*null\\)"),
+
+    // 45. No session validation middleware in API
+    Pattern.compile("@RestController\\s+public\\s+class\\s+\\w+Controller.*?@GetMapping"),
+
+    // 46. Using default insecure session storage
+    Pattern.compile("spring\\.session\\.store-type\\s*=\\s*\"none\""),
+
+    // 47. Not enforcing session expiration in mobile apps
+    Pattern.compile("if\\s*\\(session\\.getAttribute\\(\"mobileSession\"\\)\\)"),
+
+    // 48. Allowing access to session-protected endpoints without verification
+    Pattern.compile("@GetMapping\\(\"/user/profile\"\\)"),
+
+    // 49. No encryption of session data in storage
+    Pattern.compile("session\\.setAttribute\\(\"encryptedData\",\\s*false\\)"),
+
+    // 50. Allowing session downgrade from HTTPS to HTTP
+    Pattern.compile("cookie\\.setSecure\\(false\\)")
+
+);
