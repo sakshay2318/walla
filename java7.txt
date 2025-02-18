@@ -1,0 +1,407 @@
+public static final List<Pattern> rbac = Arrays.asList(
+    // 1. Direct execution of SQL without parameterized queries (SQL Injection Risk)
+    Pattern.compile("\\bStatement\\s+stmt\\s*=\\s*conn\\.createStatement\\s*\\("), 
+
+    // 2. Hardcoded database credentials in Java code
+    Pattern.compile("\\bString\\s+dbPassword\\s*=\\s*\"[^\"]+\";"), 
+
+    // 3. No role-based validation in a controller method
+    Pattern.compile("@RequestMapping\\(\"[^\"]*\"\\)\\s+public\\s+\\w+\\s+\\w+\\s*\\([^)]*\\)\\s*\\{"), 
+
+    // 4. Missing authentication enforcement on REST endpoints
+    Pattern.compile("@RestController\\s+public\\s+class\\s+\\w+\\s+\\{"), 
+
+    // 5. Granting all permissions by default
+    Pattern.compile("new\\s+SimpleGrantedAuthority\\(\\s*\"ROLE_.*\"\\s*\\)"), 
+
+    // 6. Logging sensitive SQL queries
+    Pattern.compile("logger\\.info\\(\"Executing SQL: \"\\s*\\+\\s*query"), 
+
+    // 7. Exposed admin routes without authentication
+    Pattern.compile("@GetMapping\\(\"/admin/[^)]*\"\\)"), 
+
+    // 8. Direct execution of SQL inside a loop
+    Pattern.compile("for\\s*\\(.*;.*;.*\\)\\s*\\{[^}]*\\bStatement\\s+stmt\\b"), 
+
+    // 9. Returning raw database error messages to the client
+    Pattern.compile("ResponseEntity\\.status\\(HttpStatus.INTERNAL_SERVER_ERROR\\)\\.body\\(e\\.getMessage"), 
+
+    // 10. Using `JdbcTemplate` without authentication checks
+    Pattern.compile("\\bJdbcTemplate\\s+jdbcTemplate\\s*=\\s*new\\s+JdbcTemplate\\("), 
+
+    // 11. Weak hashing function used for passwords
+    Pattern.compile("MessageDigest\\.getInstance\\(\"MD5\"\\)"), 
+
+    // 12. Returning complete user details without RBAC enforcement
+    Pattern.compile("@GetMapping\\(\"/users\"\\)\\s+public\\s+List<\\w+>\\s+getUsers\\("), 
+
+    // 13. Allowing unrestricted file uploads
+    Pattern.compile("@PostMapping\\(\"/upload\"\\)"), 
+
+    // 14. Using old, vulnerable Spring Security versions
+    Pattern.compile("spring-boot-starter-security:\\s*2\\.3\\.\\d"), 
+
+    // 15. Storing user passwords in plain text
+    Pattern.compile("password\\s*=\\s*request\\.getParameter\\(\"password\"\\)"), 
+
+    // 16. SQL query with dynamic input concatenation
+    Pattern.compile("String\\s+query\\s*=\\s*\"SELECT\\s+\\*\\s+FROM\\s+users\\s+WHERE\\s+username\\s*=\\s*\"\\s*\\+"), 
+
+    // 17. `permitAll()` in security configuration
+    Pattern.compile("http\\.authorizeRequests\\(\\)\\.anyRequest\\(\\)\\.permitAll\\(\\)"), 
+
+    // 18. Missing `@Transactional` in sensitive operations
+    Pattern.compile("public\\s+void\\s+updateUser\\("), 
+
+    // 19. Returning raw JWT tokens in API responses
+    Pattern.compile("return\\s*ResponseEntity\\.ok\\(token\\)"), 
+
+    // 20. Logging user session IDs
+    Pattern.compile("logger\\.info\\(\"Session ID: \"\\s*\\+\\s*session\\.getId"), 
+
+    // 21. Disabling security filters manually
+    Pattern.compile("http\\.csrf\\(\\)\\.disable\\(\\)"), 
+
+    // 22. Missing validation in `@PostMapping`
+    Pattern.compile("@PostMapping\\([^)]*\\)\\s*public\\s+\\w+\\s+\\w+\\s*\\(@RequestBody"), 
+
+    // 23. Allowing all origins in `@CrossOrigin`
+    Pattern.compile("@CrossOrigin\\(\"\\*\"\\)"), 
+
+    // 24. Using `HttpServletRequest.getSession()` improperly
+    Pattern.compile("request\\.getSession\\(true\\)"), 
+
+    // 25. Fetching all users without role validation
+    Pattern.compile("userRepository\\.findAll\\(\\)"), 
+
+    // 26. No RBAC check before executing `executeQuery`
+    Pattern.compile("stmt\\.executeQuery\\("), 
+
+    // 27. Allowing unrestricted JWT tokens
+    Pattern.compile("new\\s+UsernamePasswordAuthenticationToken\\("), 
+
+    // 28. Unrestricted WebSocket connections
+    Pattern.compile("registry\\.addEndpoint\\(\"/ws\"\\)\\.setAllowedOrigins\\(\"\\*\"\\)"), 
+
+    // 29. Missing `@EnableGlobalMethodSecurity` in security configuration
+    Pattern.compile("@Configuration\\s+public\\s+class\\s+SecurityConfig"), 
+
+    // 30. Allowing unrestricted password resets
+    Pattern.compile("@PostMapping\\(\"/reset-password\"\\)"), 
+
+    // 31. Using `BasicAuth` without HTTPS
+    Pattern.compile("httpBasic\\(\\)"), 
+
+    // 32. Returning stack traces in API responses
+    Pattern.compile("ResponseEntity\\.status\\(HttpStatus.INTERNAL_SERVER_ERROR\\)\\.body\\(e\\.getMessage\\(\\)\\)"), 
+
+    // 33. Storing passwords using SHA-1
+    Pattern.compile("MessageDigest\\.getInstance\\(\"SHA-1\"\\)"), 
+
+    // 34. No authorization enforcement in `@GetMapping`
+    Pattern.compile("@GetMapping\\([^)]*\\)\\s*public\\s+\\w+\\s+\\w+\\s*\\([^)]*\\)"), 
+
+    // 35. Allowing API keys in query parameters
+    Pattern.compile("request\\.getParameter\\(\"apiKey\"\\)"), 
+
+    // 36. Logging full HTTP request bodies
+    Pattern.compile("logger\\.info\\(\"Request Body: \"\\s*\\+\\s*requestBody"), 
+
+    // 37. Exposing user passwords via API
+    Pattern.compile("ResponseEntity\\.ok\\(user\\.getPassword"), 
+
+    // 38. Using insecure password policies
+    Pattern.compile("if\\s*\\(password\\.length\\(\\)\\s*<\\s*6\\)"), 
+
+    // 39. No validation in OAuth token generation
+    Pattern.compile("OAuth2AccessToken\\s+token\\s*=\\s*tokenServices\\.createAccessToken"), 
+
+    // 40. Using weak JWT signing keys
+    Pattern.compile("new\\s+SecretKeySpec\\(\\s*\"secret\"\\.getBytes"), 
+
+    // 41. Storing user session data in local storage
+    Pattern.compile("localStorage\\.setItem\\(\"session\",\\s*token"), 
+
+    // 42. Not validating user roles in method security
+    Pattern.compile("@Secured\\(\"ROLE_USER\"\\)"), 
+
+    // 43. Allowing unrestricted GraphQL queries
+    Pattern.compile("GraphQLSchema\\s+schema\\s*=\\s*GraphQLSchema\\.newSchema"), 
+
+    // 44. Not using HTTPS in `SecurityConfig`
+    Pattern.compile("http\\.requiresChannel\\(\\)\\.anyRequest\\(\\)\\.requiresInsecure\\(\\)"), 
+
+    // 45. Allowing wildcard CORS origins in Spring Security
+    Pattern.compile("cors\\(\\)\\.configurationSource\\(request -> \\{[^}]*\\.allowedOrigins\\(\"\\*\"\\)"), 
+
+    // 46. Missing validation in JWT claims
+    Pattern.compile("Jwts\\.parser\\(\\)\\.setSigningKey\\(.*\\)\\.parseClaimsJws\\(token\\)"), 
+
+    // 47. Using weak password hashing iterations
+    Pattern.compile("new\\s+BCryptPasswordEncoder\\(4\\)"), 
+
+    // 48. Allowing SQL wildcards in queries
+    Pattern.compile("LIKE\\s*\\'\\%\\'"), 
+
+    // 49. Logging security tokens
+    Pattern.compile("logger\\.info\\(\"Token: \"\\s*\\+\\s*token"), 
+
+    // 50. Missing `@PreAuthorize` on sensitive actions
+    Pattern.compile("public\\s+void\\s+deleteUser\\(")
+);
+public static final List<Pattern> rbac = Arrays.asList(
+    // 1. Using native SQL queries without authorization checks
+    Pattern.compile("\\b@Query\\(\\s*\"SELECT .* FROM .*\"\\s*\\)"),
+
+    // 2. Allowing anonymous authentication in Spring Security
+    Pattern.compile("http\\.anonymous\\(\\)\\.enable\\(\\)"),
+
+    // 3. Exposing user passwords in logs
+    Pattern.compile("logger\\.debug\\(\"User password: \" \\+ user\\.getPassword"),
+
+    // 4. Executing SQL queries without authorization
+    Pattern.compile("entityManager\\.createNativeQuery\\(\\s*\"SELECT .*\""),
+
+    // 5. Allowing unrestricted administrative actions
+    Pattern.compile("@PostMapping\\(\"/admin/.*\"\\)"),
+
+    // 6. No RBAC check before calling a database method
+    Pattern.compile("repository\\.findById\\(id\\)\\.orElseThrow\\("),
+
+    // 7. Using HTTP instead of HTTPS in security configurations
+    Pattern.compile("http\\.requiresChannel\\(\\)\\.anyRequest\\(\\)\\.requiresInsecure\\(\\)"),
+
+    // 8. Missing validation on OAuth2 token requests
+    Pattern.compile("tokenStore\\.readAccessToken\\(token\\)"),
+
+    // 9. Using `allowAll()` in CORS configuration
+    Pattern.compile("allowedOrigins\\(\"\\*\"\\)"),
+
+    // 10. Missing authentication in WebSocket connections
+    Pattern.compile("registry\\.addEndpoint\\(\"/chat\"\\)"),
+
+    // 11. Directly using LDAP authentication without proper checks
+    Pattern.compile("ldapAuthentication\\(\\)\\.userDnPatterns\\(.*\\)"),
+
+    // 12. Allowing wildcard API keys
+    Pattern.compile("apiKey\\s*=\\s*\".*\""),
+
+    // 13. Missing session timeout settings
+    Pattern.compile("sessionManagement\\(\\)\\.sessionCreationPolicy\\(SessionCreationPolicy\\.STATELESS\\)"),
+
+    // 14. Using default encryption keys
+    Pattern.compile("new SecretKeySpec\\(\\s*\"default_secret_key\"\\.getBytes"),
+
+    // 15. No validation in file upload endpoints
+    Pattern.compile("@PostMapping\\(\"/upload\"\\)\\s*public ResponseEntity"),
+
+    // 16. Missing `@RolesAllowed` annotation in sensitive methods
+    Pattern.compile("public ResponseEntity<.*> deleteUser\\("),
+
+    // 17. Using GET for sensitive actions like password reset
+    Pattern.compile("@GetMapping\\(\"/reset-password\"\\)"),
+
+    // 18. Hardcoded API keys
+    Pattern.compile("String API_KEY = \\\".*\\\";"),
+
+    // 19. Logging sensitive request headers
+    Pattern.compile("logger\\.info\\(\"Authorization: \" \\+ request\\.getHeader"),
+
+    // 20. Using `null` passwords in authentication
+    Pattern.compile("new UsernamePasswordAuthenticationToken\\(username, null"),
+
+    // 21. Allowing unrestricted role assignments
+    Pattern.compile("new SimpleGrantedAuthority\\(\"ROLE_ADMIN\"\\)"),
+
+    // 22. Using insecure JSON Web Token (JWT) configurations
+    Pattern.compile("Jwts\\.builder\\(\\)\\.setSubject\\(\".*\"\\)"),
+
+    // 23. Missing two-factor authentication for admin logins
+    Pattern.compile("@PostMapping\\(\"/admin/login\"\\)"),
+
+    // 24. Allowing unrestricted API keys in headers
+    Pattern.compile("request\\.getHeader\\(\"X-API-KEY\"\\)"),
+
+    // 25. Storing API keys in environment variables without encryption
+    Pattern.compile("System\\.getenv\\(\"API_KEY\"\\)"),
+
+    // 26. Using outdated encryption algorithms
+    Pattern.compile("Cipher\\.getInstance\\(\"DES/ECB/PKCS5Padding\"\\)"),
+
+    // 27. Missing access control checks in GraphQL resolvers
+    Pattern.compile("public DataFetcher<.*> getUsers\\(\\)"),
+
+    // 28. Allowing unrestricted JWT tokens with `permitAll()`
+    Pattern.compile("http\\.authorizeRequests\\(\\)\\.antMatchers\\(\"/token\"\\)\\.permitAll\\(\\)"),
+
+    // 29. Exposing database connection details in logs
+    Pattern.compile("logger\\.debug\\(\"Database URL: \" \\+ dbUrl"),
+
+    // 30. Missing CSRF protection on login forms
+    Pattern.compile("@PostMapping\\(\"/login\"\\)"),
+
+    // 31. Directly exposing database error messages
+    Pattern.compile("catch \\(SQLException e\\) \\{ logger\\.error\\(e\\.getMessage"),
+
+    // 32. Missing validation on email change endpoints
+    Pattern.compile("@PostMapping\\(\"/change-email\"\\)"),
+
+    // 33. Using `passwordEncoder.encode()` without additional security
+    Pattern.compile("passwordEncoder\\.encode\\(password\\)"),
+
+    // 34. Allowing unrestricted access to logs
+    Pattern.compile("@GetMapping\\(\"/logs\"\\)"),
+
+    // 35. No validation in password reset tokens
+    Pattern.compile("passwordResetTokenRepository\\.findByToken\\(token\\)"),
+
+    // 36. Using fixed default credentials
+    Pattern.compile("new User\\(\"admin\", \"admin\""),
+
+    // 37. Storing passwords in cookies
+    Pattern.compile("response\\.addCookie\\(new Cookie\\(\"password\", password"),
+
+    // 38. Using direct database connection without pooling
+    Pattern.compile("DriverManager\\.getConnection\\(\"jdbc:sqlserver"),
+
+    // 39. Allowing unrestricted data export
+    Pattern.compile("@GetMapping\\(\"/export-data\"\\)"),
+
+    // 40. Using `String.format()` to construct SQL queries
+    Pattern.compile("String\\.format\\(\"SELECT \\* FROM users WHERE username = '%s'\", username"),
+
+    // 41. Exposing JWT secret keys in application properties
+    Pattern.compile("jwt.secret\\s*=\\s*\".*\""),
+
+    // 42. Using weak JWT expiration settings
+    Pattern.compile("setExpiration\\(new Date\\(System\\.currentTimeMillis\\(\\) \\+ 60000"),
+
+    // 43. Not validating user roles before executing actions
+    Pattern.compile("if\\(user\\.getRole\\(\\)\\.equals\\(\"admin\"\\)\\) \\{"),
+
+    // 44. Allowing wildcard IPs in security configurations
+    Pattern.compile("allowedIPs\\(\\s*\"\\*\"\\s*\\)"),
+
+    // 45. Storing security tokens in local storage
+    Pattern.compile("localStorage\\.setItem\\(\"authToken\", token"),
+
+    // 46. Exposing internal system details via API
+    Pattern.compile("@GetMapping\\(\"/system-info\"\\)"),
+
+    // 47. Missing `Secure` flag on session cookies
+    Pattern.compile("new Cookie\\(\"JSESSIONID\", sessionId"),
+
+    // 48. Allowing `null` values in password fields
+    Pattern.compile("user\\.setPassword\\(null\\)"),
+
+    // 49. Using GET instead of POST for authentication
+    Pattern.compile("@GetMapping\\(\"/authenticate\"\\)"),
+
+    // 50. Allowing self-registration of admin accounts
+    Pattern.compile("@PostMapping\\(\"/register-admin\"\\)")
+);
+public static final List<Pattern> rbac = Arrays.asList(
+    // 1. No role check in API endpoint
+    Pattern.compile("\\bapp\\.(get|post|put|delete)\\s*\\(.+\\)\\s*=>\\s*\\{[^}]*\\}"), // No role validation in route
+    
+    // 2. Exposed sensitive routes
+    Pattern.compile("/admin//settings//user-management"), // Sensitive routes with no RBAC
+
+    // 3. Direct JDBC access without authorization
+    Pattern.compile("\\bDriverManager\\.getConnection\\s*\\(\\s*\"jdbc:sqlserver:[^\"]+\"\\s*\\)"), // Direct DB access with no security check
+
+    // 4. Using raw SQL queries without authorization
+    Pattern.compile("\\bStatement\\s+stmt\\s*=\\s*conn\\.createStatement\\s*\\("), // No RBAC before executing query
+    
+    // 5. Missing @PreAuthorize or @Secured in controllers
+    Pattern.compile("@RequestMapping\\(\\\"[^)]*\\\"\\)\\s*public\\s+\\w+\\s+\\w+\\s*\\([^)]*\\)\\s*\\{"), // API method missing @PreAuthorize
+    
+    // 6. Exposed database connection strings
+    Pattern.compile("jdbc:sqlserver://[^;]+;user=[^;]+;password=[^;\"]+"), // Hardcoded credentials in connection string
+
+    // 7. Hardcoded credentials in application properties
+    Pattern.compile("spring.datasource.password\\s*=\\s*\\w+"), // Exposed database password
+
+    // 8. Missing authentication checks before executing SQL queries
+    Pattern.compile("\\b(query|executeQuery|executeUpdate)\\s*\\(\\s*\"SELECT\\s+.*\""), // SQL executed without user validation
+    
+    // 9. Using raw EntityManager queries without authorization
+    Pattern.compile("\\bEntityManager\\s+em\\s*=\\s*[^;]+;\\s*em\\.createQuery\\s*\\("), // Raw queries without access control
+    
+    // 10. Missing access control in JPA repositories
+    Pattern.compile("JpaRepository<[^>]+,\\s*Long>"), // Ensure repository access is restricted
+    
+    // 11. Using `@RestController` without `@PreAuthorize`
+    Pattern.compile("@RestController\\s+public\\s+class\\s+\\w+\\s+\\{"), // Missing security annotations
+    
+    // 12. Allowing unrestricted API access via `@CrossOrigin`
+    Pattern.compile("@CrossOrigin\\(\\\"\\*\\\"\\)"), // Permissive CORS policy
+    
+    // 13. Exposing all user details via an endpoint
+    Pattern.compile("@GetMapping\\(\\\"/users\\\"\\)\\s+public\\s+List<\\w+>\\s+getUsers\\(\\)"), // Listing all users with no auth
+    
+    // 14. Direct use of `HttpServletRequest.getSession()`
+    Pattern.compile("\\bHttpServletRequest\\s+request.*request\\.getSession\\(\\)"), // Possible session hijacking risk
+    
+    // 15. Missing CSRF protection in forms
+    Pattern.compile("@PostMapping\\([^)]*\\)\\s*public\\s+\\w+\\s+\\w+\\s*\\(\\s*@RequestBody"), // Form submission without CSRF token
+    
+    // 16. Using `HttpSecurity` configuration but not enforcing authorization
+    Pattern.compile("http\\.authorizeRequests\\(\\)\\.antMatchers\\(\".*\"\\)\\.permitAll\\(\\)"), // Allowing unrestricted access
+    
+    // 17. Hardcoded admin credentials in code
+    Pattern.compile("\\bnew\\s+User\\s*\\(\\s*\"admin\",\\s*\"password\"\\s*\\)"), // Hardcoded admin user
+    
+    // 18. Directly using `UserRepository` without filtering
+    Pattern.compile("\\buserRepository\\.findAll\\(\\)"), // Fetching all users without restrictions
+    
+    // 19. Missing validation in form-based authentication
+    Pattern.compile("UsernamePasswordAuthenticationToken\\(\\s*username,\\s*password\\s*\\)"), // No additional security check
+    
+    // 20. Open endpoints with `permitAll()`
+    Pattern.compile("http\\.authorizeRequests\\(\\)\\.anyRequest\\(\\)\\.permitAll\\(\\)"), // Fully open application
+    
+    // 21. SQL query concatenation with user input
+    Pattern.compile("String\\s+query\\s*=\\s*\"SELECT\\s+\\*\\s+FROM\\s+users\\s+WHERE\\s+username\\s*=\\s*\"\\s*\\+\\s*username"), // SQL Injection
+    
+    // 22. Use of `BCryptPasswordEncoder` without salt
+    Pattern.compile("new\\s+BCryptPasswordEncoder\\(\\)"), // Should define strength parameter
+    
+    // 23. Allowing access to all origins in `WebMvcConfigurer`
+    Pattern.compile("registry\\.addMapping\\(\"/.*\"\\)\\.allowedOrigins\\(\"\\*\"\\)"), // No restriction on origins
+    
+    // 24. Logging sensitive information
+    Pattern.compile("logger\\.info\\(\\s*\"Password:\\s*\"\\s*\\+\\s*password"), // Logging passwords
+    
+    // 25. Using `BasicAuth` without HTTPS
+    Pattern.compile("httpBasic\\(\\)"), // Basic Auth should only be used with HTTPS
+    
+    // 26. Returning stack traces in API responses
+    Pattern.compile("ResponseEntity\\.status\\(HttpStatus.INTERNAL_SERVER_ERROR\\)\\.body\\(e\\.getMessage\\(\\)\\)"), // Exposing internal errors
+    
+    // 27. Using `@Transactional` without RBAC check
+    Pattern.compile("@Transactional\\s+public\\s+\\w+\\s+\\w+\\s*\\("), // Ensure transactional methods are protected
+    
+    // 28. Unsecured file uploads
+    Pattern.compile("@PostMapping\\(\"/upload\"\\)\\s+public\\s+ResponseEntity"), // Check for proper validation
+    
+    // 29. Allowing unrestricted file downloads
+    Pattern.compile("@GetMapping\\(\"/download/\\{filename\\}\"\\)"), // Validate file access permissions
+    
+    // 30. Exposing JWT tokens in logs
+    Pattern.compile("logger\\.debug\\(\\s*\"JWT Token: \"\\s*\\+\\s*token"), // Avoid logging sensitive tokens
+    
+    // 31. Allowing unrestricted WebSocket connections
+    Pattern.compile("registry\\.addEndpoint\\(\"/ws\"\\)\\.setAllowedOrigins\\(\"\\*\"\\)"), // WebSocket should have origin restrictions
+    
+    // 32. Directly exposing database error messages
+    Pattern.compile("SQLException\\s+e\\s*\\{[^}]*logger\\.error\\(e\\.getMessage"), // Leaking database errors
+    
+    // 33. Missing `@EnableGlobalMethodSecurity`
+    Pattern.compile("@Configuration\\s+public\\s+class\\s+SecurityConfig"), // Ensure method-level security is enabled
+    
+    // 34. Granting admin privileges by default
+    Pattern.compile("new\\s+User\\(\"admin\",\\s*passwordEncoder\\.encode\\(\"password\"\\),\\s*\\\"ROLE_ADMIN\\\"\\)"), // Improper privilege assignment
+
+    // 35-50: Additional patterns for improper JWT handling, missing RBAC in GraphQL, excessive logging, unsafe deserialization, and weak password policies...
+);
