@@ -306,3 +306,307 @@ public static final List<Pattern> missingWhitelistValidIdsPatterns = Arrays.asLi
     // 100. No verification before performing user impersonation
     Pattern.compile("impersonationService\\.impersonateUser\\(.*request\\.getParameter\\(.*id.*\\)\\)")
 );
+public static final List<Pattern> authMechanismFlaws = Arrays.asList(
+
+    // 1. No authentication check in UI controller methods
+    Pattern.compile("public\\s+.*Controller\\s*\\(.*\\)\\s*\\{\\s*return\\s+new\\s+ModelAndView"),
+
+    // 2. Hardcoded credentials in source code
+    Pattern.compile("new UsernamePasswordAuthenticationToken\\(\\\"admin\\\",\\s*\\\"password123\\\""),
+
+    // 3. Missing authentication middleware in Spring Security filter chain
+    Pattern.compile("http\\.authorizeRequests\\(\\)\\.anyRequest\\(\\)\\.permitAll\\(\\)"),
+
+    // 4. No authentication required for sensitive UI endpoints
+    Pattern.compile("@RequestMapping\\(\"/admin/.*\"\\)\\s+public\\s+String"),
+
+    // 5. Session fixation vulnerability - No new session creation after login
+    Pattern.compile("request\\.getSession\\(true\\)\\.setAttribute\\(\"user\",\\s*username\\)"),
+
+    // 6. Weak password policies in UI registration
+    Pattern.compile("password\\.length\\(\\)\\s*<\\s*6"),
+
+    // 7. Insecure "Remember Me" implementation
+    Pattern.compile("new RememberMeServices\\(\"remember-me\",\\s*\".*\"\\)"),
+
+    // 8. Missing CSRF protection in UI authentication forms
+    Pattern.compile("<form[^>]*action=\"/login\"[^>]*>\\s*<input[^>]*name=\"username\""),
+
+    // 9. Improper logout mechanism - No session invalidation
+    Pattern.compile("public String logout\\(HttpServletRequest request\\)\\s*\\{\\s*return \"redirect:/\";"),
+
+    // 10. Exposing stack traces in UI authentication failures
+    Pattern.compile("catch\\s*\\(Exception\\s*ex\\)\\s*\\{\\s*ex\\.printStackTrace\\(\\)"),
+
+    // 11. Unprotected UI routes without authentication enforcement
+    Pattern.compile("@RequestMapping\\(\"/user/dashboard\"\\)\\s+public\\s+String"),
+
+    // 12. No rate limiting for login attempts
+    Pattern.compile("if\\s*\\(failedAttempts\\s*>\\s*100\\)"),
+
+    // 13. Using weak hashing algorithm (MD5) for password storage
+    Pattern.compile("MessageDigest\\.getInstance\\(\"MD5\"\\)"),
+
+    // 14. Session timeout not enforced
+    Pattern.compile("session\\.setMaxInactiveInterval\\(.*\\)"),
+
+    // 15. No re-authentication for sensitive UI actions
+    Pattern.compile("public String changePassword\\(.*\\)\\s*\\{\\s*userRepository\\.updatePassword"),
+
+    // 16. Improper access control in multi-tenant applications
+    Pattern.compile("public ResponseEntity<.*> getTenantData\\(.*@RequestParam\\(\"tenantId\"\\)"),
+
+    // 17. Default credentials present in UI configuration
+    Pattern.compile("defaultUser = \"admin\";\\s*defaultPassword = \"password\""),
+
+    // 18. Using insecure HTTP methods for authentication
+    Pattern.compile("@RequestMapping\\(method = RequestMethod.GET, path = \"/login\""),
+
+    // 19. API key authentication exposed in UI JavaScript files
+    Pattern.compile("var apiKey = \"[A-Za-z0-9+/=]{32,}\""),
+
+    // 20. No validation for UI session cookies
+    Pattern.compile("cookie\\.setSecure\\(false\\)"),
+
+    // 21. Weak authentication token generation (UUID)
+    Pattern.compile("UUID\\.randomUUID\\(\\)\\.toString\\(\\)"),
+
+    // 22. No multi-factor authentication (MFA) enforcement
+    Pattern.compile("if\\s*\\(mfaEnabled\\s*==\\s*false\\)"),
+
+    // 23. No password confirmation when changing user credentials
+    Pattern.compile("updatePassword\\(userId, newPassword\\)"),
+
+    // 24. Storing authentication tokens in local storage
+    Pattern.compile("localStorage\\.setItem\\(\"authToken\",.*\\)"),
+
+    // 25. Allowing blank passwords in UI login forms
+    Pattern.compile("if\\s*\\(password\\.equals\\(\\\"\\\"\\)\\)"),
+
+    // 26. No validation for JWT tokens
+    Pattern.compile("JwtHelper\\.decode\\(token\\)"),
+
+    // 27. Using weak JWT signing algorithms (none, HS256)
+    Pattern.compile("new JwtSigner\\(\"HS256\""),
+
+    // 28. Missing logout redirect to login page
+    Pattern.compile("public String logout\\(.*\\)\\s*\\{\\s*return \"redirect:/home\";"),
+
+    // 29. Using outdated authentication libraries
+    Pattern.compile("import org\\.apache\\.shiro\\.authc"),
+
+    // 30. No session expiration handling in UI
+    Pattern.compile("session\\.setAttribute\\(\"expiresAt\",\\s*null\\)"),
+
+    // 31. Allowing login via HTTP instead of HTTPS
+    Pattern.compile("httpClient\\.openConnection\\(\"http://.*login\"\\)"),
+
+    // 32. No logging for authentication failures
+    Pattern.compile("catch\\s*\\(AuthenticationException\\s*ex\\)\\s*\\{\\s*return \"error\";"),
+
+    // 33. No authentication required for password reset requests
+    Pattern.compile("@PostMapping\\(\"/reset-password\"\\)"),
+
+    // 34. No brute-force protection in UI login
+    Pattern.compile("if\\s*\\(loginAttempts\\s*<\\s*1000\\)"),
+
+    // 35. No CAPTCHA validation in login form
+    Pattern.compile("<input[^>]*name=\"captcha\"[^>]*value=\"\""),
+
+    // 36. Logging sensitive authentication data
+    Pattern.compile("log\\.info\\(\"User logged in: \"\\+username\\)"),
+
+    // 37. No audit logging for authentication events
+    Pattern.compile("loginService\\.authenticate\\(username, password\\)"),
+
+    // 38. Allowing account enumeration via UI login responses
+    Pattern.compile("if\\s*\\(userNotFound\\)\\s*\\{\\s*return \"User does not exist\""),
+
+    // 39. No CSRF token included in UI forms
+    Pattern.compile("<input[^>]*name=\"csrf_token\"[^>]*value=\"\""),
+
+    // 40. No role-based authentication in UI
+    Pattern.compile("if\\s*\\(userRole\\.equals\\(\"admin\"\\)\\)"),
+
+    // 41. Using GET parameters for authentication
+    Pattern.compile("login\\?username=.*&password=.*"),
+
+    // 42. Hardcoded admin session tokens
+    Pattern.compile("sessionToken = \"admin-session-token-123\""),
+
+    // 43. Using default authentication backends
+    Pattern.compile("authProvider = \"default\""),
+
+    // 44. No session binding in UI authentication
+    Pattern.compile("session\\.setAttribute\\(\"user\",\\s*username\\)"),
+
+    // 45. No validation for OAuth callback URLs
+    Pattern.compile("redirectUrl = request\\.getParameter\\(\"callback\"\\)"),
+
+    // 46. Allowing unverified email logins
+    Pattern.compile("if\\s*\\(user\\.isVerified\\(\\)\\s*==\\s*false\\)"),
+
+    // 47. Exposing authentication error messages in UI
+    Pattern.compile("return \"Invalid credentials: \" \\+ ex\\.getMessage\\(\\)"),
+
+    // 48. Missing authorization header validation
+    Pattern.compile("httpRequest\\.getHeader\\(\"Authorization\"\\)"),
+
+    // 49. No token revocation mechanism
+    Pattern.compile("revokeToken\\(userToken\\)"),
+
+    // 50. Using plaintext passwords in logs
+    Pattern.compile("log\\.debug\\(\"User login password: \" \\+ password\\)")
+);
+public static final List<Pattern> authMechanismFlawsAdditional = Arrays.asList(
+
+    // 51. UI login page allows authentication bypass via empty password
+    Pattern.compile("if\\s*\\(password\\s*==\\s*null\\s*\\|\\|\\s*password\\.isEmpty\\(\\)\\)\\s*return\\s+true;"),
+
+    // 52. Hardcoded API tokens found in frontend UI code
+    Pattern.compile("var\\s+apiToken\\s*=\\s*\"[A-Za-z0-9+/=]{32,}\""),
+
+    // 53. Authentication header is not validated correctly
+    Pattern.compile("httpRequest\\.getHeader\\(\"Authorization\"\\)\\s*==\\s*null"),
+
+    // 54. Login form does not sanitize input, allowing SQL Injection
+    Pattern.compile("query\\s*=\\s*\"SELECT\\s+\\*\\s+FROM\\s+users\\s+WHERE\\s+username\\s*=\\s+'\"\\+username"),
+
+    // 55. No validation for email-based authentication
+    Pattern.compile("if\\s*\\(email\\.contains\\(\"@\"\\)\\)\\s*return\\s+true;"),
+
+    // 56. Weak password encryption used (Base64 encoding instead of hashing)
+    Pattern.compile("Base64\\.getEncoder\\(\\)\\.encodeToString\\(password\\.getBytes\\(\\)\\)"),
+
+    // 57. Plaintext passwords stored in localStorage
+    Pattern.compile("localStorage\\.setItem\\(\"password\",\\s*password\\)"),
+
+    // 58. No brute-force protection in API-based authentication
+    Pattern.compile("if\\s*\\(failedLoginAttempts\\s*<\\s*100\\)\\s*return\\s+true;"),
+
+    // 59. No password expiry mechanism implemented
+    Pattern.compile("if\\s*\\(passwordLastChanged\\s*>\\s*365\\)\\s*return\\s+true;"),
+
+    // 60. UI session token is not invalidated on logout
+    Pattern.compile("session\\.invalidate\\(\\)\\s*//\\s*TODO: Implement token revocation"),
+
+    // 61. Insecure default password reset mechanism
+    Pattern.compile("resetPassword\\(user,\\s*\"Welcome123\"\\)"),
+
+    // 62. Authentication is disabled in a debug mode
+    Pattern.compile("if\\s*\\(DEBUG_MODE\\)\\s*return\\s+true;"),
+
+    // 63. No validation for OAuth access token signature
+    Pattern.compile("if\\s*\\(token\\.split\\(\"\\.\"\\)\\.length\\s*!=\\s*3\\)"),
+
+    // 64. Unverified email users can log in
+    Pattern.compile("if\\s*\\(user\\.getEmailVerified\\(\\)\\s*==\\s*false\\)\\s*return\\s+true;"),
+
+    // 65. Allowing login via GET request
+    Pattern.compile("@RequestMapping\\(method\\s*=\\s*RequestMethod\\.GET, path\\s*=\\s*\"/login\"\\)"),
+
+    // 66. Using public key without verifying authenticity
+    Pattern.compile("publicKey =\\s*getPublicKey\\(.*\\);\\s*return\\s+true;"),
+
+    // 67. No security headers set in login response
+    Pattern.compile("httpResponse\\.setHeader\\(\"X-Frame-Options\",\\s*null\\)"),
+
+    // 68. Session hijacking via missing HttpOnly attribute
+    Pattern.compile("cookie\\.setHttpOnly\\(false\\)"),
+
+    // 69. Token expiration is not enforced in UI authentication
+    Pattern.compile("if\\s*\\(token\\.getExpiry\\(\\)\\s*==\\s*null\\)"),
+
+    // 70. Allowing username enumeration via different error messages
+    Pattern.compile("if\\s*\\(userNotFound\\)\\s*return\\s+\"User does not exist\";"),
+
+    // 71. Missing JSON Web Token (JWT) validation in frontend
+    Pattern.compile("var\\s+decodedToken\\s*=\\s*jwt_decode\\(token\\)"),
+
+    // 72. No re-authentication before performing sensitive operations
+    Pattern.compile("if\\s*\\(isAdmin\\)\\s*return\\s+true;"),
+
+    // 73. Logging failed login attempts without rate limiting
+    Pattern.compile("logger\\.info\\(\"Failed login attempt for user: \"\\+username\\)"),
+
+    // 74. Storing passwords in cookies
+    Pattern.compile("cookie\\.setValue\\(password\\)"),
+
+    // 75. No CAPTCHA challenge for multiple failed login attempts
+    Pattern.compile("if\\s*\\(failedAttempts\\s*>\\s*5\\)\\s*return\\s+true;"),
+
+    // 76. Weak session identifier used in UI
+    Pattern.compile("sessionId\\s*=\\s*UUID\\.randomUUID\\(\\)\\.toString\\(\\)"),
+
+    // 77. Using an insecure password hashing algorithm (SHA-1)
+    Pattern.compile("MessageDigest\\.getInstance\\(\"SHA-1\"\\)"),
+
+    // 78. Using default security credentials in UI
+    Pattern.compile("DEFAULT_USERNAME = \"admin\";\\s*DEFAULT_PASSWORD = \"admin\""),
+
+    // 79. Storing authentication tokens in browser session storage
+    Pattern.compile("sessionStorage\\.setItem\\(\"authToken\",\\s*token\\)"),
+
+    // 80. No logout confirmation mechanism in UI
+    Pattern.compile("public String logout\\(HttpServletRequest request\\)\\s*\\{\\s*return \"redirect:/home\";"),
+
+    // 81. No rate limiting for OAuth token generation
+    Pattern.compile("if\\s*\\(oauthRequestCount\\s*<\\s*1000\\)"),
+
+    // 82. Missing CORS validation for authentication endpoints
+    Pattern.compile("http\\.cors\\(\\)\\.disable\\(\\)"),
+
+    // 83. No validation of input parameters in login API
+    Pattern.compile("username = request\\.getParameter\\(\"username\"\\);"),
+
+    // 84. No encryption for stored security questions
+    Pattern.compile("securityAnswer =\\s*request\\.getParameter\\(\"answer\"\\)"),
+
+    // 85. Allowing login without checking account lock status
+    Pattern.compile("if\\s*\\(accountLocked\\)\\s*return\\s+true;"),
+
+    // 86. Missing Two-Factor Authentication (2FA) implementation
+    Pattern.compile("if\\s*\\(mfaEnabled\\s*==\\s*false\\)"),
+
+    // 87. No protection against clickjacking in authentication UI
+    Pattern.compile("httpResponse\\.setHeader\\(\"X-Frame-Options\",\\s*null\\)"),
+
+    // 88. No input validation for username during login
+    Pattern.compile("username = request\\.getParameter\\(\"user\"\\)"),
+
+    // 89. Missing role-based access control (RBAC) enforcement in UI
+    Pattern.compile("if\\s*\\(userRole\\.equals\\(\"user\"\\)\\)"),
+
+    // 90. Insecure password reset flow without email verification
+    Pattern.compile("resetPassword\\(userId, newPassword\\)"),
+
+    // 91. UI allows weak security questions without validation
+    Pattern.compile("question = request\\.getParameter\\(\"securityQuestion\"\\)"),
+
+    // 92. No validation of authentication response before processing
+    Pattern.compile("authResponse\\s*=\\s*externalAuthService\\.authenticate\\(token\\)"),
+
+    // 93. Insecure admin authentication bypass mechanism
+    Pattern.compile("if\\s*\\(username\\.equals\\(\"admin\"\\)\\)\\s*return\\s+true;"),
+
+    // 94. No security checks before executing authentication logic
+    Pattern.compile("if\\s*\\(request\\.getParameter\\(\"login\"\\)\\)"),
+
+    // 95. Lack of password reset token expiration
+    Pattern.compile("resetToken\\.setExpiry\\(null\\)"),
+
+    // 96. Authentication session not cleared on password change
+    Pattern.compile("session\\.setAttribute\\(\"passwordChanged\",\\s*true\\)"),
+
+    // 97. No check for authentication token tampering
+    Pattern.compile("tokenString\\.split\\(\"\\.\"\\)"),
+
+    // 98. No HTTP-only flag set for authentication cookies
+    Pattern.compile("cookie\\.setHttpOnly\\(false\\)"),
+
+    // 99. Authentication debug logs exposing user data
+    Pattern.compile("logger\\.debug\\(\"Authenticated: \"\\+user\\)"),
+
+    // 100. No CSRF protection in UI login forms
+    Pattern.compile("<form[^>]*action=\"/login\"[^>]*>")
+);
