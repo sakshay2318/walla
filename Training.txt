@@ -1,0 +1,24 @@
+Architecture Overview for Training Module in ServiceNow with Azure Video Storage
+1. User Interaction Layer (Frontend - ServiceNow Portal)
+Users access the training module through the ServiceNow self-service portal.
+UI displays video content, theory, and assessment questions in a structured format.
+Authentication & role-based access control managed by ServiceNow.
+2. Content Management (ServiceNow & Azure Storage)
+Videos are stored in Azure Blob Storage and embedded in ServiceNow via URL.
+Theory content and assessment questions are stored in ServiceNow Tables.
+Metadata about each module, progress tracking, and completion status stored in ServiceNow.
+3. Training Workflow (ServiceNow Workflow & Business Rules)
+Users progress through sub-modules sequentially.
+Business rules enforce completion criteria before moving to the next module.
+Assessments auto-evaluated based on predefined rules.
+4. Certificate Generation (ServiceNow Integration & PDF Generation)
+On successful completion of all modules, a certificate is generated.
+ServiceNow generates a PDF certificate using PDF Generation APIs or a custom script.
+Certificate stored in ServiceNow and optionally emailed to the user.
+5. Notifications & Reporting
+Automated notifications via ServiceNow Notification Engine (email/SMS).
+Admins can track user progress through ServiceNow Reports & Dashboards.
+6. Integration & Security
+ServiceNow-Azure Integration via REST API or direct URL embedding for videos.
+Role-based Access Control (RBAC) ensures users only access authorized content.
+Audit Logs maintain tracking of module completion and certification.
