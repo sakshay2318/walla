@@ -1,0 +1,299 @@
+// 1. No authentication check in API routes
+        Pattern.compile("\\broute\\s*\\(\\s*\"[^\"]+\"\\s*\\)\\s*\\{[^}]*\\}"), 
+        
+        // 2. Missing authentication middleware
+        Pattern.compile("\\bdef\\s+[a-zA-Z0-9_]+\\s*\\(\\s*request:\\s*Request[^)]*\\)\\s*:\\s*Result\\s*="), 
+        
+        // 3. Unrestricted admin access
+        Pattern.compile("\\bpath\\s*\\(\"/admin/.*\"\\)\\s*\\{[^}]*\\}"), 
+        
+        // 4. Hardcoded admin credentials
+        Pattern.compile("\\bval\\s+adminPassword\\s*=\\s*\"[^\"]+\""), 
+        
+        // 5. Exposed authentication token in URL
+        Pattern.compile("\\bquery\\s*\\(\\s*\"authToken\"\\s*\\)"), 
+        
+        // 6. Unprotected sensitive settings endpoint
+        Pattern.compile("\\bpath\\s*\\(\"/settings/.*\"\\)\\s*\\{[^}]*\\}"), 
+        
+        // 7. No CSRF protection
+        Pattern.compile("\\bCSRF\\s*\\(\\s*disabled\\s*\\)"), 
+        
+        // 8. Weak password policy
+        Pattern.compile("\\bpassword.matches\\(\\s*\".{1,6}\"\\s*\\)"), 
+        
+        // 9. Direct session manipulation
+        Pattern.compile("\\bsession\\s*\\(\\s*\"user\"\\s*->\\s*[^)]*\\)"), 
+        
+        // 10. No role-based access control (RBAC)
+        Pattern.compile("\\bif\\s*\\(\\s*user.role\\s*!\\s*=\\s*\"admin\"\\s*\\)"), 
+        
+        // 11. Exposed JWT secret key
+        Pattern.compile("\\bval\\s+jwtSecret\\s*=\\s*\"[^\"]+\""), 
+        
+        // 12. Weak JWT algorithm
+        Pattern.compile("\\balgorithm\\s*=\\s*Algorithms\\.NONE"), 
+        
+        // 13. No authentication in WebSocket endpoint
+        Pattern.compile("\\bpath\\s*\\(\"/ws/.*\"\\)\\s*\\{[^}]*\\}"), 
+        
+        // 14. Exposed API key in code
+        Pattern.compile("\\bval\\s+apiKey\\s*=\\s*\"[^\"]+\""), 
+        
+        // 15. Logging sensitive authentication details
+        Pattern.compile("\\blogger\\.(info|debug)\\s*\\(\\s*\"User logged in: \\$\\{user.password\\}\"\\s*\\)"), 
+        
+        // 16. Unvalidated redirect
+        Pattern.compile("\\bRedirect\\s*\\(\\s*request.getQueryString\\(\\s*\"redirectUrl\"\\s*\\)"), 
+        
+        // 17. Session fixation vulnerability
+        Pattern.compile("\\bsession\\s*\\(\\s*\"sessionId\"\\s*->\\s*request.session\\(\\s*\"sessionId\"\\s*\\)\\s*\\)"), 
+        
+        // 18. No account lockout mechanism
+        Pattern.compile("\\bfailedAttempts\\s*=\\s*0"), 
+        
+        // 19. No multi-factor authentication (MFA)
+        Pattern.compile("\\buser.authenticate\\s*\\(\\s*username,\\s*password\\s*\\)"), 
+        
+        // 20. Lack of encryption for stored passwords
+        Pattern.compile("\\bval\\s+hashedPassword\\s*=\\s*password"), 
+        
+        // 21. Authentication bypass via parameter tampering
+        Pattern.compile("\\bif\\s*\\(\\s*request.getQueryString\\(\\s*\"role\"\\s*\\)\\s*=\\s*\"admin\"\\s*\\)"), 
+        
+        // 22. No verification for password reset requests
+        Pattern.compile("\\bdef\\s+resetPassword\\s*\\(\\s*email:\\s*String\\s*\\)"), 
+        
+        // 23. Unrestricted file upload in authentication
+        Pattern.compile("\\bpath\\s*\\(\"/uploadAvatar\"\\)\\s*\\{[^}]*\\}"), 
+        
+        // 24. No CAPTCHA on login
+        Pattern.compile("\\bdef\\s+login\\s*\\(\\s*username:\\s*String,\\s*password:\\s*String\\s*\\)"), 
+        
+        // 25. Weak session timeout settings
+        Pattern.compile("\\bmaxInactiveInterval\\s*=\\s*Integer\\.MAX_VALUE"), 
+        
+        // 26. API key passed in query parameter
+        Pattern.compile("\\bquery\\s*\\(\\s*\"apiKey\"\\s*\\)"), 
+        
+        // 27. No XSS protection in login forms
+        Pattern.compile("\\busername\\s*=\\s*request.getQueryString\\(\\s*\"username\"\\s*\\)"), 
+        
+        // 28. Hardcoded authentication tokens
+        Pattern.compile("\\bval\\s+authToken\\s*=\\s*\"[^\"]+\""), 
+        
+        // 29. No user logout endpoint
+        Pattern.compile("\\bdef\\s+logout\\s*\\(\\s*\\)\\s*:\\s*Result"), 
+        
+        // 30. Exposed database connection string
+        Pattern.compile("\\bval\\s+dbUrl\\s*=\\s*\"jdbc:[^\"]+\""), 
+        
+        // 31. Debug mode enabled in production
+        Pattern.compile("\\bPlay\\.isDev\\s*\\(\\s*true\\s*\\)"), 
+        
+        // 32. No expiration on authentication tokens
+        Pattern.compile("\\btoken\\.setExpiration\\s*\\(\\s*null\\s*\\)"), 
+        
+        // 33. Weak password hashing algorithm
+        Pattern.compile("\\bMessageDigest\\.getInstance\\(\\s*\"MD5\"\\s*\\)"), 
+        
+        // 34. No audit logging for authentication
+        Pattern.compile("\\blogger\\.info\\(\\s*\"User logged in\"\\s*\\)"), 
+        
+        // 35. No re-authentication for sensitive actions
+        Pattern.compile("\\bdef\\s+changePassword\\s*\\(\\s*newPassword:\\s*String\\s*\\)"), 
+        
+        // 36. No brute-force attack protection
+        Pattern.compile("\\bfailedLoginAttempts\\s*=\\s*0"), 
+        
+        // 37. Exposed password reset token in logs
+        Pattern.compile("\\blogger\\.info\\(\\s*\"Reset token: \\$\\{token\\}\"\\s*\\)"), 
+        
+        // 38. No check for password reuse
+        Pattern.compile("\\bif\\s*\\(\\s*newPassword\\s*==\\s*oldPassword\\s*\\)"), 
+        
+        // 39. Unrestricted API endpoint
+        Pattern.compile("\\bGET\\s*\\(\\s*\"/api/.*\"\\)"), 
+        
+        // 40. Unverified JWT tokens
+        Pattern.compile("\\bdecodeJWT\\s*\\(\\s*token\\s*\\)"), 
+        
+        // 41. No logging for authentication failures
+        Pattern.compile("\\bcatch\\s*\\(\\s*AuthenticationException\\s*\\)\\s*\\{\\s*\\}"), 
+        
+        // 42. Weak secret key for authentication
+        Pattern.compile("\\bval\\s+secretKey\\s*=\\s*\"12345\""), 
+        
+        // 43. Open redirect vulnerability
+        Pattern.compile("\\bRedirect\\s*\\(\\s*request.getQueryString\\(\\s*\"url\"\\s*\\)"), 
+        
+        // 44. Missing session expiration on logout
+        Pattern.compile("\\bsession\\.clear\\(\\)"), 
+        
+        // 45. Allowing null passwords
+        Pattern.compile("\\bpassword\\s*=\\s*null"), 
+        
+        // 46. Default admin credentials present
+        Pattern.compile("\\badmin\\s*=\\s*\"admin\""), 
+        
+        // 47. Hardcoded OAuth tokens
+        Pattern.compile("\\bval\\s+oauthToken\\s*=\\s*\"[^\"]+\""), 
+        
+        // 48. No CSRF token validation
+        Pattern.compile("\\bcsrfToken\\s*=\\s*None"), 
+        
+        // 49. Logging JWT tokens
+        Pattern.compile("\\blogger\\.info\\(\\s*\"JWT: \\$\\{token\\}\"\\s*\\)"), 
+        
+        // 50. Unprotected API gateway
+        Pattern.compile("\\bGET\\s*\\(\\s*\"/gateway/.*\"\\)"));
+
+        // 51. No authentication check before database query execution
+        Pattern.compile("\\bdb.run\\s*\\(\\s*sql\\(.*SELECT.*FROM\\s+users.*\\)"), 
+        
+        // 52. Hardcoded API key usage
+        Pattern.compile("\\bval\\s+apiKey\\s*=\\s*\"[A-Za-z0-9_]{20,}\""), 
+        
+        // 53. Debug mode enabled in configuration
+        Pattern.compile("\\bconfig.getBoolean\\(\\s*\"play.debug\"\\s*\\)\\s*==\\s*true"), 
+        
+        // 54. Insecure use of cookies for authentication
+        Pattern.compile("\\bcookie\\s*\\(\\s*\"auth\"\\s*\\)"), 
+        
+        // 55. Missing authentication check in form submission
+        Pattern.compile("\\bform\\s*\\(\\s*\"loginForm\"\\s*\\)"), 
+        
+        // 56. Exposed user emails in API responses
+        Pattern.compile("\\bjson\\.write\\(\\s*user.email\\s*\\)"), 
+        
+        // 57. Storing plain text passwords in database
+        Pattern.compile("\\bINSERT\\s+INTO\\s+users\\s*\\(.*password.*\\)\\s+VALUES\\s*\\(.*\"[^\"]{1,10}\".*\\)"), 
+        
+        // 58. No HTTPS enforcement
+        Pattern.compile("\\bPlay\\.isProd\\(\\)\\s*&&\\s*request.headers\\(\"X-Forwarded-Proto\"\\)\\s*!\\s*=\\s*\"https\""), 
+        
+        // 59. Insecure session handling
+        Pattern.compile("\\bsession\\(\\s*\"authToken\"\\s*->\\s*request.queryString\\(\"auth\"\\)\\s*\\)"), 
+        
+        // 60. No authorization check for accessing admin routes
+        Pattern.compile("\\bpath\\(\\s*\"/admin/.*\"\\s*\\)\\s*\\{[^}]*\\}"), 
+        
+        // 61. Accepting credentials via GET requests
+        Pattern.compile("\\bGET\\s*\\(\\s*\"/login\\?username=.*&password=.*\"\\)"), 
+        
+        // 62. Allowing authentication without password
+        Pattern.compile("\\bif\\s*\\(\\s*password.isEmpty\\(\\)\\s*\\)\\s*return\\s*true"), 
+        
+        // 63. Missing CSRF protection in login API
+        Pattern.compile("\\bdef\\s+login\\s*\\(\\s*request:\\s*Request\\s*\\)"), 
+        
+        // 64. No session timeout for user authentication
+        Pattern.compile("\\bsetMaxInactiveInterval\\s*\\(\\s*Integer\\.MAX_VALUE\\s*\\)"), 
+        
+        // 65. Token expiration set to long duration
+        Pattern.compile("\\bsetExpiration\\s*\\(\\s*new\\s+Date\\(System\\.currentTimeMillis\\(\\)\\s*\\+\\s*86400000L\\s*\\)"), 
+        
+        // 66. Unprotected GraphQL API queries
+        Pattern.compile("\\bval\\s+graphqlQuery\\s*=\\s*\"\\{.*user.*\\}\""), 
+        
+        // 67. Weak password storage using SHA1
+        Pattern.compile("\\bMessageDigest.getInstance\\(\\s*\"SHA-1\"\\s*\\)"), 
+        
+        // 68. Authentication bypass via query parameters
+        Pattern.compile("\\bif\\s*\\(\\s*request.getQueryString\\(\"isAdmin\"\\)\\s*=\\s*\"true\"\\s*\\)"), 
+        
+        // 69. Missing audit logging for failed authentication
+        Pattern.compile("\\bcatch\\s*\\(\\s*AuthenticationException\\s*\\)\\s*\\{\\s*logger.debug"), 
+        
+        // 70. Hardcoded default credentials
+        Pattern.compile("\\bval\\s+defaultUser\\s*=\\s*\"admin\"\\s*,\\s*val\\s+defaultPassword\\s*=\\s*\"password\""), 
+        
+        // 71. No logging for authentication attempts
+        Pattern.compile("\\blogger\\.debug\\(\\s*\"User \\$\\{username\\} attempting login\"\\s*\\)"), 
+        
+        // 72. Open admin dashboard to unauthenticated users
+        Pattern.compile("\\bpath\\(\\s*\"/admin/dashboard\"\\s*\\)\\s*\\{[^}]*\\}"), 
+        
+        // 73. Weak JWT validation missing signature verification
+        Pattern.compile("\\bJWT.decode\\(\\s*token\\s*\\)"), 
+        
+        // 74. No input validation for password fields
+        Pattern.compile("\\bdef\\s+register\\(\\s*password:\\s*String\\s*\\)"), 
+        
+        // 75. No re-authentication required for critical actions
+        Pattern.compile("\\bdef\\s+updateAccountDetails\\s*\\(\\s*request:\\s*Request\\s*\\)"), 
+        
+        // 76. Hardcoded OAuth client secrets
+        Pattern.compile("\\bval\\s+clientSecret\\s*=\\s*\"[^\"]+\""), 
+        
+        // 77. No secure flag for session cookies
+        Pattern.compile("\\bcookie\\s*\\(\\s*\"sessionId\"\\s*->\\s*sessionId\\s*\\)"), 
+        
+        // 78. Allowing auto-login without validation
+        Pattern.compile("\\bval\\s+autoLoginEnabled\\s*=\\s*true"), 
+        
+        // 79. Authentication token stored in local storage
+        Pattern.compile("\\blocalStorage\\.setItem\\(\\s*\"authToken\"\\s*,\\s*token\\s*\\)"), 
+        
+        // 80. No refresh token expiration check
+        Pattern.compile("\\brefreshToken\\.isValid\\(\\)"), 
+        
+        // 81. Accepting plaintext passwords in API requests
+        Pattern.compile("\\bform\\s*\\(\\s*\"password\"\\s*->\\s*text\\s*\\)"), 
+        
+        // 82. No 2FA enforcement
+        Pattern.compile("\\bif\\s*\\(\\s*user.has2FA\\s*\\)\\s*\\{\\s*return true\\s*\\}"), 
+        
+        // 83. Logging sensitive information in debug mode
+        Pattern.compile("\\blogger\\.debug\\(\\s*\"Password entered: \\$\\{password\\}\"\\s*\\)"), 
+        
+        // 84. No role validation in GraphQL resolvers
+        Pattern.compile("\\bdef\\s+resolveUser\\s*\\(\\s*context:\\s*Context\\s*\\)"), 
+        
+        // 85. Allowing authentication via GET request
+        Pattern.compile("\\bGET\\s*\\(\\s*\"/auth\\?username=.*&password=.*\"\\)"), 
+        
+        // 86. No token revocation on logout
+        Pattern.compile("\\bblacklistToken\\s*\\(\\s*token\\s*\\)"), 
+        
+        // 87. No password strength enforcement
+        Pattern.compile("\\bif\\s*\\(\\s*password.length\\s*<\\s*6\\s*\\)"), 
+        
+        // 88. Missing logging for failed login attempts
+        Pattern.compile("\\blogger\\.info\\(\\s*\"Failed login for \\$\\{username\\}\"\\s*\\)"), 
+        
+        // 89. Allowing weak passwords like '123456'
+        Pattern.compile("\\bif\\s*\\(\\s*password\\s*=\\s*\"123456\"\\s*\\)"), 
+        
+        // 90. Using DES for password hashing
+        Pattern.compile("\\bCipher.getInstance\\(\\s*\"DES\"\\s*\\)"), 
+        
+        // 91. Lack of input sanitization in authentication API
+        Pattern.compile("\\busername\\s*=\\s*request.getQueryString\\(\"username\"\\)"), 
+        
+        // 92. Missing logout function
+        Pattern.compile("\\bdef\\s+logout\\s*\\(\\s*\\)\\s*:\\s*Result"), 
+        
+        // 93. No session expiration on inactivity
+        Pattern.compile("\\bsetMaxInactiveInterval\\s*\\(\\s*-1\\s*\\)"), 
+        
+        // 94. Logging authentication errors with sensitive data
+        Pattern.compile("\\blogger\\.error\\(\\s*\"Login failed: \\$\\{exception.getMessage\\}\"\\s*\\)"), 
+        
+        // 95. Unprotected API keys in query parameters
+        Pattern.compile("\\bqueryString\\(\\s*\"apiKey\"\\s*\\)"), 
+        
+        // 96. Accepting null passwords
+        Pattern.compile("\\bpassword\\s*=\\s*null"), 
+        
+        // 97. Allowing access with expired tokens
+        Pattern.compile("\\btoken.isExpired\\(\\)\\s*=\\s*false"), 
+        
+        // 98. No validation for session hijacking
+        Pattern.compile("\\bsession.getId\\(\\)"), 
+        
+        // 99. Exposed authentication logs
+        Pattern.compile("\\bfileWriter\\.write\\(\\s*\"User logged in: \"\\s*\\+\\s*username"), 
+        
+        // 100. No validation for role-based actions
+        Pattern.compile("\\bif\\s*\\(\\s*user.role\\s*=\\s*\"admin\"\\s*\\)")
