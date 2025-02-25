@@ -1,0 +1,302 @@
+public static final List<Pattern> sourceCodeLeakage = Arrays.asList(
+    // 1. Hardcoded database credentials
+    Pattern.compile("jdbc:(mysql|postgresql|sqlserver)://[^\\s]+\\buser=\\b[^\\s]+\\bpassword=[^\\s]+", Pattern.CASE_INSENSITIVE),
+
+    // 2. Hardcoded AWS secret keys
+    Pattern.compile("AKIA[0-9A-Z]{16}"),
+
+    // 3. Exposed private SSH keys
+    Pattern.compile("-----BEGIN PRIVATE KEY-----\\s*[A-Za-z0-9+/=\\s]+-----END PRIVATE KEY-----", Pattern.MULTILINE),
+
+    // 4. Hardcoded API keys in properties files
+    Pattern.compile("api[_-]?key\\s*=\\s*[\"'][A-Za-z0-9\\-_]+[\"']"),
+
+    // 5. Exposed .git directory in URLs
+    Pattern.compile("/\\.git/"),
+
+    // 6. Logging entire HTTP request headers
+    Pattern.compile("logger\\.info\\(\"Request Headers: \" \\+ request\\.getHeaders\\(\\)"),
+
+    // 7. Printing sensitive system properties
+    Pattern.compile("System\\.out\\.println\\(System\\.getProperty\\(\"user\\.dir\""),
+
+    // 8. Hardcoded encryption keys
+    Pattern.compile("AESKey\\s*=\\s*\"[A-Fa-f0-9]{32}\""),
+
+    // 9. Using `debug=true` in Spring Boot configuration
+    Pattern.compile("spring\\.application\\.debug\\s*=\\s*true"),
+
+    // 10. Exposed `.env` file
+    Pattern.compile("/\\.env"),
+
+    // 11. Logging raw passwords in debug mode
+    Pattern.compile("logger\\.debug\\(\"Password: \" \\+ user\\.getPassword\\(\\)"),
+
+    // 12. Returning full stack traces in API responses
+    Pattern.compile("ResponseEntity\\.status\\(HttpStatus.INTERNAL_SERVER_ERROR\\)\\.body\\(e\\.getMessage\\(\\)\\)"),
+
+    // 13. Exposing `application.properties` in API
+    Pattern.compile("@GetMapping\\(\"/config\"\\)"),
+
+    // 14. Logging JWT tokens
+    Pattern.compile("logger\\.info\\(\"JWT Token: \" \\+ token"),
+
+    // 15. Exposed `.gitignore` file
+    Pattern.compile("/\\.gitignore"),
+
+    // 16. Using `@CrossOrigin("*")`, allowing unrestricted access
+    Pattern.compile("@CrossOrigin\\(\"\\*\"\\)"),
+
+    // 17. Exposing security configuration via API
+    Pattern.compile("@GetMapping\\(\"/security-config\"\\)"),
+
+    // 18. Returning raw SQL errors to clients
+    Pattern.compile("ResponseEntity\\.ok\\(e\\.getMessage\\(\\)\\)"),
+
+    // 19. Using `System.getenv("PASSWORD")` without encryption
+    Pattern.compile("System\\.getenv\\(\"PASSWORD\"\\)"),
+
+    // 20. Exposed Kubernetes secrets in logs
+    Pattern.compile("logger\\.info\\(\"K8s Secret: \" \\+ secretValue"),
+
+    // 21. Exposed database schema
+    Pattern.compile("@GetMapping\\(\"/db-schema\"\\)"),
+
+    // 22. Using `public static final String PASSWORD`
+    Pattern.compile("public static final String PASSWORD\\s*=\\s*\"[^\"]+\""),
+
+    // 23. Exposing `pom.xml` or `build.gradle`
+    Pattern.compile("/pom\\.xml|/build\\.gradle"),
+
+    // 24. Logging full SQL queries
+    Pattern.compile("logger\\.info\\(\"Executing SQL: \" \\+ query"),
+
+    // 25. Exposing local system path in responses
+    Pattern.compile("return new ResponseEntity\\(new File\\(System\\.getProperty\\(\"user\\.dir\"\\)"),
+
+    // 26. Using `.htpasswd` files in public directories
+    Pattern.compile("/\\.htpasswd"),
+
+    // 27. Storing JWT secret key in properties file
+    Pattern.compile("jwt\\.secret\\s*=\\s*\"[^\"]+\""),
+
+    // 28. Returning raw user passwords in API responses
+    Pattern.compile("ResponseEntity\\.ok\\(user\\.getPassword\\(\\)\\)"),
+
+    // 29. Using weak password hashing (MD5)
+    Pattern.compile("MessageDigest\\.getInstance\\(\"MD5\"\\)"),
+
+    // 30. Allowing all hosts in security config
+    Pattern.compile("allowedHosts\\(\\s*\"\\*\"\\s*\\)"),
+
+    // 31. Logging entire response bodies
+    Pattern.compile("logger\\.info\\(\"Response Body: \" \\+ responseBody"),
+
+    // 32. Hardcoded Firebase secrets
+    Pattern.compile("AIza[0-9A-Za-z\\-_]{35}"),
+
+    // 33. Using `permitAll()` in Spring Security
+    Pattern.compile("http\\.authorizeRequests\\(\\)\\.anyRequest\\(\\)\\.permitAll\\(\\)"),
+
+    // 34. Exposed Swagger documentation in production
+    Pattern.compile("@EnableSwagger2"),
+
+    // 35. Returning full user object in API responses
+    Pattern.compile("ResponseEntity\\.ok\\(userRepository\\.findAll\\(\\)\\)"),
+
+    // 36. Using old, vulnerable Java libraries
+    Pattern.compile("spring-boot-starter-web:\\s*2\\.3\\.\\d"),
+
+    // 37. Logging HTTP request body
+    Pattern.compile("logger\\.info\\(\"Request Body: \" \\+ requestBody"),
+
+    // 38. Exposed `.htaccess` file
+    Pattern.compile("/\\.htaccess"),
+
+    // 39. Exposing admin dashboard routes
+    Pattern.compile("@GetMapping\\(\"/admin-dashboard\"\\)"),
+
+    // 40. Using `@RestController` without authentication middleware
+    Pattern.compile("@RestController\\s+public class\\s+\\w+\\s+\\{"),
+
+    // 41. Returning stack traces in JSON responses
+    Pattern.compile("return ResponseEntity\\.status\\(500\\)\\.body\\(e\\.getStackTrace\\(\\)\\)"),
+
+    // 42. Using `null` password in authentication logic
+    Pattern.compile("new UsernamePasswordAuthenticationToken\\(username, null"),
+
+    // 43. Exposing unrestricted API documentation
+    Pattern.compile("@GetMapping\\(\"/api-docs\"\\)"),
+
+    // 44. Logging entire JWT payload
+    Pattern.compile("logger\\.info\\(\"Decoded JWT: \" \\+ decodedJWT"),
+
+    // 45. Exposing local file system in REST API
+    Pattern.compile("@GetMapping\\(\"/files\"\\)"),
+
+    // 46. Allowing unrestricted file downloads
+    Pattern.compile("@GetMapping\\(\"/download/\\*\"\\)"),
+
+    // 47. Logging user session details
+    Pattern.compile("logger\\.info\\(\"Session Info: \" \\+ session"),
+
+    // 48. Hardcoded SMTP credentials
+    Pattern.compile("mail\\.password\\s*=\\s*\"[^\"]+\""),
+
+    // 49. Using weak encryption algorithms
+    Pattern.compile("Cipher\\.getInstance\\(\"DES/ECB/PKCS5Padding\"\\)"),
+
+    // 50. Storing OAuth client secrets in code
+    Pattern.compile("client\\.secret\\s*=\\s*\"[^\"]+\"")
+);
+public static final List<Pattern> sourceCodeLeakage = Arrays.asList(
+    // 1. Hardcoded Google API Key
+    Pattern.compile("AIza[0-9A-Za-z\\-_]{35}"),
+
+    // 2. Hardcoded Stripe API Key
+    Pattern.compile("sk_live_[0-9a-zA-Z]{24}"),
+
+    // 3. Hardcoded Twilio Credentials
+    Pattern.compile("AC[0-9a-fA-F]{32}"),
+
+    // 4. Hardcoded Slack Token
+    Pattern.compile("xox[baprs]-[0-9]{12}-[0-9]{12}-[a-zA-Z0-9]{24}"),
+
+    // 5. Hardcoded Facebook OAuth Token
+    Pattern.compile("EAACEdEose0cBA[0-9A-Za-z]+"),
+
+    // 6. Hardcoded PayPal Client Secret
+    Pattern.compile("client_secret=[0-9a-z]{32}"),
+
+    // 7. Hardcoded AWS Access Key ID
+    Pattern.compile("AKIA[0-9A-Z]{16}"),
+
+    // 8. Hardcoded AWS Secret Access Key
+    Pattern.compile("[0-9a-zA-Z/+]{40}"),
+
+    // 9. Exposed `.gitconfig` file
+    Pattern.compile("/\\.gitconfig"),
+
+    // 10. Hardcoded private keys in code
+    Pattern.compile("-----BEGIN (RSA|EC|DSA|PGP) PRIVATE KEY-----"),
+
+    // 11. Exposed `.bash_history` file
+    Pattern.compile("/\\.bash_history"),
+
+    // 12. Exposed `.npmrc` file with credentials
+    Pattern.compile("_authToken=[A-Za-z0-9+/=]+"),
+
+    // 13. Exposed database connection string
+    Pattern.compile("jdbc:(mysql|postgresql|sqlserver)://[^\\s]+"),
+
+    // 14. Using `request.getParameter("password")` without validation
+    Pattern.compile("request\\.getParameter\\(\"password\"\\)"),
+
+    // 15. Exposing local `.aws/credentials` file
+    Pattern.compile("/\\.aws/credentials"),
+
+    // 16. Logging full request body
+    Pattern.compile("logger\\.info\\(\"Request Body: \" \\+ requestBody"),
+
+    // 17. Logging HTTP headers
+    Pattern.compile("logger\\.info\\(\"Headers: \" \\+ request\\.getHeaders\\(\\)"),
+
+    // 18. Hardcoded Firebase database URL
+    Pattern.compile("https:\\/\\/.*\\.firebaseio\\.com"),
+
+    // 19. Exposed `.dockercfg` file
+    Pattern.compile("/\\.dockercfg"),
+
+    // 20. Exposed `.docker/config.json` file
+    Pattern.compile("/\\.docker/config\\.json"),
+
+    // 21. Hardcoded Telegram Bot Token
+    Pattern.compile("bot[0-9]{9}:[A-Za-z0-9_-]{35}"),
+
+    // 22. Exposed Cloudflare API key
+    Pattern.compile("v1\\.0-[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"),
+
+    // 23. Exposed `.ssh/known_hosts` file
+    Pattern.compile("/\\.ssh/known_hosts"),
+
+    // 24. Using `System.getenv("DB_PASSWORD")` without encryption
+    Pattern.compile("System\\.getenv\\(\"DB_PASSWORD\"\\)"),
+
+    // 25. Hardcoded GitHub Personal Access Token
+    Pattern.compile("[0-9a-f]{40}"),
+
+    // 26. Hardcoded Google Cloud API Key
+    Pattern.compile("AIzaSy[A-Za-z0-9-_]{33}"),
+
+    // 27. Hardcoded RSA SSH Private Key
+    Pattern.compile("-----BEGIN RSA PRIVATE KEY-----"),
+
+    // 28. Exposing `/var/log/auth.log`
+    Pattern.compile("/var/log/auth\\.log"),
+
+    // 29. Allowing file upload without extension validation
+    Pattern.compile("MultipartFile file"),
+
+    // 30. Hardcoded SMTP credentials in properties
+    Pattern.compile("mail\\.smtp\\.password\\s*=\\s*\"[^\"]+\""),
+
+    // 31. Exposing `/etc/passwd`
+    Pattern.compile("/etc/passwd"),
+
+    // 32. Logging entire JWT payload
+    Pattern.compile("logger\\.info\\(\"JWT Payload: \" \\+ decodedJWT"),
+
+    // 33. Using default credentials in properties file
+    Pattern.compile("defaultUser=admin\\s*defaultPassword=admin"),
+
+    // 34. Hardcoded Azure Storage Key
+    Pattern.compile("DefaultEndpointsProtocol=https;AccountName=[a-z0-9]+;AccountKey=[A-Za-z0-9+/=]{88}"),
+
+    // 35. Exposing full server stack trace in response
+    Pattern.compile("ResponseEntity\\.status\\(500\\)\\.body\\(e\\.getStackTrace\\(\\)\\)"),
+
+    // 36. Using `permitAll()` in security config
+    Pattern.compile("http\\.authorizeRequests\\(\\)\\.anyRequest\\(\\)\\.permitAll\\(\\)"),
+
+    // 37. Exposing system environment variables in API
+    Pattern.compile("System\\.getenv\\(\".*\"\\)"),
+
+    // 38. Allowing `CORS` from any origin
+    Pattern.compile("@CrossOrigin\\(\"\\*\"\\)"),
+
+    // 39. Using `disable()` in Spring Security
+    Pattern.compile("http\\.csrf\\(\\)\\.disable\\(\\)"),
+
+    // 40. Exposed Google Maps API Key
+    Pattern.compile("AIzaSy[A-Za-z0-9-_]{33}"),
+
+    // 41. Hardcoded Jenkins Credentials
+    Pattern.compile("jenkins_token=[A-Za-z0-9-_]{32}"),
+
+    // 42. Logging full response body
+    Pattern.compile("logger\\.info\\(\"Response Body: \" \\+ responseBody"),
+
+    // 43. Exposed `.env.production` file
+    Pattern.compile("/\\.env\\.production"),
+
+    // 44. Using `plaintext` storage for passwords
+    Pattern.compile("new User\\(\"admin\", \"password\""),
+
+    // 45. Exposing MySQL root password
+    Pattern.compile("mysql_root_password\\s*=\\s*\"[^\"]+\""),
+
+    // 46. Using `request.getParameter("credit_card")` without validation
+    Pattern.compile("request\\.getParameter\\(\"credit_card\"\\)"),
+
+    // 47. Using default JWT secret key
+    Pattern.compile("jwt\\.secret\\s*=\\s*\"changeme\""),
+
+    // 48. Logging unmasked API keys
+    Pattern.compile("logger\\.info\\(\"API Key: \" \\+ apiKey"),
+
+    // 49. Hardcoded reCAPTCHA Secret Key
+    Pattern.compile("6[0-9a-zA-Z_-]{39}"),
+
+    // 50. Exposed Kubernetes API Token
+    Pattern.compile("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+")
+);
