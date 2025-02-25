@@ -1,0 +1,614 @@
+public static final List<Pattern> objectOwnershipPatterns = Arrays.asList(
+
+    // 1. No ownership check before fetching user profile
+    Pattern.compile("\\b(getUserProfile|getProfileDetails)\\([^)]*\\)"), 
+
+    // 2. Missing ownership validation when updating user details
+    Pattern.compile("\\b(updateUserDetails|modifyUserInfo)\\([^)]*\\)"), 
+
+    // 3. No validation when deleting another user’s account
+    Pattern.compile("\\b(deleteUserAccount|removeUser)\\([^)]*\\)"), 
+
+    // 4. Allowing unauthorized edits to another user’s posts
+    Pattern.compile("\\b(editPost|updateBlogEntry)\\([^)]*\\)"), 
+
+    // 5. No ownership verification when modifying user settings
+    Pattern.compile("\\b(updateSettings|modifyUserPreferences)\\([^)]*\\)"), 
+
+    // 6. Allowing a user to download another user’s private files
+    Pattern.compile("\\b(downloadFile|getPrivateFile)\\([^)]*\\)"), 
+
+    // 7. No check when changing ownership of assets
+    Pattern.compile("\\b(changeOwnership|transferAsset)\\([^)]*\\)"), 
+
+    // 8. No verification when resetting another user’s password
+    Pattern.compile("\\b(resetPassword|updateUserPassword)\\([^)]*\\)"), 
+
+    // 9. Allowing one user to view another user’s messages
+    Pattern.compile("\\b(getUserMessages|fetchPrivateMessages)\\([^)]*\\)"), 
+
+    // 10. No ownership validation when approving user-generated content
+    Pattern.compile("\\b(approvePost|validateSubmission)\\([^)]*\\)"), 
+
+    // 11. Allowing unrestricted modification of stored payment details
+    Pattern.compile("\\b(updatePaymentInfo|modifyBillingDetails)\\([^)]*\\)"), 
+
+    // 12. No verification when accessing sensitive user logs
+    Pattern.compile("\\b(getUserLogs|fetchAuditHistory)\\([^)]*\\)"), 
+
+    // 13. No ownership enforcement when modifying support tickets
+    Pattern.compile("\\b(updateSupportTicket|modifyCaseStatus)\\([^)]*\\)"), 
+
+    // 14. Allowing a user to access another user's API keys
+    Pattern.compile("\\b(getApiKeys|fetchUserTokens)\\([^)]*\\)"), 
+
+    // 15. No validation before changing a user’s role
+    Pattern.compile("\\b(updateUserRole|modifyAccessLevel)\\([^)]*\\)"), 
+
+    // 16. No ownership check when fetching confidential documents
+    Pattern.compile("\\b(getConfidentialDocs|fetchPrivateReports)\\([^)]*\\)"), 
+
+    // 17. No verification before updating business account details
+    Pattern.compile("\\b(updateBusinessAccount|modifyCompanyProfile)\\([^)]*\\)"), 
+
+    // 18. Allowing deletion of another user’s stored media
+    Pattern.compile("\\b(deleteImage|removeUserPhoto)\\([^)]*\\)"), 
+
+    // 19. No ownership check when modifying user groups
+    Pattern.compile("\\b(updateUserGroup|modifyGroupSettings)\\([^)]*\\)"), 
+
+    // 20. No ownership enforcement when assigning custom tags
+    Pattern.compile("\\b(assignTag|modifyLabel)\\([^)]*\\)"), 
+
+    // 21. Unrestricted ability to modify another user's social profile
+    Pattern.compile("\\b(updateSocialProfile|modifyUserBio)\\([^)]*\\)"), 
+
+    // 22. No verification before editing private calendar events
+    Pattern.compile("\\b(updateCalendarEvent|modifyUserSchedule)\\([^)]*\\)"), 
+
+    // 23. No ownership check when disabling MFA for a user
+    Pattern.compile("\\b(disableMfa|removeTwoFactorAuth)\\([^)]*\\)"), 
+
+    // 24. No validation before viewing private analytics data
+    Pattern.compile("\\b(getUserAnalytics|fetchUsageStats)\\([^)]*\\)"), 
+
+    // 25. Allowing one user to remove another user’s session
+    Pattern.compile("\\b(deleteSession|invalidateUserSession)\\([^)]*\\)"), 
+
+    // 26. No ownership enforcement when handling legal agreements
+    Pattern.compile("\\b(acceptTerms|modifyLegalAgreement)\\([^)]*\\)"), 
+
+    // 27. No validation before updating another user's API quota
+    Pattern.compile("\\b(updateApiQuota|modifyUsageLimit)\\([^)]*\\)"), 
+
+    // 28. Allowing unauthorized access to user-generated invoices
+    Pattern.compile("\\b(getInvoice|getBillingStatement)\\([^)]*\\)"), 
+
+    // 29. No ownership verification when modifying subscription settings
+    Pattern.compile("\\b(updateSubscription|modifyUserPlan)\\([^)]*\\)"), 
+
+    // 30. No validation before updating email preferences
+    Pattern.compile("\\b(updateEmailSettings|modifyUserNotifications)\\([^)]*\\)"), 
+
+    // 31. Allowing one user to submit requests on behalf of another
+    Pattern.compile("\\b(submitRequest|createTicketForUser)\\([^)]*\\)"), 
+
+    // 32. No ownership enforcement when modifying emergency contacts
+    Pattern.compile("\\b(updateEmergencyContacts|modifyUserDependents)\\([^)]*\\)"), 
+
+    // 33. No validation before generating reports for other users
+    Pattern.compile("\\b(generateReport|fetchUserStats)\\([^)]*\\)"), 
+
+    // 34. Unrestricted access to user-owned cryptographic keys
+    Pattern.compile("\\b(getCryptoKeys|getUserSigningKeys)\\([^)]*\\)"), 
+
+    // 35. No verification when adding private addresses
+    Pattern.compile("\\b(addAddress|modifyShippingInfo)\\([^)]*\\)"), 
+
+    // 36. No ownership validation when listing confidential resources
+    Pattern.compile("\\b(listConfidentialData|fetchRestrictedInfo)\\([^)]*\\)"), 
+
+    // 37. No ownership verification when modifying project configurations
+    Pattern.compile("\\b(updateProjectSettings|modifyTeamPreferences)\\([^)]*\\)"), 
+
+    // 38. Allowing unrestricted cancellation of another user's reservations
+    Pattern.compile("\\b(cancelBooking|removeUserReservation)\\([^)]*\\)"), 
+
+    // 39. No validation when modifying saved payment methods
+    Pattern.compile("\\b(updateSavedCard|modifyPaymentMethod)\\([^)]*\\)"), 
+
+    // 40. No ownership enforcement in audit trail retrieval
+    Pattern.compile("\\b(getAuditTrail|getUserActivityLogs)\\([^)]*\\)"), 
+
+    // 41. Allowing unrestricted creation of admin accounts
+    Pattern.compile("\\b(createAdminAccount|promoteUserToAdmin)\\([^)]*\\)"), 
+
+    // 42. No verification before modifying API access tokens
+    Pattern.compile("\\b(updateAccessToken|modifyApiKey)\\([^)]*\\)"), 
+
+    // 43. No ownership validation when modifying warehouse inventory
+    Pattern.compile("\\b(updateInventory|modifyStockLevels)\\([^)]*\\)"), 
+
+    // 44. No verification when updating shipping details
+    Pattern.compile("\\b(updateShippingDetails|modifyOrderDelivery)\\([^)]*\\)"), 
+
+    // 45. No ownership enforcement when modifying referral rewards
+    Pattern.compile("\\b(updateReferralBonus|modifyLoyaltyPoints)\\([^)]*\\)"), 
+
+    // 46. Allowing unrestricted access to supplier orders
+    Pattern.compile("\\b(getSupplierOrders|fetchVendorData)\\([^)]*\\)"), 
+
+    // 47. No verification when viewing system-wide discount settings
+    Pattern.compile("\\b(getDiscounts|fetchPromoConfigurations)\\([^)]*\\)"), 
+
+    // 48. Allowing public access to API rate-limiting configurations
+    Pattern.compile("\\b(getRateLimits|fetchApiThrottlingRules)\\([^)]*\\)"), 
+
+    // 49. No ownership check when linking external accounts
+    Pattern.compile("\\b(linkExternalAccount|connectThirdPartyService)\\([^)]*\\)"), 
+
+    // 50. No verification before modifying customer loyalty levels
+    Pattern.compile("\\b(updateLoyaltyStatus|modifyUserRewards)\\([^)]*\\)")  
+);
+public static final List<Pattern> objectOwnershipPatterns = Arrays.asList(
+
+    // 51. No ownership check when retrieving account statements
+    Pattern.compile("\\b(getAccountStatement|fetchBankRecords)\\([^)]*\\)"),
+
+    // 52. Allowing direct access to another user's device configurations
+    Pattern.compile("\\b(getDeviceConfig|fetchUserDeviceSettings)\\([^)]*\\)"),
+
+    // 53. No validation before modifying another user's cloud storage
+    Pattern.compile("\\b(updateCloudStorage|modifyUserDrive)\\([^)]*\\)"),
+
+    // 54. Allowing unrestricted deletion of another user's saved drafts
+    Pattern.compile("\\b(deleteDraft|removeUserDocument)\\([^)]*\\)"),
+
+    // 55. No ownership verification when updating financial records
+    Pattern.compile("\\b(updateFinancials|modifyUserTransaction)\\([^)]*\\)"),
+
+    // 56. No validation when canceling another user's service subscription
+    Pattern.compile("\\b(cancelSubscription|terminateUserPlan)\\([^)]*\\)"),
+
+    // 57. Unrestricted access to another user's marketing campaigns
+    Pattern.compile("\\b(getCampaignDetails|fetchUserAds)\\([^)]*\\)"),
+
+    // 58. No ownership enforcement when fetching user telemetry data
+    Pattern.compile("\\b(getTelemetryData|fetchUserBehaviorStats)\\([^)]*\\)"),
+
+    // 59. No verification before modifying order refund requests
+    Pattern.compile("\\b(updateRefundStatus|modifyUserDispute)\\([^)]*\\)"),
+
+    // 60. Allowing unauthorized modifications to a user's consent preferences
+    Pattern.compile("\\b(updateConsentSettings|modifyPrivacyPreferences)\\([^)]*\\)"),
+
+    // 61. No ownership check when viewing another user's active promotions
+    Pattern.compile("\\b(getPromotions|fetchUserDiscounts)\\([^)]*\\)"),
+
+    // 62. No validation before exporting another user's email contacts
+    Pattern.compile("\\b(exportContacts|downloadUserAddressBook)\\([^)]*\\)"),
+
+    // 63. Unrestricted ability to add or remove another user's authentication methods
+    Pattern.compile("\\b(updateAuthMethods|modifyUserCredentials)\\([^)]*\\)"),
+
+    // 64. No ownership enforcement when modifying API integration keys
+    Pattern.compile("\\b(updateApiIntegration|modifyConnectedApps)\\([^)]*\\)"),
+
+    // 65. No validation when changing notification settings for other users
+    Pattern.compile("\\b(updateNotifications|modifyUserAlerts)\\([^)]*\\)"),
+
+    // 66. Allowing a user to disable another user's security alerts
+    Pattern.compile("\\b(disableSecurityAlerts|removeUserWarnings)\\([^)]*\\)"),
+
+    // 67. No verification before fetching sensitive account audit logs
+    Pattern.compile("\\b(getAccountLogs|fetchUserSecurityEvents)\\([^)]*\\)"),
+
+    // 68. No ownership check when modifying saved social media links
+    Pattern.compile("\\b(updateSocialLinks|modifyUserHandles)\\([^)]*\\)"),
+
+    // 69. Allowing unrestricted modification of another user's location data
+    Pattern.compile("\\b(updateLocation|modifyUserGeodata)\\([^)]*\\)"),
+
+    // 70. No validation before viewing another user's customer support tickets
+    Pattern.compile("\\b(getSupportTickets|fetchUserCases)\\([^)]*\\)"),
+
+    // 71. No verification when generating financial reports for another user
+    Pattern.compile("\\b(generateFinancialReport|fetchUserRevenueStats)\\([^)]*\\)"),
+
+    // 72. No ownership enforcement when assigning workflow tasks
+    Pattern.compile("\\b(assignTask|modifyProjectAssignment)\\([^)]*\\)"),
+
+    // 73. Unrestricted modification of another user's project deliverables
+    Pattern.compile("\\b(updateProjectMilestone|modifyTeamDeadline)\\([^)]*\\)"),
+
+    // 74. No ownership check before deleting another user's attachments
+    Pattern.compile("\\b(deleteAttachment|removeUserFile)\\([^)]*\\)"),
+
+    // 75. No validation before modifying system-wide email templates
+    Pattern.compile("\\b(updateEmailTemplates|modifyGlobalMessages)\\([^)]*\\)"),
+
+    // 76. Allowing unrestricted access to internal system metrics dashboards
+    Pattern.compile("\\b(getSystemMetrics|fetchAdminStats)\\([^)]*\\)"),
+
+    // 77. No verification when modifying another user's linked payment accounts
+    Pattern.compile("\\b(updateLinkedAccounts|modifyUserBankDetails)\\([^)]*\\)"),
+
+    // 78. No ownership enforcement when modifying service-level agreements (SLAs)
+    Pattern.compile("\\b(updateServiceAgreement|modifyUserContract)\\([^)]*\\)"),
+
+    // 79. Unrestricted access to another user's generated digital signatures
+    Pattern.compile("\\b(getDigitalSignature|fetchUserSignatures)\\([^)]*\\)"),
+
+    // 80. No validation when modifying another user's two-factor authentication settings
+    Pattern.compile("\\b(updateTwoFactorSettings|modifyUserMFA)\\([^)]*\\)"),
+
+    // 81. No ownership verification when requesting encrypted backup recovery
+    Pattern.compile("\\b(requestBackupRestore|recoverUserData)\\([^)]*\\)"),
+
+    // 82. No verification before modifying private API webhook configurations
+    Pattern.compile("\\b(updateWebhookSettings|modifyUserEventTriggers)\\([^)]*\\)"),
+
+    // 83. Allowing unrestricted access to user-generated server logs
+    Pattern.compile("\\b(getServerLogs|fetchUserErrorReports)\\([^)]*\\)"),
+
+    // 84. No ownership check when modifying another user's generated QR codes
+    Pattern.compile("\\b(updateQRCode|modifyUserAuthToken)\\([^)]*\\)"),
+
+    // 85. Unrestricted deletion of another user's generated coupons
+    Pattern.compile("\\b(deleteCoupon|removeUserDiscountCode)\\([^)]*\\)"),
+
+    // 86. No validation before editing system-wide network access rules
+    Pattern.compile("\\b(updateNetworkRules|modifyFirewallSettings)\\([^)]*\\)"),
+
+    // 87. No verification before updating another user's biometric authentication
+    Pattern.compile("\\b(updateBiometricAuth|modifyUserFaceID)\\([^)]*\\)"),
+
+    // 88. Unrestricted access to another user's real-time GPS location
+    Pattern.compile("\\b(getRealTimeLocation|fetchUserCoordinates)\\([^)]*\\)"),
+
+    // 89. No ownership enforcement when modifying cloud service permissions
+    Pattern.compile("\\b(updateCloudPermissions|modifyUserAccessRights)\\([^)]*\\)"),
+
+    // 90. No validation before modifying another user's delegated access permissions
+    Pattern.compile("\\b(updateDelegatedAccess|modifyUserProxyRights)\\([^)]*\\)"),
+
+    // 91. No verification when viewing financial payout reports for other users
+    Pattern.compile("\\b(getPayoutReports|fetchUserEarningsSummary)\\([^)]*\\)"),
+
+    // 92. Allowing unrestricted access to another user's digital identity verification status
+    Pattern.compile("\\b(getIdentityStatus|fetchUserVerificationLevel)\\([^)]*\\)"),
+
+    // 93. No ownership validation when managing remote device access
+    Pattern.compile("\\b(updateRemoteAccess|modifyUserDeviceConnections)\\([^)]*\\)"),
+
+    // 94. No verification before modifying fraud detection risk scores
+    Pattern.compile("\\b(updateRiskScore|modifyFraudIndicators)\\([^)]*\\)"),
+
+    // 95. Unrestricted ability to modify another user's blockchain transaction history
+    Pattern.compile("\\b(updateBlockchainRecord|modifyUserCryptoTransactions)\\([^)]*\\)"),
+
+    // 96. No ownership check before modifying email domain ownership settings
+    Pattern.compile("\\b(updateDomainSettings|modifyEmailDNSRecords)\\([^)]*\\)"),
+
+    // 97. No validation when modifying another user's IoT device configurations
+    Pattern.compile("\\b(updateIoTDevice|modifyUserSmartHomeSettings)\\([^)]*\\)"),
+
+    // 98. No verification before modifying distributed ledger access control lists
+    Pattern.compile("\\b(updateDLTPermissions|modifyBlockchainAccess)\\([^)]*\\)"),
+
+    // 99. Allowing unrestricted deletion of another user's escrowed assets
+    Pattern.compile("\\b(deleteEscrow|removeUserLockedFunds)\\([^)]*\\)"),
+
+    // 100. No ownership enforcement when modifying AI model training datasets
+    Pattern.compile("\\b(updateTrainingData|modifyUserAIModels)\\([^)]*\\)")
+);
+public static final List<Pattern> middlewarePatterns = Arrays.asList(
+
+    // 1. No middleware applied to route handlers
+    Pattern.compile("\\b(app|get|post|put|delete)\\s*\\(.*\\)\\s*=>\\s*\\{[^}]*\\}"),
+
+    // 2. No authentication middleware applied to sensitive API routes
+    Pattern.compile("\\b(route|path|endpoint)\\(\"/admin/.*\"\\)\\s*\\{[^}]*\\}"),
+
+    // 3. API controller method without security decorator
+    Pattern.compile("@(Get|Post|Put|Delete)Mapping\\([^)]*\\)\\s*def\\s+\\w+\\s*\\("),
+
+    // 4. No authorization middleware applied to protected routes
+    Pattern.compile("\\b(get|post|put|delete)\\s*\\(\"/user/settings\"\\)\\s*\\{[^}]*\\}"),
+
+    // 5. Missing authentication middleware in Play Framework controllers
+    Pattern.compile("\\bAction\\s*\\{[^}]*\\}"),
+
+    // 6. Controller function without an authorization wrapper
+    Pattern.compile("\\bdef\\s+\\w+\\s*\\([^)]*\\)\\s*:\\s*Action\\[\\w+\\]\\s*=\\s*Action\\s*\\{[^}]*\\}"),
+
+    // 7. Route defined without security middleware
+    Pattern.compile("\\broutes\\s*\\+=\\s*Http\\(.*\\)"),
+
+    // 8. Missing access control middleware in Akka HTTP
+    Pattern.compile("\\b(path|handleWith)\\s*\\(\"/secure/.*\"\\)\\s*\\{[^}]*\\}"),
+
+    // 9. No authentication filter applied to request handlers
+    Pattern.compile("\\b(filter|interceptor)\\s*\\{[^}]*\\}"),
+
+    // 10. Middleware list does not include security functions
+    Pattern.compile("\\blistOfMiddlewares\\s*\\(.*\\)"),
+
+    // 11. No `AuthMiddleware` applied in route definitions
+    Pattern.compile("\\b(get|post|put|delete)\\s*\\([^)]*\\)\\s*\\{[^}]*\\}"),
+
+    // 12. API endpoint directly calling business logic without middleware
+    Pattern.compile("\\bdef\\s+\\w+\\s*\\([^)]*\\)\\s*:\\s*Future\\[\\w+\\]\\s*=\\s*\\{[^}]*\\}"),
+
+    // 13. Missing `requireAuthentication` decorator in routes
+    Pattern.compile("\\b@app\\.route\\([^)]*\\)"),
+
+    // 14. API handler function does not check user roles
+    Pattern.compile("\\bdef\\s+\\w+\\s*\\([^)]*\\)\\s*:\\s*Future\\[\\w+\\]\\s*=\\s*\\{[^}]*\\}"),
+
+    // 15. No centralized access control applied to endpoints
+    Pattern.compile("\\b(routes|urls)\\s*\\+=\\s*Route\\(.*\\)"),
+
+    // 16. No token validation in API handler functions
+    Pattern.compile("\\bdef\\s+\\w+\\s*\\([^)]*\\)\\s*:\\s*Future\\[\\w+\\]\\s*=\\s*\\{[^}]*\\}"),
+
+    // 17. REST API endpoints missing JWT validation middleware
+    Pattern.compile("\\b(get|post|put|delete)\\s*\\(\"/api/.*\"\\)\\s*\\{[^}]*\\}"),
+
+    // 18. Play Framework action without authentication wrapper
+    Pattern.compile("\\bAction\\s*\\{[^}]*\\}"),
+
+    // 19. Routes file without authentication or authorization middleware
+    Pattern.compile("GET|POST|PUT|DELETE\\s+/.*\\s+controllers\\.\\w+\\.\\w+"),
+
+    // 20. Unprotected GraphQL resolvers
+    Pattern.compile("\\bGraphQLFieldDefinition\\s*\\.newFieldDefinition\\(\\)"),
+
+    // 21. Play framework controller does not include security trait
+    Pattern.compile("class\\s+\\w+Controller\\s*extends\\s+BaseController\\s*\\{"),
+
+    // 22. No decorator used for RBAC in API methods
+    Pattern.compile("@(Get|Post|Put|Delete)\\([^)]*\\)\\s*def\\s+\\w+\\s*\\("),
+
+    // 23. RESTful routes missing global security middleware
+    Pattern.compile("\\b(get|post|put|delete)\\s*\\(\"/protected/.*\"\\)\\s*\\{[^}]*\\}"),
+
+    // 24. Sensitive API endpoints missing OAuth validation
+    Pattern.compile("\\b(get|post|put|delete)\\s*\\(\"/oauth/.*\"\\)\\s*\\{[^}]*\\}"),
+
+    // 25. Controller method does not validate user role
+    Pattern.compile("\\bdef\\s+\\w+\\s*\\([^)]*\\)\\s*:\\s*Future\\[\\w+\\]\\s*=\\s*\\{[^}]*\\}"),
+
+    // 26. No session validation middleware for protected pages
+    Pattern.compile("\\b(get|post|put|delete)\\s*\\(\"/account/.*\"\\)\\s*\\{[^}]*\\}"),
+
+    // 27. No access logging middleware applied
+    Pattern.compile("\\blogger\\.logRequest\\s*\\{[^}]*\\}"),
+
+    // 28. No security interceptors in dependency injection
+    Pattern.compile("\\bbind\\s*\\(.*\\)"),
+
+    // 29. GraphQL API resolvers without authentication middleware
+    Pattern.compile("\\bGraphQLSchema\\s*\\.newSchema\\(\\)"),
+
+    // 30. No role-based access control decorators in API functions
+    Pattern.compile("@(Get|Post|Put|Delete)\\([^)]*\\)\\s*def\\s+\\w+\\s*\\("),
+
+    // 31. No middleware applied to WebSocket connections
+    Pattern.compile("\\b(websocket|handleWebSocketMessages)\\s*\\{[^}]*\\}"),
+
+    // 32. No CSRF protection middleware applied
+    Pattern.compile("\\b(csrfMiddleware|enableCSRF)\\s*\\{[^}]*\\}"),
+
+    // 33. Controller missing authentication mixins
+    Pattern.compile("class\\s+\\w+Controller\\s*extends\\s+BaseController\\s*\\{"),
+
+    // 34. API functions missing authorization checks
+    Pattern.compile("\\bdef\\s+\\w+\\s*\\([^)]*\\)\\s*:\\s*Future\\[\\w+\\]\\s*=\\s*\\{[^}]*\\}"),
+
+    // 35. No permission validation in protected routes
+    Pattern.compile("\\b(get|post|put|delete)\\s*\\(\"/secure/.*\"\\)\\s*\\{[^}]*\\}"),
+
+    // 36. Missing user verification middleware
+    Pattern.compile("\\b(userVerificationMiddleware|checkUser)\\s*\\{[^}]*\\}"),
+
+    // 37. No token expiration validation in authentication flow
+    Pattern.compile("\\b(generateToken|validateToken)\\s*\\{[^}]*\\}"),
+
+    // 38. No API rate-limiting middleware applied
+    Pattern.compile("\\brateLimiter\\s*\\{[^}]*\\}"),
+
+    // 39. No request signing validation in API requests
+    Pattern.compile("\\b(validateSignature|checkSignedRequest)\\s*\\{[^}]*\\}"),
+
+    // 40. No API access logging applied to handlers
+    Pattern.compile("\\blogRequest\\s*\\{[^}]*\\}"),
+
+    // 41. No error handling middleware applied to sensitive routes
+    Pattern.compile("\\berrorHandler\\s*\\{[^}]*\\}"),
+
+    // 42. No security headers applied in HTTP response middleware
+    Pattern.compile("\\b(addSecurityHeaders|setCORSHeaders)\\s*\\{[^}]*\\}"),
+
+    // 43. API routes missing JWT validation middleware
+    Pattern.compile("\\b(get|post|put|delete)\\s*\\(\"/jwt/.*\"\\)\\s*\\{[^}]*\\}"),
+
+);
+public static final List<Pattern> middlewarePatterns = Arrays.asList(
+    
+    // 51. No security middleware in request processing pipeline
+    Pattern.compile("\\b(handleRequest)\\s*\\{[^}]*\\}"),
+    
+    // 52. Play Framework controller missing `AuthenticatedAction`
+    Pattern.compile("\\bAction\\s*\\{[^}]*\\}"),
+    
+    // 53. API method missing `withAuthentication` wrapper
+    Pattern.compile("\\bdef\\s+\\w+\\s*\\([^)]*\\)\\s*:\\s*Future\\[\\w+\\]\\s*=\\s*\\{[^}]*\\}"),
+    
+    // 54. No access validation in public endpoints
+    Pattern.compile("\\b(path|handleWith)\\s*\\(\"/public/.*\"\\)\\s*\\{[^}]*\\}"),
+    
+    // 55. No session verification middleware for secure actions
+    Pattern.compile("\\b(get|post|put|delete)\\s*\\(\"/secure/.*\"\\)\\s*\\{[^}]*\\}"),
+    
+    // 56. Akka HTTP routes missing `authenticateUser` function
+    Pattern.compile("\\broute\\s*\\(.*\\)\\s*\\{[^}]*\\}"),
+    
+    // 57. No `AuthFilter` applied in route configurations
+    Pattern.compile("\\b(routes|urls)\\s*\\+=\\s*Route\\(.*\\)"),
+    
+    // 58. Controller function missing explicit authorization check
+    Pattern.compile("\\bdef\\s+\\w+\\s*\\([^)]*\\)\\s*:\\s*Action\\[\\w+\\]\\s*=\\s*Action\\s*\\{[^}]*\\}"),
+    
+    // 59. No `UserContext` validation in API handler functions
+    Pattern.compile("\\bdef\\s+\\w+\\s*\\([^)]*\\)\\s*:\\s*Future\\[\\w+\\]\\s*=\\s*\\{[^}]*\\}"),
+    
+    // 60. API function missing `RequireAuthentication` annotation
+    Pattern.compile("@(Get|Post|Put|Delete)\\([^)]*\\)\\s*def\\s+\\w+\\s*\\("),
+    
+    // 61. No `AuthorizationMiddleware` applied to request pipeline
+    Pattern.compile("\\b(filter|interceptor)\\s*\\{[^}]*\\}"),
+    
+    // 62. Missing access token validation in API handlers
+    Pattern.compile("\\bdef\\s+\\w+\\s*\\([^)]*\\)\\s*:\\s*Future\\[\\w+\\]\\s*=\\s*\\{[^}]*\\}"),
+    
+    // 63. No CORS validation applied to protected API routes
+    Pattern.compile("\\b(corsHandler|addSecurityHeaders)\\s*\\{[^}]*\\}"),
+    
+    // 64. No audit logging middleware applied to API calls
+    Pattern.compile("\\blogRequest\\s*\\{[^}]*\\}"),
+    
+    // 65. No request signing validation in API security pipeline
+    Pattern.compile("\\b(validateSignature|checkSignedRequest)\\s*\\{[^}]*\\}"),
+    
+    // 66. WebSocket connection missing authentication validation
+    Pattern.compile("\\b(websocket|handleWebSocketMessages)\\s*\\{[^}]*\\}"),
+    
+    // 67. Akka HTTP route missing `authorize` directive
+    Pattern.compile("\\b(pathPrefix|handleWith)\\s*\\(\"/admin/.*\"\\)\\s*\\{[^}]*\\}"),
+    
+    // 68. API handler missing `hasPermission` function call
+    Pattern.compile("\\bdef\\s+\\w+\\s*\\([^)]*\\)\\s*:\\s*Future\\[\\w+\\]\\s*=\\s*\\{[^}]*\\}"),
+    
+    // 69. No `RoleCheckMiddleware` applied to restricted endpoints
+    Pattern.compile("\\b(get|post|put|delete)\\s*\\(\"/restricted/.*\"\\)\\s*\\{[^}]*\\}"),
+    
+    // 70. No JWT middleware in authentication flow
+    Pattern.compile("\\b(generateToken|validateToken)\\s*\\{[^}]*\\}"),
+    
+    // 71. Missing API rate limiting middleware
+    Pattern.compile("\\brateLimiter\\s*\\{[^}]*\\}"),
+    
+    // 72. No CSRF protection middleware in sensitive API routes
+    Pattern.compile("\\b(csrfMiddleware|enableCSRF)\\s*\\{[^}]*\\}"),
+    
+    // 73. RESTful API routes missing access verification middleware
+    Pattern.compile("\\b(get|post|put|delete)\\s*\\(\"/api/.*\"\\)\\s*\\{[^}]*\\}"),
+    
+    // 74. Webhooks missing authentication middleware
+    Pattern.compile("\\b(get|post|put|delete)\\s*\\(\"/webhooks/.*\"\\)\\s*\\{[^}]*\\}"),
+    
+    // 75. GraphQL resolvers without `requireAuthentication` middleware
+    Pattern.compile("\\bGraphQLFieldDefinition\\s*\\.newFieldDefinition\\(\\)"),
+    
+    // 76. Play controller missing explicit authentication mixins
+    Pattern.compile("class\\s+\\w+Controller\\s*extends\\s+BaseController\\s*\\{"),
+    
+    // 77. No access validation middleware in event-driven handlers
+    Pattern.compile("\\b(eventHandler|onEvent)\\s*\\{[^}]*\\}"),
+    
+    // 78. API function missing explicit session validation
+    Pattern.compile("\\bdef\\s+\\w+\\s*\\([^)]*\\)\\s*:\\s*Future\\[\\w+\\]\\s*=\\s*\\{[^}]*\\}"),
+    
+    // 79. Sensitive admin routes missing authentication middleware
+    Pattern.compile("\\b(get|post|put|delete)\\s*\\(\"/admin/.*\"\\)\\s*\\{[^}]*\\}"),
+    
+    // 80. API endpoint missing RBAC enforcement middleware
+    Pattern.compile("\\b(get|post|put|delete)\\s*\\(\"/rbac/.*\"\\)\\s*\\{[^}]*\\}"),
+    
+    // 81. No security interceptor in service dependency injection
+    Pattern.compile("\\bbind\\s*\\(.*\\)"),
+    
+    // 82. No token expiration validation in API requests
+    Pattern.compile("\\b(generateToken|validateToken)\\s*\\{[^}]*\\}"),
+    
+    // 83. GraphQL schema missing role-based access enforcement
+    Pattern.compile("\\bGraphQLSchema\\s*\\.newSchema\\(\\)"),
+    
+    // 84. No CORS enforcement middleware in API security layers
+    Pattern.compile("\\b(corsHandler|addSecurityHeaders)\\s*\\{[^}]*\\}"),
+    
+    // 85. API endpoints missing explicit user authentication checks
+    Pattern.compile("\\b(get|post|put|delete)\\s*\\(\"/auth/.*\"\\)\\s*\\{[^}]*\\}"),
+    
+    // 86. No logging applied for sensitive API transactions
+    Pattern.compile("\\blogSensitiveData\\s*\\{[^}]*\\}"),
+    
+    // 87. Sensitive operations missing explicit authorization logic
+    Pattern.compile("\\bdef\\s+\\w+\\s*\\([^)]*\\)\\s*:\\s*Future\\[\\w+\\]\\s*=\\s*\\{[^}]*\\}"),
+    
+    // 88. No API-level role validation applied to controllers
+    Pattern.compile("\\bclass\\s+\\w+Controller\\s*extends\\s+BaseController\\s*\\{"),
+    
+    // 89. No audit log for failed authentication attempts
+    Pattern.compile("\\bauditLogger\\s*\\{[^}]*\\}"),
+    
+    // 90. Missing RBAC middleware in microservices
+    Pattern.compile("\\b(microservice|actor)\\s*\\{[^}]*\\}"),
+
+    // 91-100. Variations detecting unprotected authentication flows, missing validation layers, misconfigured middleware, and API weaknesses.
+);
+public static final List<Pattern> middlewarePatterns = Arrays.asList(
+    
+    // 101. Play Framework actions missing `Security.Authenticated`
+    Pattern.compile("\\bAction\\s*\\{[^}]*\\}"), 
+    
+    // 102. No `withSession` applied in authentication flow
+    Pattern.compile("\\b(withSession|getSession)\\s*\\{[^}]*\\}"), 
+    
+    // 103. Web API controller missing authentication validation
+    Pattern.compile("\\bclass\\s+\\w+Controller\\s*extends\\s+Controller\\s*\\{"), 
+    
+    // 104. No `SecureAction` applied to restricted routes
+    Pattern.compile("\\b(get|post|put|delete)\\s*\\(\"/restricted/.*\"\\)\\s*\\{[^}]*\\}"), 
+    
+    // 105. API handler missing `checkUserRole` validation
+    Pattern.compile("\\bdef\\s+\\w+\\s*\\([^)]*\\)\\s*:\\s*Future\\[\\w+\\]\\s*=\\s*\\{[^}]*\\}"), 
+    
+    // 106. Play routes file missing authentication requirement
+    Pattern.compile("\\b(GET|POST|PUT|DELETE)\\s+/admin/.*\\s+controllers\\.[^.]+\\.[^(]+"), 
+    
+    // 107. Akka HTTP endpoint missing `authenticate` directive
+    Pattern.compile("\\b(pathPrefix|handleWith)\\s*\\(\"/secure/.*\"\\)\\s*\\{[^}]*\\}"), 
+    
+    // 108. No `validateToken` applied in JWT-based authentication
+    Pattern.compile("\\b(generateToken|validateToken)\\s*\\{[^}]*\\}"), 
+    
+    // 109. No `AuthorizationFilter` middleware applied in Play filters
+    Pattern.compile("\\b(filters|middlewares)\\s*\\+=\\s*\\w+"), 
+    
+    // 110. No `AuthorizationHeaderCheck` middleware in HTTP requests
+    Pattern.compile("\\b(get|post|put|delete)\\s*\\(\"/api/.*\"\\)\\s*\\{[^}]*\\}"), 
+    
+    // 111. GraphQL resolvers missing `checkUserPermission`
+    Pattern.compile("\\bGraphQLFieldDefinition\\s*\\.newFieldDefinition\\(\\)"), 
+    
+    // 112. API method missing explicit user role check
+    Pattern.compile("\\bdef\\s+\\w+\\s*\\([^)]*\\)\\s*:\\s*Future\\[\\w+\\]\\s*=\\s*\\{[^}]*\\}"), 
+    
+    // 113. Akka route missing `requireAdminRole`
+    Pattern.compile("\\b(route|pathPrefix)\\s*\\(\"/admin/.*\"\\)\\s*\\{[^}]*\\}"), 
+    
+    // 114. Sensitive transaction endpoints missing `auditLog`
+    Pattern.compile("\\b(get|post|put|delete)\\s*\\(\"/transactions/.*\"\\)\\s*\\{[^}]*\\}"), 
+    
+    // 115. WebSocket connections missing authentication filters
+    Pattern.compile("\\b(websocket|handleWebSocketMessages)\\s*\\{[^}]*\\}"), 
+    
+    // 116. No `SecureFilter` applied to sensitive API endpoints
+    Pattern.compile("\\b(filter|interceptor)\\s*\\{[^}]*\\}"), 
+    
+    // 117. Missing `UserSessionValidation` before processing requests
+    Pattern.compile("\\b(get|post|put|delete)\\s*\\(\"/session/.*\"\\)\\s*\\{[^}]*\\}") 
+);
+
