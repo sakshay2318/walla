@@ -1,0 +1,615 @@
+public static final List<Pattern> strictParamValidationIssues = Arrays.asList(
+
+// 1. Missing type constraints in function parameters
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*Any\\)"), // Function accepting 'Any' type, no strict validation
+
+// 2. No validation on user input in Play framework routes
+Pattern.compile(".*routes.*GET\\s+/\\w+"), // No parameter constraints in route definitions
+
+// 3. Accepting raw user input without sanitization
+Pattern.compile("\\bval\\s+\\w+\\s*=\\s*request\\s*\\.?get\\w*\\(.+\\)"), // No sanitization of request parameters
+
+// 4. No regex validation on user-supplied string parameters
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*String\\)"), // Function accepting String without validation
+
+// 5. No length constraints on user input
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*String\\)"), // Should enforce length restrictions
+
+// 6. Lack of numeric range validation
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*Int\\)"), // Integer input without range checks
+
+// 7. Allowing arbitrary JSON input without schema validation
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*JsValue\\)"), // JsValue input without validation
+
+// 8. Allowing arbitrary map input without key-value validation
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*Map\\[.*,.*\\]\\)"), // No key-value type restrictions
+
+// 9. No whitelist-based input validation
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*String\\)"), // Should check against allowed values
+
+// 10. No escaping of special characters in input
+Pattern.compile("\\bval\\s+\\w+\\s*=\\s*request\\s*\\.getQueryString\\(\\w+\\)"), // Potential for injection attacks
+
+// 11. Lack of proper null-checking in function parameters
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*Option\\[.*\\]\\)"), // Should enforce default values
+
+// 12. Directly executing user input as shell command
+Pattern.compile("\\bRuntime\\.getRuntime\\(\\)\\.exec\\(.*request.*\\)"), // Command injection risk
+
+// 13. Allowing uncontrolled object deserialization
+Pattern.compile("\\bJson\\.parse\\(request\\..*\\)"), // No schema validation
+
+// 14. No validation on numeric user input
+Pattern.compile("\\bval\\s+\\w+\\s*=\\s*request\\s*\\.getQueryString\\(\\w+\\)\\.toInt"), // Unsafe conversion
+
+// 15. No boundary checks on user-supplied indexes
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*Int\\)"), // Should enforce index range
+
+// 16. Using eval() or similar execution functions on user input
+Pattern.compile("\\bscala\\.reflect\\.runtime\\.universe\\..*eval\\(.*request.*\\)"), // Dangerous execution
+
+// 17. Allowing unchecked XML input
+Pattern.compile("\\bXML\\.loadString\\(request\\..*\\)"), // XML injection risk
+
+// 18. Accepting arbitrary headers without validation
+Pattern.compile("\\brequest\\.headers\\(.*\\)"), // Headers should be validated
+
+// 19. Accepting input without checking for prohibited characters
+Pattern.compile("\\bval\\s+\\w+\\s*=\\s*request\\..*"), // Should sanitize input
+
+// 20. Accepting unchecked HTTP parameters
+Pattern.compile("\\brequest\\.getQueryString\\(.*\\)"), // No validation on input
+
+// 21. Passing unchecked input to database queries
+Pattern.compile("\\bconn\\.prepareStatement\\(.*request.*\\)"), // SQL injection risk
+
+// 22. Accepting unrestricted file uploads
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*MultipartFormData\\)"), // No file type or size validation
+
+// 23. No validation for user-controlled JSON fields
+Pattern.compile("\\bJson\\.parse\\(request\\..*\\)"), // Should validate JSON structure
+
+// 24. Accepting unchecked form parameters
+Pattern.compile("\\brequest\\.body\\.asFormUrlEncoded\\(.*\\)"), // Form inputs should be validated
+
+// 25. Allowing unrestricted function calls via reflection
+Pattern.compile("\\bClass\\.forName\\(.*request.*\\)"), // Reflection can be dangerous
+
+// 26. Accepting unchecked dynamic route parameters
+Pattern.compile("\\bpath\\(.*\\)"), // Path parameters should be constrained
+
+// 27. Allowing unrestricted access to system properties
+Pattern.compile("\\bSystem\\.getProperty\\(.*request.*\\)"), // Should limit access
+
+// 28. Lack of input sanitization in logs
+Pattern.compile("\\blogger\\.info\\(.*request.*\\)"), // Log injection risk
+
+// 29. No validation for date-time input formats
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*DateTime\\)"), // Should enforce strict formats
+
+// 30. Accepting unrestricted URL input
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*URL\\)"), // URL input should be validated
+
+// 31. Accepting unrestricted email input
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*String\\)"), // Should enforce email format
+
+// 32. No content-type validation for HTTP requests
+Pattern.compile("\\brequest\\.contentType\\(.*\\)"), // Should check allowed types
+
+// 33. Accepting raw user input into file operations
+Pattern.compile("\\bnew\\s+File\\(.*request.*\\)"), // Should validate paths
+
+// 34. No validation for numeric values passed to arithmetic operations
+Pattern.compile("\\bval\\s+\\w+\\s*=\\s*request\\..*\\.toInt"), // Should check for overflows
+
+// 35. Accepting unrestricted boolean input
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*Boolean\\)"), // Boolean input should be constrained
+
+// 36. No validation on financial transactions
+Pattern.compile("\\bdef\\s+processPayment\\(amount:\\s*Double\\)"), // Should enforce limits
+
+// 37. No validation on access control parameters
+Pattern.compile("\\bdef\\s+setUserRole\\(role:\\s*String\\)"), // Should check against allowed roles
+
+// 38. Accepting unrestricted path input
+Pattern.compile("\\bval\\s+filePath\\s*=\\s*request\\..*"), // Should restrict to safe directories
+
+// 39. No validation on nested object input
+Pattern.compile("\\bcase class\\s+\\w+\\(.*\\)"), // Should enforce constraints
+
+// 40. Accepting unchecked external API input
+Pattern.compile("\\bwsClient\\.url\\(.*request.*\\)"), // External input should be validated
+
+// 41. Accepting unrestricted image uploads
+Pattern.compile("\\bdef\\s+uploadImage\\(image:\\s*File\\)"), // Should check file type and size
+
+// 42. No validation for UUID input
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*UUID\\)"), // Should enforce strict format
+
+// 43. Accepting unrestricted password input
+Pattern.compile("\\bdef\\s+setPassword\\(password:\\s*String\\)"), // Should enforce strong passwords
+
+// 44. No validation for API keys
+Pattern.compile("\\bdef\\s+authenticate\\(apiKey:\\s*String\\)"), // Should check API key format
+
+// 45. Accepting unrestricted ZIP file input
+Pattern.compile("\\bdef\\s+uploadZip\\(zip:\\s*File\\)"), // Should validate ZIP contents
+
+// 46. Accepting unrestricted array input
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*Array\\[.*\\]\\)"), // Should check array size
+
+// 47. No validation for currency formats
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*BigDecimal\\)"), // Should enforce currency formats
+
+// 48. Accepting unrestricted query input
+Pattern.compile("\\bval\\s+query\\s*=\\s*request\\..*"), // Query input should be sanitized
+
+// 49. Accepting unchecked webhooks
+Pattern.compile("\\bdef\\s+processWebhook\\(payload:\\s*JsValue\\)"), // Should validate webhook data
+
+// 50. No validation for encrypted data input
+Pattern.compile("\\bdef\\s+decryptData\\(data:\\s*String\\)"), // Should enforce encryption format
+);
+public static final List<Pattern> strictParamValidationIssues = Arrays.asList(
+
+// 51. Accepting unrestricted user input for API requests
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*Request\\[.*\\]\\)"), // Should enforce request validation
+
+// 52. Using unchecked raw SQL queries
+Pattern.compile("\\bval\\s+query\\s*=\\s*\"SELECT\\s+.*\\s+FROM\\s+.*\"\\s*\\+\\s*request\\..*"), // SQL injection risk
+
+// 53. Allowing unrestricted reflection-based instantiation
+Pattern.compile("\\bClass\\.forName\\(request\\..*\\)\\.newInstance\\(\\)"), // Reflection security risk
+
+// 54. No input validation for session attributes
+Pattern.compile("\\bsession\\(.*\\)"), // Session values should be validated
+
+// 55. Accepting unrestricted input into Play Framework forms
+Pattern.compile("\\bForm\\s*\\(.*\\)"), // Forms should validate user input
+
+// 56. Allowing unchecked XML entity parsing
+Pattern.compile("\\bXML\\.load\\(request\\..*\\)"), // XML External Entity (XXE) attack risk
+
+// 57. No validation on array length for user input
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*Array\\[.*\\]\\)"), // Should enforce length constraints
+
+// 58. Accepting arbitrary JSON with JsObject
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*JsObject\\)"), // Should enforce schema validation
+
+// 59. Using unchecked concatenation for SQL queries
+Pattern.compile("\\b\"SELECT\\s+.*\\s+FROM\\s+.*\"\\s*\\+\\s*request\\..*"), // SQL injection risk
+
+// 60. No validation for date format input
+Pattern.compile("\\bdef\\s+\\w+\\(\\w+:\\s*Date\\)"), // Should enforce strict date formats
+
+// 61. Allowing unrestricted system process execution
+Pattern.compile("\\bProcess\\(request\\..*\\)"), // Potential command injection
+
+// 62. Accepting unrestricted OAuth tokens
+Pattern.compile("\\bdef\\s+authenticate\\(token:\\s*String\\)"), // Should validate token format
+
+// 63. No input validation on HTML form parameters
+Pattern.compile("\\bForm\\s*\\(.*\\)\\.bindFromRequest"), // Should validate input fields
+
+// 64. Allowing unrestricted cookie values
+Pattern.compile("\\bcookies\\(.*\\)"), // Cookie values should be validated
+
+// 65. Accepting unchecked URL parameters
+Pattern.compile("\\bval\\s+\\w+\\s*=\\s*request\\s*\\.queryString\\(\\w+\\)"), // Should sanitize input
+
+// 66. No validation for Base64-encoded input
+Pattern.compile("\\bBase64\\.decode\\(request\\..*\\)"), // Should enforce strict decoding rules
+
+// 67. Allowing unchecked credit card input
+Pattern.compile("\\bdef\\s+\\w+\\(cardNumber:\\s*String\\)"), // Should validate credit card format
+
+// 68. Accepting unchecked input in GraphQL queries
+Pattern.compile("\\bdef\\s+executeQuery\\(query:\\s*String\\)"), // Should validate query structure
+
+// 69. No validation for API pagination parameters
+Pattern.compile("\\bdef\\s+\\w+\\(page:\\s*Int, size:\\s*Int\\)"), // Should enforce limit and range
+
+// 70. Using unchecked user input in exception messages
+Pattern.compile("\\bthrow\\s+new\\s+Exception\\(.*request.*\\)"), // Should sanitize input
+
+// 71. Accepting unrestricted XML input with SAXParser
+Pattern.compile("\\bSAXParser\\.parse\\(request\\..*\\)"), // XXE attack risk
+
+// 72. No validation for IP addresses in input
+Pattern.compile("\\bdef\\s+\\w+\\(ip:\\s*String\\)"), // Should validate IP format
+
+// 73. Allowing unrestricted access to server environment variables
+Pattern.compile("\\bSystem\\.getenv\\(.*request.*\\)"), // Sensitive data exposure risk
+
+// 74. No validation for token-based authentication
+Pattern.compile("\\bdef\\s+authenticate\\(token:\\s*String\\)"), // Should check against known tokens
+
+// 75. Accepting unrestricted JSONP callbacks
+Pattern.compile("\\bjsonp\\(request\\..*\\)"), // Should validate callback names
+
+// 76. Allowing unchecked file name input
+Pattern.compile("\\bdef\\s+\\w+\\(fileName:\\s*String\\)"), // Should enforce naming conventions
+
+// 77. No validation for phone numbers
+Pattern.compile("\\bdef\\s+\\w+\\(phone:\\s*String\\)"), // Should enforce phone number format
+
+// 78. Accepting unrestricted URLs for redirections
+Pattern.compile("\\bRedirect\\(request\\..*\\)"), // Open redirect vulnerability
+
+// 79. No validation for input in web sockets
+Pattern.compile("\\bdef\\s+onMessage\\(message:\\s*String\\)"), // Should validate and sanitize input
+
+// 80. Accepting unchecked UUIDs
+Pattern.compile("\\bdef\\s+\\w+\\(id:\\s*UUID\\)"), // Should enforce strict UUID validation
+
+// 81. Allowing unrestricted binary file uploads
+Pattern.compile("\\bdef\\s+uploadFile\\(file:\\s*File\\)"), // Should enforce MIME type validation
+
+// 82. Accepting unchecked integer input for critical calculations
+Pattern.compile("\\bdef\\s+\\w+\\(amount:\\s*Int\\)"), // Should enforce boundary checks
+
+// 83. No validation for financial transaction amounts
+Pattern.compile("\\bdef\\s+transferMoney\\(amount:\\s*BigDecimal\\)"), // Should enforce range limits
+
+// 84. Allowing unrestricted WebSocket connections
+Pattern.compile("\\bWebSocket\\.accept\\(request\\..*\\)"), // Should enforce authentication
+
+// 85. No validation for query parameter arrays
+Pattern.compile("\\brequest\\.queryString\\(.*\\)"), // Should sanitize array parameters
+
+// 86. Accepting unchecked zip file extraction
+Pattern.compile("\\bnew\\s+ZipFile\\(request\\..*\\)"), // Path traversal risk
+
+// 87. No validation for redirect URLs
+Pattern.compile("\\bRedirect\\(.*\\)"), // Should validate allowed domains
+
+// 88. Allowing unrestricted input in cache keys
+Pattern.compile("\\bcache\\.set\\(request\\..*\\)"), // Cache poisoning risk
+
+// 89. No validation for JWT tokens
+Pattern.compile("\\bdef\\s+validateJWT\\(token:\\s*String\\)"), // Should enforce strict decoding
+
+// 90. Accepting unchecked password inputs
+Pattern.compile("\\bdef\\s+setPassword\\(password:\\s*String\\)"), // Should enforce password strength
+
+// 91. No validation for hexadecimal input
+Pattern.compile("\\bdef\\s+\\w+\\(hex:\\s*String\\)"), // Should enforce valid hex format
+
+// 92. Accepting unrestricted time zone input
+Pattern.compile("\\bdef\\s+\\w+\\(timezone:\\s*String\\)"), // Should validate against allowed time zones
+
+// 93. No validation for currency codes
+Pattern.compile("\\bdef\\s+\\w+\\(currency:\\s*String\\)"), // Should validate currency formats
+
+// 94. Accepting unchecked values in JSON merges
+Pattern.compile("\\bJson\\.merge\\(.*request.*\\)"), // Should sanitize JSON structures
+
+// 95. No validation for random number seed values
+Pattern.compile("\\bRandom\\.setSeed\\(request\\..*\\)"), // Should enforce constraints
+
+// 96. Allowing unrestricted email input for registration
+Pattern.compile("\\bdef\\s+registerUser\\(email:\\s*String\\)"), // Should enforce email validation
+
+// 97. No validation for webhook event types
+Pattern.compile("\\bdef\\s+processWebhook\\(event:\\s*String\\)"), // Should check allowed event types
+
+// 98. Accepting unchecked binary data input
+Pattern.compile("\\bdef\\s+\\w+\\(data:\\s*Array\\[Byte\\]\\)"), // Should enforce strict formats
+
+// 99. No validation for social media OAuth IDs
+Pattern.compile("\\bdef\\s+loginWithOAuth\\(id:\\s*String\\)"), // Should check OAuth ID formats
+
+// 100. Allowing unrestricted multipart form data input
+Pattern.compile("\\brequest\\.body\\.asMultipartFormData"), // Should enforce file type and size restrictions
+
+);
+public static final List<Pattern> whitelistValidationIssues = Arrays.asList(
+
+// 1. No whitelist validation for user IDs in API calls
+Pattern.compile("\\bdef\\s+\\w+\\(userId:\\s*String\\)"), // Should validate userId against known users
+
+// 2. Direct use of user input in database queries
+Pattern.compile("\\bquery\\s*=\\s*\"SELECT\\s+.*\\s+FROM\\s+.*WHERE.*id\\s*=\\s*\"\\s*\\+\\s*request\\..*"), // SQL injection risk
+
+// 3. No whitelist check for account IDs
+Pattern.compile("\\bdef\\s+\\w+\\(accountId:\\s*String\\)"), // Should validate accountId against known accounts
+
+// 4. Allowing unrestricted access to file resources
+Pattern.compile("\\bnew\\s+File\\(request\\..*\\)"), // Should validate allowed file paths
+
+// 5. No validation for API keys before processing
+Pattern.compile("\\bdef\\s+\\w+\\(apiKey:\\s*String\\)"), // Should validate apiKey against known keys
+
+// 6. Using unchecked user input for admin operations
+Pattern.compile("\\bdef\\s+adminAction\\(adminId:\\s*String\\)"), // Should validate adminId against allowed admins
+
+// 7. No validation for document IDs in retrieval
+Pattern.compile("\\bdef\\s+getDocument\\(documentId:\\s*String\\)"), // Should validate documentId against known documents
+
+// 8. Accepting unchecked project IDs in API calls
+Pattern.compile("\\bdef\\s+getProject\\(projectId:\\s*String\\)"), // Should validate projectId against existing projects
+
+// 9. Allowing unrestricted order IDs in checkout
+Pattern.compile("\\bdef\\s+checkout\\(orderId:\\s*String\\)"), // Should validate orderId before processing payment
+
+// 10. No validation for session IDs in authentication
+Pattern.compile("\\bdef\\s+authenticate\\(sessionId:\\s*String\\)"), // Should validate sessionId against active sessions
+
+// 11. Accepting unrestricted database record IDs
+Pattern.compile("\\bdef\\s+fetchRecord\\(recordId:\\s*String\\)"), // Should validate recordId against known records
+
+// 12. No whitelist enforcement for payment transaction IDs
+Pattern.compile("\\bdef\\s+processPayment\\(transactionId:\\s*String\\)"), // Should validate transactionId before processing
+
+// 13. No validation for group IDs in membership checks
+Pattern.compile("\\bdef\\s+joinGroup\\(groupId:\\s*String\\)"), // Should validate groupId against known groups
+
+// 14. Accepting unchecked event IDs for notifications
+Pattern.compile("\\bdef\\s+notifyEvent\\(eventId:\\s*String\\)"), // Should validate eventId before notifying
+
+// 15. No validation for organization IDs in enterprise APIs
+Pattern.compile("\\bdef\\s+getOrganization\\(organizationId:\\s*String\\)"), // Should validate organizationId before access
+
+// 16. Accepting unchecked license keys for software validation
+Pattern.compile("\\bdef\\s+validateLicense\\(licenseKey:\\s*String\\)"), // Should validate licenseKey against a known list
+
+// 17. No whitelist validation for coupon codes
+Pattern.compile("\\bdef\\s+applyCoupon\\(couponCode:\\s*String\\)"), // Should validate couponCode before applying discounts
+
+// 18. Allowing unrestricted device IDs in security policies
+Pattern.compile("\\bdef\\s+registerDevice\\(deviceId:\\s*String\\)"), // Should validate deviceId before allowing access
+
+// 19. No validation for customer IDs in loyalty programs
+Pattern.compile("\\bdef\\s+redeemPoints\\(customerId:\\s*String\\)"), // Should validate customerId before redeeming points
+
+// 20. Accepting unchecked vendor IDs in procurement processes
+Pattern.compile("\\bdef\\s+approveVendor\\(vendorId:\\s*String\\)"), // Should validate vendorId before approval
+
+// 21. No validation for warehouse IDs in inventory management
+Pattern.compile("\\bdef\\s+updateInventory\\(warehouseId:\\s*String\\)"), // Should validate warehouseId before modification
+
+// 22. Allowing unrestricted school IDs in educational platforms
+Pattern.compile("\\bdef\\s+accessSchoolData\\(schoolId:\\s*String\\)"), // Should validate schoolId before access
+
+// 23. No validation for discount IDs in promotional campaigns
+Pattern.compile("\\bdef\\s+activateDiscount\\(discountId:\\s*String\\)"), // Should validate discountId before activation
+
+// 24. Accepting unrestricted car registration numbers in ride-sharing
+Pattern.compile("\\bdef\\s+assignDriver\\(carNumber:\\s*String\\)"), // Should validate carNumber before assignment
+
+// 25. No validation for flight booking IDs in airline systems
+Pattern.compile("\\bdef\\s+getFlightDetails\\(bookingId:\\s*String\\)"), // Should validate bookingId before retrieval
+
+// 26. Accepting unchecked domain names for website verification
+Pattern.compile("\\bdef\\s+verifyDomain\\(domain:\\s*String\\)"), // Should validate domain before verification
+
+// 27. No whitelist enforcement for blockchain wallet addresses
+Pattern.compile("\\bdef\\s+transferCrypto\\(walletAddress:\\s*String\\)"), // Should validate walletAddress before transfer
+
+// 28. Allowing unrestricted certificate IDs in authentication
+Pattern.compile("\\bdef\\s+verifyCertificate\\(certificateId:\\s*String\\)"), // Should validate certificateId before approval
+
+// 29. No validation for shipment tracking numbers
+Pattern.compile("\\bdef\\s+trackShipment\\(trackingNumber:\\s*String\\)"), // Should validate trackingNumber before lookup
+
+// 30. Accepting unchecked insurance policy numbers
+Pattern.compile("\\bdef\\s+getPolicyDetails\\(policyNumber:\\s*String\\)"), // Should validate policyNumber before access
+
+// 31. No validation for health record IDs in medical systems
+Pattern.compile("\\bdef\\s+getMedicalRecord\\(recordId:\\s*String\\)"), // Should validate recordId before access
+
+// 32. Allowing unrestricted electoral roll numbers in voting systems
+Pattern.compile("\\bdef\\s+verifyVoter\\(voterId:\\s*String\\)"), // Should validate voterId before allowing voting
+
+// 33. No whitelist validation for banking account numbers
+Pattern.compile("\\bdef\\s+transferFunds\\(accountNumber:\\s*String\\)"), // Should validate accountNumber before transactions
+
+// 34. Accepting unchecked API client IDs in OAuth authentication
+Pattern.compile("\\bdef\\s+validateClient\\(clientId:\\s*String\\)"), // Should validate clientId before authorization
+
+// 35. No validation for package tracking numbers in logistics
+Pattern.compile("\\bdef\\s+getPackageStatus\\(trackingId:\\s*String\\)"), // Should validate trackingId before lookup
+
+// 36. Allowing unrestricted access to lottery ticket numbers
+Pattern.compile("\\bdef\\s+checkLotteryResult\\(ticketNumber:\\s*String\\)"), // Should validate ticketNumber before checking
+
+// 37. No validation for academic roll numbers in universities
+Pattern.compile("\\bdef\\s+getStudentRecord\\(rollNumber:\\s*String\\)"), // Should validate rollNumber before access
+
+// 38. Accepting unchecked vehicle registration numbers in toll systems
+Pattern.compile("\\bdef\\s+validateVehicle\\(vehicleNumber:\\s*String\\)"), // Should validate vehicleNumber before processing
+
+// 39. No whitelist enforcement for conference ticket IDs
+Pattern.compile("\\bdef\\s+scanTicket\\(ticketId:\\s*String\\)"), // Should validate ticketId before allowing entry
+
+// 40. Allowing unrestricted mining rig IDs in blockchain networks
+Pattern.compile("\\bdef\\s+registerRig\\(rigId:\\s*String\\)"), // Should validate rigId before approval
+
+// 41-50: (More cases similar to above covering ID-based security risks)
+
+);
+public static final List<Pattern> whitelistValidationIssues = Arrays.asList(
+
+// 51. No whitelist validation for employee ID before accessing HR data
+Pattern.compile("\\bdef\\s+getEmployeeRecord\\(employeeId:\\s*String\\)"), // Should validate employeeId against authorized records
+
+// 52. Accepting unchecked loan application IDs in banking systems
+Pattern.compile("\\bdef\\s+getLoanDetails\\(loanId:\\s*String\\)"), // Should validate loanId before retrieving data
+
+// 53. No validation for prescription IDs in healthcare apps
+Pattern.compile("\\bdef\\s+getPrescription\\(prescriptionId:\\s*String\\)"), // Should validate prescriptionId before retrieval
+
+// 54. Allowing unrestricted social security numbers (SSN) lookup
+Pattern.compile("\\bdef\\s+findSSN\\(ssn:\\s*String\\)"), // Should validate SSN against a secure list
+
+// 55. No whitelist validation for tax identification numbers
+Pattern.compile("\\bdef\\s+validateTaxId\\(taxId:\\s*String\\)"), // Should verify taxId before processing
+
+// 56. Accepting unchecked passport numbers for identity verification
+Pattern.compile("\\bdef\\s+validatePassport\\(passportNumber:\\s*String\\)"), // Should validate passportNumber against known records
+
+// 57. No validation for voter registration numbers
+Pattern.compile("\\bdef\\s+validateVoter\\(voterNumber:\\s*String\\)"), // Should validate voterNumber before allowing access
+
+// 58. Allowing unrestricted vehicle license plate lookup
+Pattern.compile("\\bdef\\s+getLicensePlate\\(plateNumber:\\s*String\\)"), // Should validate plateNumber against authorized vehicles
+
+// 59. No whitelist enforcement for driver's license verification
+Pattern.compile("\\bdef\\s+verifyDriversLicense\\(licenseNumber:\\s*String\\)"), // Should validate licenseNumber before approval
+
+// 60. Accepting unchecked student ID numbers in educational platforms
+Pattern.compile("\\bdef\\s+getStudentInfo\\(studentId:\\s*String\\)"), // Should validate studentId before access
+
+// 61. No validation for university admission numbers
+Pattern.compile("\\bdef\\s+validateAdmission\\(admissionId:\\s*String\\)"), // Should check admissionId against known records
+
+// 62. Allowing unrestricted mobile phone numbers in user verification
+Pattern.compile("\\bdef\\s+sendOTP\\(phoneNumber:\\s*String\\)"), // Should validate phoneNumber before sending OTP
+
+// 63. No whitelist validation for payment gateway merchant IDs
+Pattern.compile("\\bdef\\s+processMerchantPayment\\(merchantId:\\s*String\\)"), // Should validate merchantId against approved merchants
+
+// 64. Accepting unchecked insurance claim numbers
+Pattern.compile("\\bdef\\s+getClaimStatus\\(claimId:\\s*String\\)"), // Should validate claimId before processing
+
+// 65. No validation for airline passenger ticket numbers
+Pattern.compile("\\bdef\\s+validateTicket\\(ticketNumber:\\s*String\\)"), // Should verify ticketNumber before use
+
+// 66. Allowing unrestricted healthcare provider IDs
+Pattern.compile("\\bdef\\s+validateProvider\\(providerId:\\s*String\\)"), // Should validate providerId against known providers
+
+// 67. No whitelist validation for hospital patient numbers
+Pattern.compile("\\bdef\\s+getPatientRecord\\(patientId:\\s*String\\)"), // Should validate patientId before retrieving data
+
+// 68. Accepting unchecked supplier IDs in procurement systems
+Pattern.compile("\\bdef\\s+approveSupplier\\(supplierId:\\s*String\\)"), // Should validate supplierId before approval
+
+// 69. No validation for membership card numbers in loyalty programs
+Pattern.compile("\\bdef\\s+redeemLoyaltyPoints\\(cardNumber:\\s*String\\)"), // Should validate cardNumber before redemption
+
+// 70. Allowing unrestricted franchise IDs in business applications
+Pattern.compile("\\bdef\\s+validateFranchise\\(franchiseId:\\s*String\\)"), // Should validate franchiseId against approved franchises
+
+// 71. No whitelist validation for rental property IDs
+Pattern.compile("\\bdef\\s+bookProperty\\(propertyId:\\s*String\\)"), // Should validate propertyId before booking
+
+// 72. Accepting unchecked asset IDs in asset tracking systems
+Pattern.compile("\\bdef\\s+trackAsset\\(assetId:\\s*String\\)"), // Should validate assetId before tracking
+
+// 73. No validation for contractor IDs in construction management
+Pattern.compile("\\bdef\\s+approveContractor\\(contractorId:\\s*String\\)"), // Should validate contractorId before approval
+
+// 74. Allowing unrestricted realtor license verification
+Pattern.compile("\\bdef\\s+validateRealtor\\(realtorId:\\s*String\\)"), // Should validate realtorId against known records
+
+// 75. No whitelist validation for scholarship IDs in educational grants
+Pattern.compile("\\bdef\\s+validateScholarship\\(scholarshipId:\\s*String\\)"), // Should validate scholarshipId before granting
+
+// 76. Accepting unchecked investment account numbers
+Pattern.compile("\\bdef\\s+getInvestmentDetails\\(accountId:\\s*String\\)"), // Should validate accountId before retrieval
+
+// 77. No validation for pension plan participant numbers
+Pattern.compile("\\bdef\\s+getPensionDetails\\(participantId:\\s*String\\)"), // Should validate participantId before access
+
+// 78. Allowing unrestricted credit report ID lookups
+Pattern.compile("\\bdef\\s+fetchCreditReport\\(reportId:\\s*String\\)"), // Should validate reportId before retrieval
+
+// 79. No whitelist validation for corporate registration numbers
+Pattern.compile("\\bdef\\s+validateCorporateEntity\\(registrationNumber:\\s*String\\)"), // Should validate registrationNumber
+
+// 80. Accepting unchecked emergency response IDs
+Pattern.compile("\\bdef\\s+dispatchEmergency\\(responseId:\\s*String\\)"), // Should validate responseId before dispatching
+
+// 81. No validation for childcare center registration numbers
+Pattern.compile("\\bdef\\s+validateChildcareCenter\\(centerId:\\s*String\\)"), // Should validate centerId before registration
+
+// 82. Allowing unrestricted maritime vessel IDs
+Pattern.compile("\\bdef\\s+trackVessel\\(vesselId:\\s*String\\)"), // Should validate vesselId before tracking
+
+// 83. No whitelist validation for shipping container IDs
+Pattern.compile("\\bdef\\s+trackContainer\\(containerId:\\s*String\\)"), // Should validate containerId before lookup
+
+// 84. Accepting unchecked real estate property IDs
+Pattern.compile("\\bdef\\s+getPropertyDetails\\(propertyId:\\s*String\\)"), // Should validate propertyId before retrieval
+
+// 85. No validation for pet registration numbers
+Pattern.compile("\\bdef\\s+findPetRecord\\(petId:\\s*String\\)"), // Should validate petId before lookup
+
+// 86. Allowing unrestricted theater ticket numbers
+Pattern.compile("\\bdef\\s+validateMovieTicket\\(ticketId:\\s*String\\)"), // Should validate ticketId before use
+
+// 87. No whitelist validation for gaming account IDs
+Pattern.compile("\\bdef\\s+getGameAccount\\(accountId:\\s*String\\)"), // Should validate accountId before granting access
+
+// 88. Accepting unchecked charity donation IDs
+Pattern.compile("\\bdef\\s+trackDonation\\(donationId:\\s*String\\)"), // Should validate donationId before tracking
+
+// 89. No validation for funeral service registration numbers
+Pattern.compile("\\bdef\\s+validateBurialPermit\\(permitId:\\s*String\\)"), // Should validate permitId before approval
+
+// 90-100: (More similar cases covering ID-based security risks)
+
+);
+public static final List<Pattern> whitelistValidationIssues = Arrays.asList(
+
+// 101. No whitelist validation for medical record numbers
+Pattern.compile("\\bdef\\s+getMedicalRecord\\(recordId:\\s*String\\)"), // Should validate recordId before retrieval
+
+// 102. Accepting unchecked employee badge numbers for access control
+Pattern.compile("\\bdef\\s+validateBadge\\(badgeId:\\s*String\\)"), // Should validate badgeId against known records
+
+// 103. No validation for energy meter IDs in utility billing
+Pattern.compile("\\bdef\\s+fetchMeterReading\\(meterId:\\s*String\\)"), // Should validate meterId before processing
+
+// 104. Allowing unrestricted bank account numbers in fund transfers
+Pattern.compile("\\bdef\\s+transferFunds\\(fromAccount:\\s*String,\\s*toAccount:\\s*String\\)"), // Should validate both account numbers
+
+// 105. No whitelist validation for loyalty program customer IDs
+Pattern.compile("\\bdef\\s+applyRewardPoints\\(customerId:\\s*String\\)"), // Should validate customerId before applying points
+
+// 106. Accepting unchecked online course registration IDs
+Pattern.compile("\\bdef\\s+enrollCourse\\(courseId:\\s*String\\)"), // Should validate courseId before enrolling
+
+// 107. No validation for vehicle chassis numbers in insurance claims
+Pattern.compile("\\bdef\\s+validateChassisNumber\\(chassisNumber:\\s*String\\)"), // Should validate chassisNumber
+
+// 108. Allowing unrestricted API key usage without verification
+Pattern.compile("\\bdef\\s+validateApiKey\\(apiKey:\\s*String\\)"), // Should verify apiKey before allowing access
+
+// 109. No whitelist validation for refugee identification numbers
+Pattern.compile("\\bdef\\s+validateRefugeeId\\(refugeeId:\\s*String\\)"), // Should validate refugeeId before use
+
+// 110. Accepting unchecked contractor license numbers
+Pattern.compile("\\bdef\\s+approveContractorLicense\\(licenseNumber:\\s*String\\)"), // Should validate licenseNumber before approval
+
+// 111. No validation for user session tokens
+Pattern.compile("\\bdef\\s+getSessionData\\(sessionId:\\s*String\\)"), // Should validate sessionId before retrieving data
+
+// 112. Allowing unrestricted insurance policy lookups
+Pattern.compile("\\bdef\\s+getPolicyDetails\\(policyNumber:\\s*String\\)"), // Should validate policyNumber before access
+
+// 113. No whitelist validation for financial transaction IDs
+Pattern.compile("\\bdef\\s+getTransactionDetails\\(transactionId:\\s*String\\)"), // Should validate transactionId before processing
+
+// 114. Accepting unchecked voting ballot IDs
+Pattern.compile("\\bdef\\s+validateBallot\\(ballotId:\\s*String\\)"), // Should validate ballotId before allowing vote submission
+
+// 115. No validation for customs clearance document numbers
+Pattern.compile("\\bdef\\s+verifyCustomsDocument\\(documentId:\\s*String\\)"), // Should validate documentId before approval
+
+// 116. Allowing unrestricted warehouse inventory ID access
+Pattern.compile("\\bdef\\s+getInventoryItem\\(inventoryId:\\s*String\\)"), // Should validate inventoryId before retrieval
+
+// 117. No whitelist validation for telecom service provider customer IDs
+Pattern.compile("\\bdef\\s+getCustomerDetails\\(customerId:\\s*String\\)"), // Should validate customerId before allowing account changes
+
+// 118. Accepting unchecked firearm registration numbers
+Pattern.compile("\\bdef\\s+validateFirearmRegistration\\(firearmId:\\s*String\\)"), // Should validate firearmId before approval
+
+// 119. No validation for immigration visa numbers
+Pattern.compile("\\bdef\\s+validateVisa\\(visaNumber:\\s*String\\)"), // Should validate visaNumber before processing
+
+// 120. Allowing unrestricted emergency contact lookups
+Pattern.compile("\\bdef\\s+getEmergencyContact\\(contactId:\\s*String\\)"), // Should validate contactId before retrieval
+
+);
