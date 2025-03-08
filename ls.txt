@@ -193,3 +193,36 @@ public class LanguageSelection {
         dialog.setVisible(true);
     }
 }
+
+
+languageCheckBoxes[i].addActionListener(e -> {
+    boolean isSelected = languageCheckBoxes[i].isSelected();
+    
+    for (Component component : scanOptionPanels.get(language).getComponents()) {
+        if (component instanceof JCheckBox) {
+            JCheckBox checkBox = (JCheckBox) component;
+            checkBox.setSelected(isSelected);
+        }
+    }
+});
+
+// Update language checkbox when scan options are selected
+for (Component component : scanOptionPanels.get(language).getComponents()) {
+    if (component instanceof JCheckBox) {
+        JCheckBox checkBox = (JCheckBox) component;
+
+        checkBox.addActionListener(e -> {
+            boolean anySelected = false;
+
+            for (Component c : scanOptionPanels.get(language).getComponents()) {
+                if (c instanceof JCheckBox && ((JCheckBox) c).isSelected()) {
+                    anySelected = true;
+                    break;
+                }
+            }
+
+            languageCheckBoxes[i].setSelected(anySelected);
+        });
+    }
+}
+
