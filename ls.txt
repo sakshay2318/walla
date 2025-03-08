@@ -1,0 +1,90 @@
+public static void showLanguageDialog(CountDownLatch latch) {
+        final JDialog dialog = new JDialog();
+        dialog.setTitle("Choose Language & Scan Options");
+        dialog.setModal(true);
+        dialog.setSize(500, 600);
+        dialog.setLocationRelativeTo(null);
+
+        String[] languages = {"SpringBoot", "Scala", "Electrode", "Node.js"};
+
+        // Scan options per language
+        Map<String, String[]> scanOptions = new HashMap<>();
+        scanOptions.put("SpringBoot", new String[]{"IDOR", "RBAC", "SQL Injection", "XSS", "CSRF", "Sensitive Data Exposure", "Broken Authentication", "Security Misconfiguration", "Insecure Deserialization", "Using Components with Known Vulnerabilities", "Logging & Monitoring"});
+        scanOptions.put("Scala", new String[]{"RBAC", "Object Ownership", "Injection", "XSS", "IDOR", "Broken Authentication", "Security Misconfiguration", "Sensitive Data Exposure", "Insecure Storage", "Cryptographic Issues", "API Security Issues"});
+        scanOptions.put("Electrode", new String[]{"Security Headers", "OAuth Issues", "XSS", "CSRF", "Broken Access Control", "Insecure Authentication", "Privilege Escalation", "Injection Attacks", "API Security", "Rate Limiting Issues", "Session Management"});
+        scanOptions.put("Node.js", new String[]{"IDOR", "RBAC", "NoSQL Injection", "Command Injection", "XSS", "Sensitive Data Exposure", "Broken Authentication", "Security Misconfiguration", "CORS Issues", "Insecure Deserialization", "Logging & Monitoring Gaps"});
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(languages.length + 1, 1));
+
+        JCheckBox[] languageCheckBoxes = new JCheckBox[languages.length];
+        Map<String, JCheckBox[]> scanOptionCheckBoxes = new HashMap<>();
+
+        for (int i = 0; i < languages.length; i++) {
+            String language = languages[i];
+
+            // Language Checkbox
+            languageCheckBoxes[i] = new JCheckBox(language);
+            languageCheckBoxes[i].setFont(new Font("Arial", Font.BOLD, 16));
+            panel.add(languageCheckBoxes[i]);
+
+            // Scan Options Checkboxes
+            String[] options = scanOptions.get(language);
+            JCheckBox[] checkBoxes = new JCheckBox[options.length];
+            JPanel subPanel = new JPanel();
+            subPanel.setLayout(new GridLayout(options.length, 1));
+
+            for (int j = 0; j < options.length; j++) {
+                checkBoxes[j] = new JCheckBox(options[j]);
+                checkBoxes[j].setFont(new Font("Arial", Font.PLAIN, 14));
+                subPanel.add(checkBoxes[j]);
+            }
+
+            scanOptionCheckBoxes.put(language, checkBoxes);
+            panel.add(subPanel);
+
+            // Language checkbox action: Select/Deselect all related scan options
+            languageCheckBoxes[i].addActionListener(e -> {
+                boolean isSelected = languageCheckBoxes[i].isSelected();
+                for (JCheckBox checkBox : scanOptionCheckBoxes.get(language)) {
+                    checkBox.setSelected(isSelected);
+                }
+            });
+        }
+
+        JButton runScanButton = new JButton("Run Scan");
+        runScanButton.setFont(new Font("Arial", Font.BOLD, 16));
+        runScanButton.addActionListener(e -> {
+            selectedLanguages.clear();
+            languageScanOptions.clear();
+
+            for (int i = 0; i < languages.length; i++) {
+                if (languageCheckBoxes[i].isSelected()) {
+                    String language = languages[i];
+                    selectedLanguages.add(language);
+                    ArrayList<String> selectedScans = new ArrayList<>();
+                    for (JCheckBox checkBox : scanOptionCheckBoxes.get(language)) {
+                        if (checkBox.isSelected()) {
+                            selectedScans.add(checkBox.getText());
+                        }
+                    }
+                    languageScanOptions.put(language, selectedScans);
+                }
+            }
+
+            System.out.println("Selected Languages: " + selectedLanguages);
+            System.out.println("Selected Scan Options: " + languageScanOptions);
+            dialog.dispose();
+            latch.countDown(); // Continue execution after selection
+        });
+
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.setFont(new Font("Arial", Font.BOLD, 16));
+        cancelButton.addActionListener(e -> dialog.dispose());
+
+        panel.add(runScanButton);
+        panel.add(cancelButton);
+
+        dialog.getContentPane().add(new JScrollPane(panel));
+        dialog.setVisible(true);
+    }
