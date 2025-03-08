@@ -1,8 +1,49 @@
-public static void showLanguageDialog(CountDownLatch latch) {
+package com.security.analyzer;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+
+public class LanguageSelection {
+
+    public static ArrayList<String> selectedLanguages = new ArrayList<>();
+    public static Map<String, ArrayList<String>> languageScanOptions = new HashMap<>();
+    private static JPanel subOptionPanel; // Panel to show selected language's sub-options
+    private static Map<String, JCheckBox[]> scanOptionCheckBoxes = new HashMap<>();
+    private static String currentExpandedLanguage = null; // Track expanded language
+
+    public static void main(String[] args) {
+        CountDownLatch latch = new CountDownLatch(1);
+        createAndShowGUI(latch);
+    }
+
+    public static void createAndShowGUI(CountDownLatch latch) {
+        JFrame frame = new JFrame("Security Scanner - Language Selection");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(500, 400);
+        frame.setLocationRelativeTo(null);
+
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+
+        JButton button = new JButton("Choose Language");
+        button.setFont(new Font("Arial", Font.BOLD, 18));
+        button.addActionListener(e -> showLanguageDialog(latch));
+
+        mainPanel.add(button, BorderLayout.CENTER);
+        frame.add(mainPanel);
+        frame.setVisible(true);
+    }
+
+    public static void showLanguageDialog(CountDownLatch latch) {
         final JDialog dialog = new JDialog();
-        dialog.setTitle("Choose Language & Scan Options");
+        dialog.setTitle("Select Language & Scan Options");
         dialog.setModal(true);
-        dialog.setSize(500, 600);
+        dialog.setSize(550, 600);
         dialog.setLocationRelativeTo(null);
 
         String[] languages = {"SpringBoot", "Scala", "Electrode", "Node.js"};
@@ -15,24 +56,41 @@ public static void showLanguageDialog(CountDownLatch latch) {
         scanOptions.put("Node.js", new String[]{"IDOR", "RBAC", "NoSQL Injection", "Command Injection", "XSS", "Sensitive Data Exposure", "Broken Authentication", "Security Misconfiguration", "CORS Issues", "Insecure Deserialization", "Logging & Monitoring Gaps"});
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(languages.length + 1, 1));
+        panel.setLayout(new GridLayout(languages.length, 1));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JCheckBox[] languageCheckBoxes = new JCheckBox[languages.length];
-        Map<String, JCheckBox[]> scanOptionCheckBoxes = new HashMap<>();
+
+        subOptionPanel = new JPanel();
+        subOptionPanel.setLayout(new BoxLayout(subOptionPanel, BoxLayout.Y_AXIS));
 
         for (int i = 0; i < languages.length; i++) {
             String language = languages[i];
 
             // Language Checkbox
+            JPanel langPanel = new JPanel(new BorderLayout());
+            langPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+            langPanel.setBackground(new Color(230, 240, 255));
+
             languageCheckBoxes[i] = new JCheckBox(language);
             languageCheckBoxes[i].setFont(new Font("Arial", Font.BOLD, 16));
-            panel.add(languageCheckBoxes[i]);
 
-            // Scan Options Checkboxes
+            JButton expandButton = new JButton("+");
+            expandButton.setFont(new Font("Arial", Font.BOLD, 14));
+            expandButton.setPreferredSize(new Dimension(40, 30));
+
+            langPanel.add(languageCheckBoxes[i], BorderLayout.WEST);
+            langPanel.add(expandButton, BorderLayout.EAST);
+
+            panel.add(langPanel);
+
+            // Scan Options Checkboxes (Initially Hidden)
             String[] options = scanOptions.get(language);
             JCheckBox[] checkBoxes = new JCheckBox[options.length];
             JPanel subPanel = new JPanel();
             subPanel.setLayout(new GridLayout(options.length, 1));
+            subPanel.setBorder(BorderFactory.createTitledBorder(language + " Scan Options"));
+            subPanel.setVisible(false);
 
             for (int j = 0; j < options.length; j++) {
                 checkBoxes[j] = new JCheckBox(options[j]);
@@ -41,7 +99,24 @@ public static void showLanguageDialog(CountDownLatch latch) {
             }
 
             scanOptionCheckBoxes.put(language, checkBoxes);
-            panel.add(subPanel);
+
+            // Expand Button Action: Show only one sub-option panel at a time
+            expandButton.addActionListener(e -> {
+                if (currentExpandedLanguage != null) {
+                    subOptionPanel.removeAll();
+                    subOptionPanel.revalidate();
+                    subOptionPanel.repaint();
+                }
+
+                if (!language.equals(currentExpandedLanguage)) {
+                    subOptionPanel.add(subPanel);
+                    subOptionPanel.revalidate();
+                    subOptionPanel.repaint();
+                    currentExpandedLanguage = language;
+                } else {
+                    currentExpandedLanguage = null;
+                }
+            });
 
             // Language checkbox action: Select/Deselect all related scan options
             languageCheckBoxes[i].addActionListener(e -> {
@@ -52,6 +127,12 @@ public static void showLanguageDialog(CountDownLatch latch) {
             });
         }
 
+        // Scrollable Panel for Language Selection
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setPreferredSize(new Dimension(520, 250));
+
+        // Buttons
         JButton runScanButton = new JButton("Run Scan");
         runScanButton.setFont(new Font("Arial", Font.BOLD, 16));
         runScanButton.addActionListener(e -> {
@@ -82,9 +163,17 @@ public static void showLanguageDialog(CountDownLatch latch) {
         cancelButton.setFont(new Font("Arial", Font.BOLD, 16));
         cancelButton.addActionListener(e -> dialog.dispose());
 
-        panel.add(runScanButton);
-        panel.add(cancelButton);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(runScanButton);
+        buttonPanel.add(cancelButton);
 
-        dialog.getContentPane().add(new JScrollPane(panel));
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.add(scrollPane, BorderLayout.NORTH);
+        mainPanel.add(subOptionPanel, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.getContentPane().add(mainPanel);
         dialog.setVisible(true);
     }
+}
