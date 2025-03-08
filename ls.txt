@@ -13,7 +13,7 @@ public class LanguageSelection {
     public static ArrayList<String> selectedLanguages = new ArrayList<>();
     public static Map<String, ArrayList<String>> languageScanOptions = new HashMap<>();
     private static JPanel subOptionPanel; // Panel to show selected language's sub-options
-    private static Map<String, JCheckBox[]> scanOptionCheckBoxes = new HashMap<>();
+    private static Map<String, JPanel> scanOptionPanels = new HashMap<>();
     private static String currentExpandedLanguage = null; // Track expanded language
 
     public static void main(String[] args) {
@@ -62,7 +62,7 @@ public class LanguageSelection {
         JCheckBox[] languageCheckBoxes = new JCheckBox[languages.length];
 
         subOptionPanel = new JPanel();
-        subOptionPanel.setLayout(new BoxLayout(subOptionPanel, BoxLayout.Y_AXIS));
+        subOptionPanel.setLayout(new BorderLayout());
 
         for (int i = 0; i < languages.length; i++) {
             String language = languages[i];
@@ -86,43 +86,42 @@ public class LanguageSelection {
 
             // Scan Options Checkboxes (Initially Hidden)
             String[] options = scanOptions.get(language);
-            JCheckBox[] checkBoxes = new JCheckBox[options.length];
             JPanel subPanel = new JPanel();
             subPanel.setLayout(new GridLayout(options.length, 1));
             subPanel.setBorder(BorderFactory.createTitledBorder(language + " Scan Options"));
-            subPanel.setVisible(false);
 
-            for (int j = 0; j < options.length; j++) {
-                checkBoxes[j] = new JCheckBox(options[j]);
-                checkBoxes[j].setFont(new Font("Arial", Font.PLAIN, 14));
-                subPanel.add(checkBoxes[j]);
+            for (String option : options) {
+                JCheckBox checkBox = new JCheckBox(option);
+                checkBox.setFont(new Font("Arial", Font.PLAIN, 14));
+                subPanel.add(checkBox);
             }
 
-            scanOptionCheckBoxes.put(language, checkBoxes);
+            scanOptionPanels.put(language, subPanel); // Store panels for easy access
 
             // Expand Button Action: Show only one sub-option panel at a time
             expandButton.addActionListener(e -> {
                 if (currentExpandedLanguage != null) {
                     subOptionPanel.removeAll();
-                    subOptionPanel.revalidate();
-                    subOptionPanel.repaint();
                 }
 
                 if (!language.equals(currentExpandedLanguage)) {
-                    subOptionPanel.add(subPanel);
-                    subOptionPanel.revalidate();
-                    subOptionPanel.repaint();
+                    subOptionPanel.add(scanOptionPanels.get(language), BorderLayout.CENTER);
                     currentExpandedLanguage = language;
                 } else {
                     currentExpandedLanguage = null;
                 }
+
+                subOptionPanel.revalidate();
+                subOptionPanel.repaint();
             });
 
             // Language checkbox action: Select/Deselect all related scan options
             languageCheckBoxes[i].addActionListener(e -> {
                 boolean isSelected = languageCheckBoxes[i].isSelected();
-                for (JCheckBox checkBox : scanOptionCheckBoxes.get(language)) {
-                    checkBox.setSelected(isSelected);
+                for (Component component : scanOptionPanels.get(language).getComponents()) {
+                    if (component instanceof JCheckBox) {
+                        ((JCheckBox) component).setSelected(isSelected);
+                    }
                 }
             });
         }
@@ -144,9 +143,13 @@ public class LanguageSelection {
                     String language = languages[i];
                     selectedLanguages.add(language);
                     ArrayList<String> selectedScans = new ArrayList<>();
-                    for (JCheckBox checkBox : scanOptionCheckBoxes.get(language)) {
-                        if (checkBox.isSelected()) {
-                            selectedScans.add(checkBox.getText());
+
+                    for (Component component : scanOptionPanels.get(language).getComponents()) {
+                        if (component instanceof JCheckBox) {
+                            JCheckBox checkBox = (JCheckBox) component;
+                            if (checkBox.isSelected()) {
+                                selectedScans.add(checkBox.getText());
+                            }
                         }
                     }
                     languageScanOptions.put(language, selectedScans);
