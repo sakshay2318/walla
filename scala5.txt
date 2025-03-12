@@ -1,0 +1,608 @@
+public static final List<Pattern> sessionManagementIssues = Arrays.asList(
+    
+    // 1. Missing session validation in Play Framework actions
+    Pattern.compile("\\bAction\\s*\\{[^}]*\\}"), // No session check in Play Framework Action
+
+    // 2. Direct request handling without session validation
+    Pattern.compile("\\bdef\\s+\\w+\\s*\\(.*Request\\[.*\\]\\)\\s*:\\s*Result\\s*=\\s*\\{[^}]*\\}"), // Controller method without session validation
+
+    // 3. Missing authentication check before accessing secured endpoints
+    Pattern.compile("\\bdef\\s+\\w+\\s*\\(.*\\)\\s*:\\s*Result\\s*=\\s*\\{[^}]*\\}"), // No authentication check in controller methods
+
+    // 4. Unrestricted access to admin routes
+    Pattern.compile("/admin/\\w+"), // Admin routes without security enforcement
+
+    // 5. Direct access to user settings without authentication
+    Pattern.compile("/user/settings"), // No session enforcement for user settings
+
+    // 6. Play Framework session retrieval without validation
+    Pattern.compile("\\bsession\\.get\\s*\\(.*\\)"), // Using session without authentication check
+
+    // 7. Missing authorization middleware in routes
+    Pattern.compile("\\bRoute\\s*\\(.*\\)\\s*:\\s*Result\\s*=\\s*\\{[^}]*\\}"), // Route without authentication check
+
+    // 8. Hardcoded authentication bypass
+    Pattern.compile("if\\s*\\(.*user.*==.*admin.*\\)"), // Hardcoded bypass of authentication
+
+    // 9. Direct access to protected API endpoints
+    Pattern.compile("\"/api/secure/\\w+\""), // Secure API endpoint without authentication check
+
+    // 10. Play Framework route without authentication enforcement
+    Pattern.compile("GET|POST|PUT|DELETE\\s+\"/\\w+\"\\s*").compile("controllers\\..*"), // No authentication check in routes
+
+    // 11. Exposed API without authentication
+    Pattern.compile("@ApiOperation.*public\\s*Response\\s*\\w+\\s*\\(.*\\)"), // API operation missing authentication
+
+    // 12. Missing session expiration setting
+    Pattern.compile("\\bsession\\s*\\.\\s*set\\s*\\(.*\\)"), // Session set without expiration
+
+    // 13. Hardcoded authentication token usage
+    Pattern.compile("\\btoken\\s*=\\s*\"[^\"]+\""), // Hardcoded authentication token
+
+    // 14. JWT token usage without verification
+    Pattern.compile("\\bJWT\\s*\\.\\s*decode\\s*\\(.*\\)"), // Decoding JWT without validation
+
+    // 15. Unsecured cookie usage
+    Pattern.compile("\\bCookie\\s*\\(.*\\)"), // Creating cookies without secure flag
+
+    // 16. Session retrieval without null check
+    Pattern.compile("\\bsession\\s*\\.\\s*apply\\s*\\(.*\\)"), // Using session without checking null
+
+    // 17. Lack of CSRF protection in Play framework routes
+    Pattern.compile("\\bCSRF\\s*\\.\\s*getToken\\s*\\(.*\\)"), // Missing CSRF token verification
+
+    // 18. Storing session information in client-side storage
+    Pattern.compile("\\blocalStorage\\.setItem\\s*\\(.*\\)"), // Storing sensitive data in local storage
+
+    // 19. Storing session details in logs
+    Pattern.compile("\\blogger\\.info\\s*\\(.*session.*\\)"), // Logging session details
+
+    // 20. No logout session invalidation
+    Pattern.compile("\\bsession\\s*\\.\\s*remove\\s*\\(.*\\)"), // No session removal on logout
+
+    // 21. Allowing empty passwords in authentication
+    Pattern.compile("\\bpassword\\s*==\\s*\"\""), // Empty password check missing
+
+    // 22. Direct access to sensitive data without session enforcement
+    Pattern.compile("\\bdb\\.query\\s*\\(.*user.*\\)"), // Querying user data without authentication
+
+    // 23. No token expiration enforcement
+    Pattern.compile("\\btoken\\s*\\.\\s*isExpired\\s*\\(.*\\)"), // Not checking JWT expiration
+
+    // 24. Open WebSockets without authentication
+    Pattern.compile("\\bWebSocket\\s*\\.\\s*accept\\s*\\(.*\\)"), // WebSocket opened without authentication
+
+    // 25. Exposed GraphQL endpoint without authentication
+    Pattern.compile("\\bGraphQL\\s*\\.\\s*execute\\s*\\(.*\\)"), // GraphQL execution without authentication
+
+    // 26. Direct access to user sessions
+    Pattern.compile("\\bUserSession\\s*\\.\\s*get\\s*\\(.*\\)"), // Accessing session without validation
+
+    // 27. API call without authentication middleware
+    Pattern.compile("\\bcallAPI\\s*\\(.*\\)"), // API call without security validation
+
+    // 28. Missing session renewal on login
+    Pattern.compile("\\bsession\\s*\\.\\s*update\\s*\\(.*\\)"), // No session renewal on authentication
+
+    // 29. Unsafe password storage
+    Pattern.compile("\\bpassword\\s*=\\s*\"[^\"]+\""), // Hardcoded password in source code
+
+    // 30. Unrestricted file uploads
+    Pattern.compile("\\bfileUpload\\s*\\(.*\\)"), // No validation on uploaded files
+
+    // 31. Sensitive user data exposed in API response
+    Pattern.compile("\\bJson\\.toJson\\s*\\(.*password.*\\)"), // Serializing sensitive data
+
+    // 32. Using HTTP instead of HTTPS for sensitive endpoints
+    Pattern.compile("\"http://.*login\""), // Login over HTTP
+
+    // 33. Exposed error messages leaking session details
+    Pattern.compile("throw new Exception\\s*\\(.*session.*\\)"), // Exception message containing session details
+
+    // 34. Unverified OAuth token usage
+    Pattern.compile("\\bOAuth\\s*\\.\\s*token\\s*\\(.*\\)"), // OAuth token use without verification
+
+    // 35. API key hardcoded in source code
+    Pattern.compile("\\bapiKey\\s*=\\s*\"[^\"]+\""), // Hardcoded API key
+
+    // 36. Lack of OTP verification in authentication flow
+    Pattern.compile("\\bOTP\\s*\\.\\s*validate\\s*\\(.*\\)"), // OTP missing in authentication
+
+    // 37. Hardcoded secret keys
+    Pattern.compile("\\bsecret\\s*=\\s*\"[^\"]+\""), // Hardcoded secret key
+
+    // 38. Unrestricted access to sensitive configuration files
+    Pattern.compile("\\bapplication\\.conf\\b"), // Accessing configuration file without security
+
+    // 39. Direct access to session attributes without verification
+    Pattern.compile("\\bsession\\s*\\.\\s*apply\\s*\\(.*\\)"), // Accessing session attributes unsafely
+
+    // 40. No 2FA enforcement for admin users
+    Pattern.compile("\\badminLogin\\s*\\(.*\\)"), // Admin login without 2FA
+
+    // 41. Storing user credentials in plain text
+    Pattern.compile("\\bcredentials\\s*=\\s*\"[^\"]+\""), // Plain text credentials
+
+    // 42. No session timeout enforcement
+    Pattern.compile("\\bsessionTimeout\\s*=\\s*0"), // Session never expires
+
+    // 43. Unverified external API authentication
+    Pattern.compile("\\bexternalAPI\\s*\\(.*\\)"), // External API without authentication
+
+    // 44. No brute-force protection for login
+    Pattern.compile("\\bfailedAttempts\\s*=\\s*0"), // No lockout mechanism
+
+    // 45. Exposed admin debug panel
+    Pattern.compile("/debug/admin"), // Admin debug panel exposed
+
+    // 46. Lack of CSP headers
+    Pattern.compile("\\bCSP\\s*\\.\\s*setPolicy\\s*\\(.*\\)"), // No Content Security Policy
+
+    // 47. No session tracking mechanism
+    Pattern.compile("\\bsessionId\\s*=\\s*\"[^\"]+\""), // No session tracking
+
+    // 48. Lack of encryption for sensitive data
+    Pattern.compile("\\bencrypt\\s*\\(.*\\)"), // No encryption
+
+    // 49. No log-out enforcement for inactive users
+    Pattern.compile("\\binactivityLogout\\s*=\\s*false"), // No automatic logout
+
+    // 50. Hardcoded admin credentials
+    Pattern.compile("\"admin:password\"") // Hardcoded admin credentials
+);
+public static final List<Pattern> sessionManagementIssues = Arrays.asList(
+    
+    // 51. Missing session check in WebSocket handlers
+    Pattern.compile("\\bWebSocket\\.accept\\s*\\(.*\\)"), // Unauthenticated WebSocket connections
+
+    // 52. Unprotected password reset endpoints
+    Pattern.compile("\"/password/reset\""), // No authentication check for password reset
+
+    // 53. Unprotected email change routes
+    Pattern.compile("\"/account/change-email\""), // No session validation in email change
+
+    // 54. Storing authentication tokens in cookies without HttpOnly flag
+    Pattern.compile("\\bCookie\\(\\s*\"auth_token\""), // Insecure cookie storage
+
+    // 55. Exposed application secrets in logs
+    Pattern.compile("\\blogger\\.info\\(.*secret.*\\)"), // Logging secrets
+
+    // 56. No authentication for sensitive GET requests
+    Pattern.compile("GET\\s+\"/admin/\\w+\""), // Unauthenticated admin GET request
+
+    // 57. No authentication for API access keys
+    Pattern.compile("\\bapi_key\\s*=\\s*\"[^\"]+\""), // Hardcoded API key exposure
+
+    // 58. Lack of authorization check in controller methods
+    Pattern.compile("\\bdef\\s+\\w+\\s*\\(.*\\)\\s*:\\s*Result\\s*=\\s*\\{[^}]*\\}"), // No auth check
+
+    // 59. No session validation for OAuth logins
+    Pattern.compile("\\bOAuthProvider\\s*\\.\\s*authenticate\\s*\\(.*\\)"), // OAuth authentication without validation
+
+    // 60. Sensitive routes accessible without authentication
+    Pattern.compile("\"/admin/configurations\""), // Configuration exposure
+
+    // 61. Unauthenticated access to audit logs
+    Pattern.compile("\"/logs/audit\""), // Audit logs accessible without authentication
+
+    // 62. No session termination after logout
+    Pattern.compile("\\bsession\\s*\\.\\s*clear\\s*\\(.*\\)"), // Logout without session invalidation
+
+    // 63. Using GET for authentication token transfer
+    Pattern.compile("\"GET /auth/token\\?\""), // Insecure token transfer via URL
+
+    // 64. Plaintext transmission of passwords
+    Pattern.compile("\\bpassword\\s*=\\s*\"[^\"]+\""), // Hardcoded password exposure
+
+    // 65. Hardcoded database credentials
+    Pattern.compile("\\bdbPassword\\s*=\\s*\"[^\"]+\""), // Hardcoded database credentials
+
+    // 66. No input validation for login fields
+    Pattern.compile("\\busername\\s*=\\s*request\\s*\\.\\s*getParameter\\s*\\(.*\\)"), // Direct user input to authentication logic
+
+    // 67. Lack of session expiration on password change
+    Pattern.compile("\\bsession\\s*\\.\\s*update\\s*\\(.*\\)"), // Session not invalidated after password reset
+
+    // 68. Unrestricted modification of user roles
+    Pattern.compile("\"/admin/modify-role\""), // Role modification without authentication
+
+    // 69. No multi-factor authentication for sensitive actions
+    Pattern.compile("\\bverifyMFA\\s*\\(.*\\)"), // Missing MFA enforcement
+
+    // 70. Lack of secure flag in session cookies
+    Pattern.compile("\\bCookie\\s*\\(.*\"sessionId\""), // Session cookie missing Secure flag
+
+    // 71. No restrictions on brute-force login attempts
+    Pattern.compile("\\bfailedAttempts\\s*=\\s*0"), // No lockout for repeated failures
+
+    // 72. Allowing empty security questions
+    Pattern.compile("\\bsecurityQuestion\\s*=\\s*\"\""), // Empty security questions allowed
+
+    // 73. Logging sensitive authentication data
+    Pattern.compile("\\blogger\\.debug\\s*\\(.*password.*\\)"), // Logging passwords
+
+    // 74. Missing session timeout for inactive users
+    Pattern.compile("\\bsessionTimeout\\s*=\\s*\"infinity\""), // No session timeout enforcement
+
+    // 75. Insecure API key storage in frontend JavaScript
+    Pattern.compile("\\bwindow\\.apiKey\\s*=\\s*\"[^\"]+\""), // Exposed API key in frontend
+
+    // 76. Missing logout confirmation
+    Pattern.compile("\"/logout\""), // Logout route without confirmation
+
+    // 77. Storing plain-text user information in local storage
+    Pattern.compile("\\blocalStorage\\.setItem\\s*\\(.*user.*\\)"), // Unencrypted user data storage
+
+    // 78. Lack of HTTPS enforcement
+    Pattern.compile("\\bhttp:\\/\\/\\w+"), // HTTP URLs used instead of HTTPS
+
+    // 79. No IP restriction on admin panel access
+    Pattern.compile("\"/admin\""), // No IP-based restrictions
+
+    // 80. Unrestricted access to API documentation
+    Pattern.compile("\"/swagger-ui.html\""), // Open API documentation
+
+    // 81. Unauthenticated database queries
+    Pattern.compile("\\bquery\\s*\\(.*SELECT.*FROM\\s+users"), // Querying users table without authentication
+
+    // 82. No logging for failed login attempts
+    Pattern.compile("\\blogger\\.warn\\s*\\(.*login failed.*\\)"), // No logging of failed login attempts
+
+    // 83. Unrestricted CORS policy
+    Pattern.compile("\\bCORS\\s*\\.\\s*allowAll\\s*\\(.*\\)"), // CORS allowing all origins
+
+    // 84. Missing audit logs for sensitive actions
+    Pattern.compile("\\blogger\\.info\\s*\\(.*deleted user.*\\)"), // No audit logs for account deletion
+
+    // 85. Lack of permissions check for API endpoints
+    Pattern.compile("\"/api/protected\""), // No permission check for API
+
+    // 86. No password complexity enforcement
+    Pattern.compile("\\bpassword\\s*=\\s*request\\s*\\.\\s*getParameter\\s*\\(.*\\)"), // Weak password policy
+
+    // 87. Allowing session reuse after logout
+    Pattern.compile("\\bsession\\s*\\.\\s*isValid\\s*\\(.*\\)"), // Session still valid post logout
+
+    // 88. Lack of API rate limiting
+    Pattern.compile("\\bRateLimiter\\s*\\.\\s*disabled\\s*\\(.*\\)"), // No API rate limiting
+
+    // 89. Unauthenticated cloud storage access
+    Pattern.compile("\\bCloudStorage\\s*\\.\\s*getFile\\s*\\(.*\\)"), // Public access to cloud storage
+
+    // 90. Hardcoded S3 bucket credentials
+    Pattern.compile("\\bS3SecretKey\\s*=\\s*\"[^\"]+\""), // Exposed AWS credentials
+
+    // 91. Missing CAPTCHA verification on login
+    Pattern.compile("\\bvalidateCaptcha\\s*\\(.*\\)"), // No CAPTCHA enforcement
+
+    // 92. Unauthenticated GraphQL mutations
+    Pattern.compile("\\bGraphQL\\s*\\.\\s*mutate\\s*\\(.*\\)"), // GraphQL mutation without auth
+
+    // 93. Lack of encrypted data transmission
+    Pattern.compile("\\bBase64\\s*\\.\\s*encode\\s*\\(.*\\)"), // Using weak encoding instead of encryption
+
+    // 94. Exposing internal server errors
+    Pattern.compile("\\bException\\s*\\.\\s*getMessage\\s*\\(.*\\)"), // Server error messages exposed
+
+    // 95. Logging authentication tokens
+    Pattern.compile("\\blogger\\.info\\s*\\(.*token.*\\)"), // Logging authentication tokens
+
+    // 96. Unauthenticated file downloads
+    Pattern.compile("\\bFileDownloader\\s*\\.\\s*download\\s*\\(.*\\)"), // No authentication in file downloads
+
+    // 97. Hardcoded SSH credentials
+    Pattern.compile("\\bsshPrivateKey\\s*=\\s*\"[^\"]+\""), // Hardcoded SSH keys
+
+    // 98. Missing session revocation for compromised accounts
+    Pattern.compile("\\bsession\\s*\\.\\s*invalidate\\s*\\(.*\\)"), // No session invalidation for security breaches
+
+    // 99. Lack of security headers in API responses
+    Pattern.compile("\\bresponse\\.addHeader\\s*\\(.*\\)"), // No security headers
+
+    // 100. Exposed JWT secrets in frontend code
+    Pattern.compile("\\bJWT_SECRET\\s*=\\s*\"[^\"]+\"") // Hardcoded JWT secrets
+);
+public static final List<Pattern> adAuthorizationIssues = Arrays.asList(
+
+    // 1. No Active Directory authentication in API routes
+    Pattern.compile("\\bapp\\.(get|post|put|delete)\\s*\\(.*\\)\\s*=>\\s*\\{[^}]*\\}"), // No AD role validation in API routes
+
+    // 2. Missing LDAP authentication check
+    Pattern.compile("\\bldapTemplate\\.search\\s*\\(.*\\)"), // LDAP search without authentication check
+
+    // 3. Direct access to Active Directory without secure authentication
+    Pattern.compile("\\bDirContext\\s*\\.\\s*search\\s*\\(.*\\)"), // Unprotected AD search queries
+
+    // 4. No group-based authorization for admin endpoints
+    Pattern.compile("\"/admin/\\w+\""), // Admin routes without role checks
+
+    // 5. Hardcoded AD credentials in source code
+    Pattern.compile("\\bpassword\\s*=\\s*\"[^\"]+\""), // Hardcoded AD password
+
+    // 6. Exposed AD user directory endpoints
+    Pattern.compile("\"/api/users/directory\""), // Unauthenticated access to user directory
+
+    // 7. No RBAC enforcement in AD-integrated API endpoints
+    Pattern.compile("\\bdef\\s+\\w+\\s*\\(.*\\)\\s*:\\s*Result\\s*=\\s*\\{[^}]*\\}"), // No RBAC check in method
+
+    // 8. Unrestricted access to AD user details
+    Pattern.compile("\"/api/users/details\""), // No authentication check for user details
+
+    // 9. Insecure LDAP query construction
+    Pattern.compile("\\b\"\\(uid=\\\"\\s*\\+\\s*username\\s*\\+\\s*\"\\)\""), // LDAP injection vulnerability
+
+    // 10. Missing user role verification before granting access
+    Pattern.compile("\\bif\\s*\\(user\\s*==\\s*admin\\)"), // Simple user check instead of AD roles
+
+    // 11. No session validation after AD authentication
+    Pattern.compile("\\bauthenticateUser\\s*\\(.*\\)"), // Auth without session validation
+
+    // 12. Lack of two-factor authentication for AD login
+    Pattern.compile("\\bvalidateMFA\\s*\\(.*\\)"), // No MFA for AD authentication
+
+    // 13. Unprotected Active Directory configuration endpoints
+    Pattern.compile("\"/admin/ad-config\""), // No authentication on AD configuration
+
+    // 14. Exposed AD group membership details
+    Pattern.compile("\"/api/users/groups\""), // Public access to AD group memberships
+
+    // 15. No log monitoring for failed AD login attempts
+    Pattern.compile("\\blogger\\.info\\s*\\(.*login failed.*\\)"), // Missing logging of failed AD login attempts
+
+    // 16. Unauthenticated access to AD role management
+    Pattern.compile("\"/admin/roles\""), // No authentication on role management
+
+    // 17. No encryption for AD authentication credentials
+    Pattern.compile("\\bBase64\\.encode\\s*\\(.*\\)"), // Encoding instead of encryption
+
+    // 18. Bypassing AD authentication with default credentials
+    Pattern.compile("\\busername\\s*==\\s*\"admin\"\\s*&&\\s*password\\s*==\\s*\"admin\""), // Hardcoded bypass
+
+    // 19. Insecure AD password reset mechanisms
+    Pattern.compile("\"/password/reset\""), // No verification for password reset
+
+    // 20. No authorization check on sensitive LDAP operations
+    Pattern.compile("\\bldapTemplate\\.modifyAttributes\\s*\\(.*\\)"), // Direct LDAP attribute modification
+
+    // 21. AD user authentication without session expiration
+    Pattern.compile("\\bsession\\s*\\.\\s*set\\s*\\(.*\\)"), // No expiration of AD session
+
+    // 22. Exposing AD group permissions publicly
+    Pattern.compile("\"/api/groups/permissions\""), // No role-based protection on group permissions
+
+    // 23. Unrestricted AD account modification
+    Pattern.compile("\"/api/users/update\""), // No access control on user updates
+
+    // 24. No API key validation for AD integrations
+    Pattern.compile("\\bapiKey\\s*=\\s*\"[^\"]+\""), // Hardcoded or exposed API key
+
+    // 25. Lack of audit logs for AD authorization events
+    Pattern.compile("\\blogger\\.debug\\s*\\(.*user role change.*\\)"), // No audit logging on AD role changes
+
+    // 26. No access control on AD sync jobs
+    Pattern.compile("\"/admin/ad-sync\""), // Unprotected AD sync operations
+
+    // 27. No IP restrictions on AD authentication endpoints
+    Pattern.compile("\"/api/auth/ad-login\""), // Publicly accessible AD authentication
+
+    // 28. Allowing AD account reuse after deactivation
+    Pattern.compile("\\baccountStatus\\s*=\\s*\"active\""), // No checks for disabled accounts
+
+    // 29. Exposing internal AD error messages
+    Pattern.compile("\\bException\\s*\\.\\s*getMessage\\s*\\(.*\\)"), // Exposing AD errors
+
+    // 30. Unrestricted access to AD user creation
+    Pattern.compile("\"/admin/create-user\""), // No authentication for new user creation
+
+    // 31. No logging for AD authentication failures
+    Pattern.compile("\\blogger\\.info\\s*\\(.*failed to authenticate.*\\)"), // Missing log entry
+
+    // 32. Allowing guest access to AD-protected resources
+    Pattern.compile("\\bguestAccess\\s*=\\s*true"), // Allowing guests on AD routes
+
+    // 33. No timeout for AD authentication requests
+    Pattern.compile("\\btimeout\\s*=\\s*\"none\""), // No timeout enforcement
+
+    // 34. Exposing AD session tokens in logs
+    Pattern.compile("\\blogger\\.info\\s*\\(.*sessionToken.*\\)"), // Logging session tokens
+
+    // 35. Insecure handling of AD user attributes
+    Pattern.compile("\\buserAttributes\\s*=\\s*request\\s*\\.\\s*getParameter\\s*\\(.*\\)"), // Unvalidated input to AD attributes
+
+    // 36. No multi-factor authentication enforcement
+    Pattern.compile("\\bverifyMFA\\s*\\(.*\\)"), // Missing MFA enforcement
+
+    // 37. Allowing anonymous AD authentication
+    Pattern.compile("\\banonymousAccess\\s*=\\s*true"), // Anonymous access enabled
+
+    // 38. No password complexity enforcement for AD users
+    Pattern.compile("\\bpasswordPolicy\\s*=\\s*\"weak\""), // Weak AD password policy
+
+    // 39. Missing security headers in AD authentication responses
+    Pattern.compile("\\bresponse\\.addHeader\\s*\\(.*\\)"), // No security headers
+
+    // 40. No encryption for AD session cookies
+    Pattern.compile("\\bCookie\\s*\\(.*\"sessionId\""), // Session cookie missing Secure flag
+
+    // 41. No protection against brute-force AD login attempts
+    Pattern.compile("\\bfailedLoginAttempts\\s*=\\s*0"), // No account lockout
+
+    // 42. AD token validation missing expiration check
+    Pattern.compile("\\bvalidateToken\\s*\\(.*\\)"), // No expiration validation on tokens
+
+    // 43. No role-based access control for AD user lists
+    Pattern.compile("\"/api/users/all\""), // No RBAC on user list retrieval
+
+    // 44. Allowing wildcard access to AD resources
+    Pattern.compile("\\baccessControl\\s*=\\s*\"*\""), // Unrestricted access
+
+    // 45. Unauthenticated access to LDAP directory structure
+    Pattern.compile("\"/ldap/directory\""), // No authentication for LDAP directory
+
+    // 46. Missing verification for AD user deactivation
+    Pattern.compile("\"/admin/deactivate-user\""), // No confirmation for deactivation
+
+    // 47. Exposing AD user email addresses publicly
+    Pattern.compile("\"/api/users/emails\""), // No protection on user email lists
+
+    // 48. Unprotected AD configuration file access
+    Pattern.compile("\\bconfig\\.properties"), // AD config file exposed
+
+    // 49. No AD group membership verification for admin tasks
+    Pattern.compile("\\buserRole\\s*==\\s*\"admin\""), // No AD group validation
+
+    // 50. Unrestricted access to AD role assignment
+    Pattern.compile("\"/admin/assign-role\"") // No authentication on role assignment
+);
+public static final List<Pattern> adAuthorizationIssues = Arrays.asList(
+
+    // 51. No role validation in API middleware
+    Pattern.compile("\\bdef\\s+authMiddleware\\s*\\(.*\\)\\s*:\\s*Action\\s*=\\s*\\{[^}]*\\}"), // Middleware missing AD role checks
+
+    // 52. API route exposed without authentication
+    Pattern.compile("\"/api/public/.*\""), // Public API without authentication
+
+    // 53. LDAP connection without TLS
+    Pattern.compile("\\bContext\\.SECURITY_PROTOCOL\\s*=\\s*\"none\""), // LDAP using plaintext authentication
+
+    // 54. Storing Active Directory credentials in plain text
+    Pattern.compile("\\bpassword\\s*=\\s*\"[^\"]+\""), // Hardcoded AD credentials
+
+    // 55. Exposed AD user password hashes
+    Pattern.compile("\"/api/users/password-hashes\""), // Public access to password hashes
+
+    // 56. Using weak hashing for AD passwords
+    Pattern.compile("\\bMessageDigest\\.getInstance\\s*\\(\\s*\"MD5\"\\s*\\)"), // MD5 hash instead of strong hashing
+
+    // 57. No authorization check on account deletion
+    Pattern.compile("\"/admin/delete-user\""), // No authentication for user deletion
+
+    // 58. Logging sensitive AD credentials
+    Pattern.compile("\\blogger\\.info\\s*\\(.*password.*\\)"), // Logging passwords in logs
+
+    // 59. Bypassing AD authentication via hardcoded admin session
+    Pattern.compile("\\bif\\s*\\(sessionUser\\s*==\\s*\"admin\"\\)"), // Hardcoded session bypass
+
+    // 60. No access control on AD user role changes
+    Pattern.compile("\"/admin/update-role\""), // No authentication for role changes
+
+    // 61. Exposed AD API tokens in source code
+    Pattern.compile("\\bapiToken\\s*=\\s*\"[^\"]+\""), // Hardcoded AD API token
+
+    // 62. Unrestricted LDAP search filter allowing enumeration
+    Pattern.compile("\\bldapTemplate\\.search\\s*\\(.*,\\s*\".*\\*.*\""), // Wildcard searches
+
+    // 63. No authentication for privileged Active Directory tasks
+    Pattern.compile("\"/admin/ad-maintenance\""), // Privileged AD task without authentication
+
+    // 64. No protection for brute-force AD login attempts
+    Pattern.compile("\\bfailedAttempts\\s*=\\s*0"), // No account lockout policy
+
+    // 65. Using default AD administrator credentials
+    Pattern.compile("\\busername\\s*=\\s*\"Administrator\""), // Default AD administrator account
+
+    // 66. Allowing unauthenticated session reuse
+    Pattern.compile("\\bsessionReuse\\s*=\\s*true"), // Session reuse without re-authentication
+
+    // 67. No authorization validation for AD group modifications
+    Pattern.compile("\"/admin/groups/update\""), // No authentication on AD group changes
+
+    // 68. Hardcoded AD domain controller address
+    Pattern.compile("\\bdomainController\\s*=\\s*\"[^\"]+\""), // Hardcoded domain controller
+
+    // 69. Unrestricted access to AD schema modifications
+    Pattern.compile("\"/admin/schema/update\""), // Schema modification without authentication
+
+    // 70. Missing verification for AD user email changes
+    Pattern.compile("\"/api/users/update-email\""), // No verification for email updates
+
+    // 71. Allowing guest accounts access to restricted AD resources
+    Pattern.compile("\\bguestUser\\s*=\\s*true"), // Unrestricted guest access
+
+    // 72. No audit logs for AD group membership changes
+    Pattern.compile("\\blogger\\.info\\s*\\(.*group membership changed.*\\)"), // No logging for role updates
+
+    // 73. Hardcoded AD connection credentials
+    Pattern.compile("\\bbindDN\\s*=\\s*\"[^\"]+\""), // Hardcoded AD bind credentials
+
+    // 74. Allowing AD users to disable security features
+    Pattern.compile("\"/api/users/disable-security\""), // User-controlled security disabling
+
+    // 75. Exposing raw AD user details
+    Pattern.compile("\"/api/users/details/raw\""), // Unprotected AD user data
+
+    // 76. No multi-factor authentication enforcement for high-privilege AD users
+    Pattern.compile("\\bif\\s*\\(userRole\\s*==\\s*\"admin\"\\)\\s*\\{[^}]*\\}"), // No MFA for admins
+
+    // 77. Missing CSRF protection on AD authentication endpoints
+    Pattern.compile("\\bcsrfToken\\s*=\\s*null"), // No CSRF token validation
+
+    // 78. No access restriction on LDAP object modifications
+    Pattern.compile("\\bldapTemplate\\.modifyAttributes\\s*\\(.*\\)"), // Direct LDAP attribute modifications
+
+    // 79. Exposing Active Directory user session tokens
+    Pattern.compile("\\blogger\\.info\\s*\\(.*sessionToken.*\\)"), // Logging session tokens
+
+    // 80. Allowing AD account login without a password
+    Pattern.compile("\\bif\\s*\\(password\\s*==\\s*\"\"\\)"), // Empty password acceptance
+
+    // 81. No encryption for LDAP authentication
+    Pattern.compile("\\bldapTemplate\\.setUseTls\\s*\\(false\\)"), // Disabling TLS for LDAP
+
+    // 82. Unauthenticated access to AD policy settings
+    Pattern.compile("\"/admin/ad-policy\""), // No authentication for AD policy management
+
+    // 83. Allowing AD login over HTTP instead of HTTPS
+    Pattern.compile("\\bhttp:\\/\\/ad-login\\b"), // AD login over insecure protocol
+
+    // 84. No timeout for LDAP search operations
+    Pattern.compile("\\bldapTemplate\\.setSearchTimeLimit\\s*\\(0\\)"), // Unlimited LDAP queries
+
+    // 85. Allowing wildcard certificates for AD authentication
+    Pattern.compile("\\bsslContext\\.init\\s*\\(.*,\\s*.*,\\s*new SecureRandom\\(\\)\\)"), // Accepting all certs
+
+    // 86. No authorization check for downloading AD logs
+    Pattern.compile("\"/admin/ad-logs/download\""), // No authentication for log access
+
+    // 87. Missing signature validation for AD JWT tokens
+    Pattern.compile("\\bverifyJwt\\s*\\(.*\\)"), // No token signature verification
+
+    // 88. Allowing unrestricted API access from all origins
+    Pattern.compile("\\bAccess-Control-Allow-Origin\\s*:\\s*\"\\*\""), // Open CORS policy
+
+    // 89. Storing AD user sessions in an insecure manner
+    Pattern.compile("\\bstoreSession\\s*=\\s*\"plaintext\""), // Sessions stored in plaintext
+
+    // 90. Missing rate limiting on AD authentication attempts
+    Pattern.compile("\\bratelimit\\s*=\\s*0"), // No login rate limiting
+
+    // 91. No verification for AD group membership changes
+    Pattern.compile("\"/api/users/change-group\""), // No confirmation before role changes
+
+    // 92. Exposed LDAP queries in logs
+    Pattern.compile("\\blogger\\.info\\s*\\(.*ldapQuery.*\\)"), // Logging raw LDAP queries
+
+    // 93. No automatic logout for idle AD sessions
+    Pattern.compile("\\bautoLogout\\s*=\\s*false"), // No session timeout
+
+    // 94. Allowing outdated TLS versions for AD connections
+    Pattern.compile("\\bTLSv1\\b"), // Deprecated TLS version
+
+    // 95. No session binding to user authentication
+    Pattern.compile("\\bsessionID\\s*=\\s*null"), // No session-user binding
+
+    // 96. Allowing unlimited AD API calls without authentication
+    Pattern.compile("\"/api/ad/open\""), // Open API endpoint
+
+    // 97. No restrictions on AD user enumeration
+    Pattern.compile("\\bldapTemplate\\.search\\s*\\(.*,\\s*\"objectClass=\\*\""), // User enumeration risk
+
+    // 98. Allowing AD password resets without identity verification
+    Pattern.compile("\"/password/reset/no-verify\""), // Reset without user verification
+
+    // 99. No protection against session hijacking for AD users
+    Pattern.compile("\\bsessionTracking\\s*=\\s*false"), // No tracking of session changes
+
+    // 100. Exposing Active Directory API debug logs in production
+    Pattern.compile("\\blogger\\.debug\\s*\\(.*AD API response.*\\)"), // Debug logs in production
+);
