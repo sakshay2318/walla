@@ -1,0 +1,420 @@
+public static final List<Pattern> sourceCodeLeakage = Arrays.asList(
+
+    // 1. Exposing `.git` directory in a web-accessible location
+    Pattern.compile("/\\.git/"), // Git repository exposed
+
+    // 2. Exposed `.env` files containing sensitive configuration
+    Pattern.compile("/\\.env"), // Environment variables exposed
+
+    // 3. Direct access to `.scala` source files
+    Pattern.compile("\\.scala$"), // Exposed source code files
+
+    // 4. Hardcoded AWS Access Key ID
+    Pattern.compile("AKIA[0-9A-Z]{16}"), // AWS Key found
+
+    // 5. Hardcoded AWS Secret Access Key
+    Pattern.compile("(?i)aws_secret_access_key\\s*=\\s*[\"'][0-9a-zA-Z\\/+=]{40}[\"']"), // AWS secret key exposed
+
+    // 6. Exposed database connection strings
+    Pattern.compile("jdbc:(mysql|postgresql|sqlserver|oracle):\\/\\/[^\\s]+"), // Database credentials leaked
+
+    // 7. API keys hardcoded in source files
+    Pattern.compile("(?i)api_key\\s*=\\s*[\"'][A-Za-z0-9_\\-]{20,40}[\"']"), // API key found in code
+
+    // 8. Hardcoded OAuth tokens
+    Pattern.compile("(?i)oauth_token\\s*=\\s*[\"'][A-Za-z0-9_\\-]{20,50}[\"']"), // OAuth token detected
+
+    // 9. Hardcoded Slack Webhooks
+    Pattern.compile("https:\\/\\/hooks\\.slack\\.com\\/services\\/T[a-zA-Z0-9]+\\/B[a-zA-Z0-9]+\\/.*"), // Slack webhook exposed
+
+    // 10. Publicly accessible `.DS_Store` file
+    Pattern.compile("\\.DS_Store"), // MacOS metadata file exposed
+
+    // 11. Publicly accessible `.htpasswd` file
+    Pattern.compile("/\\.htpasswd"), // Password protection file exposed
+
+    // 12. Debug logs leaking source code paths
+    Pattern.compile("DEBUG\\s*:\\s*\".*\\.scala\""), // Debug log with source path
+
+    // 13. Stack traces with file paths
+    Pattern.compile("at\\s+[a-zA-Z0-9_\\.]+\\(.*\\.scala:\\d+\\)"), // Stack traces exposing code paths
+
+    // 14. Hardcoded SMTP credentials
+    Pattern.compile("(?i)smtp_pass\\s*=\\s*[\"'][a-zA-Z0-9!@#$%^&*()_+\\-=]{8,50}[\"']"), // SMTP credentials found
+
+    // 15. Exposing `.pem` files in public directories
+    Pattern.compile("\\.pem$"), // Private keys exposed
+
+    // 16. Unprotected `.bak` or `.old` backup files
+    Pattern.compile("\\.(bak|old)$"), // Backup files exposed
+
+    // 17. Publicly accessible `config.json` files
+    Pattern.compile("/config\\.json"), // Configuration files exposed
+
+    // 18. Hardcoded Firebase credentials
+    Pattern.compile("(?i)firebase_api_key\\s*=\\s*[\"'][A-Za-z0-9_\\-]{20,50}[\"']"), // Firebase API key found
+
+    // 19. Debugging logs exposing secrets
+    Pattern.compile("(?i)logger\\.debug\\s*\\(.*(password|secret|key).*\\)"), // Debug log with sensitive data
+
+    // 20. `.zip` files containing source code in public directories
+    Pattern.compile("\\.zip$"), // Source code archives exposed
+
+    // 21. `.tar` or `.gz` files containing source code
+    Pattern.compile("\\.(tar|gz|tgz)$"), // Compressed source files exposed
+
+    // 22. Publicly accessible `.log` files
+    Pattern.compile("/.*\\.log$"), // Log files exposed
+
+    // 23. Hardcoded private RSA keys
+    Pattern.compile("-----BEGIN PRIVATE KEY-----"), // Private RSA key found
+
+    // 24. Exposed Jenkins build logs
+    Pattern.compile(".*Jenkinsfile.*"), // Jenkins build files in public locations
+
+    // 25. Hardcoded Google API Keys
+    Pattern.compile("AIza[0-9A-Za-z-_]{35}"), // Google API Key detected
+
+    // 26. `.swp` files from Vim editor in public directories
+    Pattern.compile("\\.swp$"), // Swap files exposed
+
+    // 27. Publicly exposed `.idea` directory
+    Pattern.compile("/\\.idea/"), // IntelliJ project files exposed
+
+    // 28. Unprotected `node_modules` directory
+    Pattern.compile("/node_modules/"), // Node.js dependencies exposed
+
+    // 29. Hardcoded JWT secrets
+    Pattern.compile("(?i)jwt_secret\\s*=\\s*[\"'][a-zA-Z0-9_\\-]{20,50}[\"']"), // JWT Secret key found
+
+    // 30. Exposed Cloudflare credentials
+    Pattern.compile("(?i)cloudflare_api_key\\s*=\\s*[\"'][A-Za-z0-9_\\-]{30,50}[\"']"), // Cloudflare API key detected
+
+    // 31. Debugging mode enabled in production
+    Pattern.compile("(?i)mode\\s*=\\s*[\"']debug[\"']"), // Debug mode enabled
+
+    // 32. Unprotected `.sqlite` databases
+    Pattern.compile("\\.sqlite$"), // SQLite database exposed
+
+    // 33. Hardcoded Twilio credentials
+    Pattern.compile("(?i)twilio_auth_token\\s*=\\s*[\"'][A-Za-z0-9]{32}[\"']"), // Twilio API Key exposed
+
+    // 34. `.crt` files containing SSL certificates in public directories
+    Pattern.compile("\\.crt$"), // SSL certificate file exposed
+
+    // 35. `.key` files containing private SSL keys
+    Pattern.compile("\\.key$"), // SSL private key exposed
+
+    // 36. Unprotected `.bak` files containing sensitive data
+    Pattern.compile("\\.bak$"), // Backup file exposed
+
+    // 37. Hardcoded database username
+    Pattern.compile("(?i)db_user\\s*=\\s*[\"'][A-Za-z0-9_\\-]+[\"']"), // Database username hardcoded
+
+    // 38. Hardcoded database password
+    Pattern.compile("(?i)db_password\\s*=\\s*[\"'][A-Za-z0-9!@#$%^&*()_+\\-=]{8,50}[\"']"), // Database password exposed
+
+    // 39. `.class` files exposed in public directories
+    Pattern.compile("\\.class$"), // Java compiled classes exposed
+
+    // 40. Exposed WordPress configuration file
+    Pattern.compile("/wp-config\\.php"), // WordPress config file exposed
+
+    // 41. Hardcoded Redis credentials
+    Pattern.compile("(?i)redis_password\\s*=\\s*[\"'][a-zA-Z0-9!@#$%^&*()_+\\-=]{8,50}[\"']"), // Redis credentials exposed
+
+    // 42. Hardcoded MongoDB connection strings
+    Pattern.compile("mongodb:\\/\\/[^\\s]+"), // MongoDB URI exposed
+
+    // 43. `.php` source files exposed in public directories
+    Pattern.compile("\\.php$"), // PHP source files exposed
+
+    // 44. Exposing `.bash_history`
+    Pattern.compile("/\\.bash_history"), // Bash history file exposed
+
+    // 45. Exposing `.zsh_history`
+    Pattern.compile("/\\.zsh_history"), // Zsh history file exposed
+
+    // 46. Exposing `~/.ssh/id_rsa`
+    Pattern.compile("/\\.ssh/id_rsa"), // Private SSH key exposed
+
+    // 47. Unprotected Kubernetes configuration files
+    Pattern.compile("/\\.kube/config"), // Kube config file exposed
+
+    // 48. Hardcoded Azure Storage Keys
+    Pattern.compile("(?i)azure_storage_key\\s*=\\s*[\"'][A-Za-z0-9+/=]{20,50}[\"']"), // Azure storage key exposed
+
+    // 49. Hardcoded PayPal credentials
+    Pattern.compile("(?i)paypal_secret\\s*=\\s*[\"'][A-Za-z0-9_\\-]{20,50}[\"']"), // PayPal secret key exposed
+
+    // 50. `.ini` files containing sensitive credentials
+    Pattern.compile("\\.ini$") // INI files exposed
+
+);
+public static final List<Pattern> sourceCodeLeakage = Arrays.asList(
+
+    // 51. Exposed `.npmrc` file with credentials
+    Pattern.compile("/\\.npmrc"), // NPM authentication file exposed
+
+    // 52. Hardcoded GitHub OAuth token
+    Pattern.compile("ghp_[A-Za-z0-9]{36}"), // GitHub Personal Access Token exposed
+
+    // 53. Hardcoded GitLab Personal Access Token
+    Pattern.compile("glpat-[A-Za-z0-9]{20,40}"), // GitLab PAT detected
+
+    // 54. `.bashrc` file exposed in public directories
+    Pattern.compile("/\\.bashrc"), // Bash configuration file exposed
+
+    // 55. `.zshrc` file exposed in public directories
+    Pattern.compile("/\\.zshrc"), // Zsh configuration file exposed
+
+    // 56. Exposed `.netrc` file containing login credentials
+    Pattern.compile("/\\.netrc"), // Netrc authentication file exposed
+
+    // 57. Hardcoded Telegram bot token
+    Pattern.compile("(?i)telegram_bot_token\\s*=\\s*[\"'][0-9]+:[A-Za-z0-9_-]{35}[\"']"), // Telegram bot token detected
+
+    // 58. Hardcoded Stripe API keys
+    Pattern.compile("sk_live_[0-9a-zA-Z]{24}"), // Stripe secret key detected
+
+    // 59. Exposed `.aws/credentials` file
+    Pattern.compile("/\\.aws/credentials"), // AWS credentials file exposed
+
+    // 60. Hardcoded SendGrid API key
+    Pattern.compile("SG\\.[A-Za-z0-9_-]{22}\\.[A-Za-z0-9_-]{43}"), // SendGrid API key detected
+
+    // 61. Exposed `composer.json` and `composer.lock` files
+    Pattern.compile("/composer\\.(json|lock)"), // PHP Composer dependency files exposed
+
+    // 62. Publicly accessible `.dockerignore` file
+    Pattern.compile("/\\.dockerignore"), // Docker ignore file exposed
+
+    // 63. Unprotected `.env.local` file
+    Pattern.compile("/\\.env\\.local"), // Local environment configuration exposed
+
+    // 64. Exposed `.babelrc` configuration files
+    Pattern.compile("/\\.babelrc"), // Babel configuration file exposed
+
+    // 65. `.pypirc` file containing PyPI credentials
+    Pattern.compile("/\\.pypirc"), // Python package credentials exposed
+
+    // 66. Exposed `.travis.yml` configuration file
+    Pattern.compile("/\\.travis\\.yml"), // Travis CI configuration exposed
+
+    // 67. `.yarnrc` file containing authentication tokens
+    Pattern.compile("/\\.yarnrc"), // Yarn authentication file exposed
+
+    // 68. Exposed `.circleci/config.yml`
+    Pattern.compile("/\\.circleci/config\\.yml"), // CircleCI configuration exposed
+
+    // 69. Hardcoded DigitalOcean API token
+    Pattern.compile("do[0-9a-f]{32}"), // DigitalOcean API token detected
+
+    // 70. Exposed `.gitconfig` file
+    Pattern.compile("/\\.gitconfig"), // Git configuration file exposed
+
+    // 71. Hardcoded Dropbox API key
+    Pattern.compile("sl\\.[A-Za-z0-9_-]{15,}"), // Dropbox API key detected
+
+    // 72. Unprotected Kubernetes secrets YAML file
+    Pattern.compile("(?i)apiVersion:\\s*kubernetes\\.io/v1\\nkind:\\s*Secret"), // Kubernetes secret found
+
+    // 73. Exposed `.tfstate` Terraform state file
+    Pattern.compile("/\\.tfstate"), // Terraform state file exposed
+
+    // 74. Hardcoded Heroku API key
+    Pattern.compile("(?i)heroku_api_key\\s*=\\s*[\"'][A-Za-z0-9_\\-]{30,50}[\"']"), // Heroku API key exposed
+
+    // 75. Hardcoded Mailgun API key
+    Pattern.compile("key-[0-9a-zA-Z]{32}"), // Mailgun API key detected
+
+    // 76. Hardcoded Bitly API token
+    Pattern.compile("(?i)bitly_access_token\\s*=\\s*[\"'][A-Za-z0-9_\\-]{30,50}[\"']"), // Bitly token detected
+
+    // 77. Publicly accessible `docker-compose.yml` file
+    Pattern.compile("/docker-compose\\.yml"), // Docker Compose configuration exposed
+
+    // 78. Hardcoded Facebook App Secret
+    Pattern.compile("(?i)facebook_app_secret\\s*=\\s*[\"'][A-Za-z0-9_\\-]{32}[\"']"), // Facebook App Secret detected
+
+    // 79. Hardcoded Instagram API Key
+    Pattern.compile("(?i)instagram_api_key\\s*=\\s*[\"'][A-Za-z0-9_\\-]{30,50}[\"']"), // Instagram API key detected
+
+    // 80. Hardcoded LinkedIn Client Secret
+    Pattern.compile("(?i)linkedin_client_secret\\s*=\\s*[\"'][A-Za-z0-9_\\-]{32}[\"']"), // LinkedIn Secret Key detected
+
+    // 81. Hardcoded Square API Key
+    Pattern.compile("sq0[a-z]{3}-[0-9A-Za-z\\-_]{22,44}"), // Square API key detected
+
+    // 82. `.session` files exposed in public directories
+    Pattern.compile("\\.session$"), // Session files exposed
+
+    // 83. Hardcoded Microsoft Azure Subscription ID
+    Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"), // Azure subscription ID detected
+
+    // 84. Exposed `.cfconfig.json` (Cloudflare configuration file)
+    Pattern.compile("/\\.cfconfig\\.json"), // Cloudflare config file exposed
+
+    // 85. `.sh_history` file exposed
+    Pattern.compile("/\\.sh_history"), // Shell command history file exposed
+
+    // 86. Exposed `.secrets` directory
+    Pattern.compile("/\\.secrets/"), // Secret storage folder exposed
+
+    // 87. Unprotected AWS `IAM` policies JSON file
+    Pattern.compile("(?i)\"Version\"\\s*:\\s*\"2012-10-17\",\\s*\"Statement\""), // AWS IAM policy file
+
+    // 88. `.metadata` files in public directories
+    Pattern.compile("\\.metadata$"), // Metadata files exposed
+
+    // 89. Hardcoded Azure DevOps PAT token
+    Pattern.compile("(?i)azure_devops_pat\\s*=\\s*[\"'][A-Za-z0-9_\\-]{30,50}[\"']"), // Azure DevOps PAT detected
+
+    // 90. `.config` files with sensitive data
+    Pattern.compile("\\.config$"), // Config files exposed
+
+    // 91. `.pyc` compiled Python files in public directories
+    Pattern.compile("\\.pyc$"), // Python bytecode files exposed
+
+    // 92. `.class` files exposed in public directories
+    Pattern.compile("\\.class$"), // Java compiled classes exposed
+
+    // 93. `.RData` files exposed in public directories
+    Pattern.compile("\\.RData$"), // R language data files exposed
+
+    // 94. Hardcoded Shopify API keys
+    Pattern.compile("shpss_[A-Za-z0-9]{32}"), // Shopify Secret Key detected
+
+    // 95. `.nfs` files exposed in public directories
+    Pattern.compile("\\.nfs[0-9]+$"), // NFS temporary files exposed
+
+    // 96. `.crt` certificate files exposed
+    Pattern.compile("\\.crt$"), // SSL certificate files exposed
+
+    // 97. `.p12` private key storage files exposed
+    Pattern.compile("\\.p12$"), // P12 keystore file exposed
+
+    // 98. Hardcoded Algolia API keys
+    Pattern.compile("(?i)algolia_api_key\\s*=\\s*[\"'][A-Za-z0-9_\\-]{30,50}[\"']"), // Algolia API key detected
+
+    // 99. `.dat` data files exposed
+    Pattern.compile("\\.dat$"), // Generic data files exposed
+
+    // 100. Hardcoded Salesforce API keys
+    Pattern.compile("(?i)salesforce_client_secret\\s*=\\s*[\"'][A-Za-z0-9_\\-]{30,50}[\"']") // Salesforce Secret Key detected
+);
+public static final List<Pattern> sqlServerAuthIssues = Arrays.asList(
+
+    // 1. Hardcoded SQL Server username and password
+    Pattern.compile("(?i)jdbc:sqlserver://[\\w\\d.]+:[0-9]+;user=[\\w\\d]+;password=[^\"']+"), // Hardcoded SQL Server credentials
+
+    // 2. Connection string missing authentication
+    Pattern.compile("(?i)jdbc:sqlserver://[\\w\\d.]+:[0-9]+;databaseName=[\\w\\d]+;"), // No authentication in connection string
+
+    // 3. Connection string using weak authentication (empty password)
+    Pattern.compile("(?i)user\\s*=\\s*['\"]?\\w+['\"]?\\s*;\\s*password\\s*=\\s*['\"]?['\"]?"), // Empty password in SQL Server connection
+
+    // 4. Using `sa` user without authentication
+    Pattern.compile("(?i)user\\s*=\\s*['\"]?sa['\"]?"), // Using `sa` account, potential security risk
+
+    // 5. Missing parameterized queries
+    Pattern.compile("(?i)Statement\\s+stmt\\s*=\\s*conn\\.createStatement\\(\\)"), // Usage of `createStatement` without parameterized queries
+
+    // 6. Query execution with concatenation (SQL injection risk)
+    Pattern.compile("(?i)executeQuery\\s*\\(\\s*\".*\"\\s*\\+\\s*\\w+"), // SQL injection via string concatenation
+
+    // 7. Using `GRANT ALL` without restrictions
+    Pattern.compile("(?i)GRANT\\s+ALL\\s+ON\\s+.*\\s+TO\\s+.*"), // Excessive privileges granted
+
+    // 8. Using `xp_cmdshell` to execute system commands
+    Pattern.compile("(?i)EXEC\\s+xp_cmdshell\\s+['\"].+['\"]"), // Execution of system commands via SQL Server
+
+    // 9. Allowing database users without a password
+    Pattern.compile("(?i)CREATE\\s+LOGIN\\s+.*\\s+WITH\\s+PASSWORD\\s*=\\s*N''"), // Empty password for database login
+
+    // 10. Using `WITH NOLOGIN`
+    Pattern.compile("(?i)CREATE\\s+LOGIN\\s+.*\\s+WITH\\s+NOLOGIN"), // Login created without authentication
+
+    // 11. Granting public access to sensitive tables
+    Pattern.compile("(?i)GRANT\\s+SELECT\\s+ON\\s+.*\\s+TO\\s+PUBLIC"), // Public access to database objects
+
+    // 12. Using `TRUSTWORTHY ON`
+    Pattern.compile("(?i)ALTER\\s+DATABASE\\s+.*\\s+SET\\s+TRUSTWORTHY\\s+ON"), // Enabling TRUSTWORTHY mode
+
+    // 13. Using `OPENROWSET` without security considerations
+    Pattern.compile("(?i)SELECT\\s+.*\\s+FROM\\s+OPENROWSET\\(.*\\)"), // OpenRowSet used without security validation
+
+    // 14. Missing `ENCRYPTION` in SQL Server connection
+    Pattern.compile("(?i)Encrypt\\s*=\\s*False"), // Encryption disabled in connection string
+
+    // 15. Using `sp_addsrvrolemember` to grant sysadmin
+    Pattern.compile("(?i)EXEC\\s+sp_addsrvrolemember\\s+.*\\s*,\\s*'sysadmin'"), // Adding user to sysadmin role
+
+    // 16. Using `WITH EXECUTE AS` without reverting
+    Pattern.compile("(?i)EXECUTE\\s+AS\\s+.*"), // Changing execution context without reverting
+
+    // 17. Using SQL authentication instead of Windows Authentication
+    Pattern.compile("(?i)jdbc:sqlserver://.*;IntegratedSecurity=false"), // SQL authentication instead of Windows authentication
+
+    // 18. Assigning database owner (`dbo`) role to a user
+    Pattern.compile("(?i)ALTER\\s+ROLE\\s+db_owner\\s+ADD\\s+MEMBER"), // Assigning database owner rights
+
+    // 19. Using `sysadmin` fixed server role
+    Pattern.compile("(?i)ALTER\\s+SERVER\\s+ROLE\\s+sysadmin\\s+ADD\\s+MEMBER"), // Adding user to sysadmin role
+
+    // 20. Hardcoded trusted connection username
+    Pattern.compile("(?i)Trusted_Connection=True;User ID=\\w+;Password=.*"), // Hardcoded credentials in trusted connection
+
+    // 21. Using `EXECUTE AS 'dbo'`
+    Pattern.compile("(?i)EXECUTE\\s+AS\\s+'dbo'"), // Executing queries as `dbo`
+
+    // 22. Enabling `CLR` execution without restriction
+    Pattern.compile("(?i)sp_configure\\s+'clr_enabled'\\s*,\\s*1"), // Enabling CLR execution
+
+    // 23. Using `UNSAFE ASSEMBLY`
+    Pattern.compile("(?i)CREATE\\s+ASSEMBLY.*WITH\\s+PERMISSION_SET\\s*=\\s+UNSAFE"), // Unsafe assembly execution
+
+    // 24. SQL Server accepting remote connections
+    Pattern.compile("(?i)sp_configure\\s+'remote access'\\s*,\\s*1"), // Allowing remote access
+
+    // 25. Using `bulk insert` without access control
+    Pattern.compile("(?i)BULK\\s+INSERT\\s+.*\\s+FROM\\s+.*"), // Bulk insert used without validation
+
+    // 26. Using `sp_OACreate` for COM object execution
+    Pattern.compile("(?i)EXEC\\s+sp_OACreate\\s+.*"), // External object execution via OLE automation
+
+    // 27. `xp_fileexist` used to check files on the system
+    Pattern.compile("(?i)EXEC\\s+xp_fileexist\\s+.*"), // Checking for files via SQL Server
+
+    // 28. No permission checks in stored procedures
+    Pattern.compile("(?i)CREATE\\s+PROCEDURE\\s+.*\\s+AS\\s+BEGIN.*END"), // Procedure created without security checks
+
+    // 29. Missing `REVOKE` statement after granting permissions
+    Pattern.compile("(?i)GRANT\\s+.*\\s+ON\\s+.*\\s+TO\\s+.*"), // Granting permissions but not revoking
+
+    // 30. Using `xp_regread` to access registry keys
+    Pattern.compile("(?i)EXEC\\s+xp_regread\\s+.*"), // Reading Windows registry keys via SQL Server
+
+    // 31. Using `DATABASE_MIRRORING` without encryption
+    Pattern.compile("(?i)ALTER\\s+DATABASE\\s+.*\\s+SET\\s+DATABASE_MIRRORING"), // Database mirroring without encryption
+
+    // 32. Storing passwords in plaintext in database tables
+    Pattern.compile("(?i)INSERT\\s+INTO\\s+.*\\s*\\(.*password.*\\)\\s*VALUES\\s*\\(.*['\"].+['\"]"), // Passwords stored in plaintext
+
+    // 33. Using `sp_start_job` without security restrictions
+    Pattern.compile("(?i)EXEC\\s+msdb\\.dbo\\.sp_start_job\\s+.*"), // Starting SQL jobs without authentication
+
+    // 34. `xp_loginconfig` used to reveal authentication settings
+    Pattern.compile("(?i)EXEC\\s+xp_loginconfig\\s+.*"), // Checking SQL Server authentication settings
+
+    // 35. Using `xp_servicecontrol` to control Windows services
+    Pattern.compile("(?i)EXEC\\s+xp_servicecontrol\\s+.*"), // Controlling Windows services via SQL Server
+
+    // 36. Using `xp_enumgroups` to list Windows groups
+    Pattern.compile("(?i)EXEC\\s+xp_enumgroups\\s+.*"), // Listing Windows groups via SQL Server
+
+    // 37. Missing `REVOKE` after `GRANT`
+    Pattern.compile("(?i)GRANT\\s+.*\\s+TO\\s+.*"), // Granting access without revoking unnecessary privileges
+
+    // 38-50. Variations of the above for different privilege levels and access methods.
+);
