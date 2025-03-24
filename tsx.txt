@@ -1,0 +1,60 @@
+import React from "react";
+import { Link } from "react-router-dom";
+import { FaHome } from "react-icons/fa";
+import { MdEvent, MdNotifications, MdSettings } from "react-icons/md";
+
+const Sidebar: React.FC = () => {
+  return (
+    <nav className="h-screen w-20 bg-black flex flex-col items-center py-6">
+      {/* Logo */}
+      <div className="mb-6 flex flex-col items-center">
+        <div className="w-10 h-10 bg-green-500 rounded-full flex justify-center items-center">
+          <span className="text-black font-bold">W</span>
+        </div>
+        <p className="text-gray-300 text-sm mt-2">Wolf</p>
+      </div>
+
+      {/* Navigation */}
+      <ul className="flex flex-col gap-6 text-gray-400">
+        <li>
+          <Link
+            to="/home"
+            className="flex flex-col items-center text-white hover:text-blue-400"
+          >
+            <FaHome size={24} />
+            <span className="text-xs mt-1">Home</span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/events"
+            className="flex flex-col items-center hover:text-white"
+          >
+            <MdEvent size={24} />
+            <span className="text-xs mt-1">Events</span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/notifications"
+            className="flex flex-col items-center hover:text-white"
+          >
+            <MdNotifications size={24} />
+            <span className="text-xs mt-1">Notifications</span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/settings"
+            className="flex flex-col items-center hover:text-white"
+          >
+            <MdSettings size={24} />
+            <span className="text-xs mt-1">Settings</span>
+          </Link>
+        </li>
+      </ul>
+    </nav>
+  );
+};
+
+export default Sidebar;
