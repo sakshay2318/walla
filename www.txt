@@ -1,0 +1,47 @@
+Slide 2: My Approach – Hybrid Security Scanning Script
+Title: 🛠️ My Contribution: Custom Script-Based Security Scanner
+
+Regex-based pattern scanning with AST validation
+
+Over 3000+ patterns across Java, Scala, and JavaScript
+
+11 scan categories (IDOR, Role-Based Access, etc.)
+
+Dev-friendly options: add patterns, exclude paths, choose languages
+
+Findings stored in JSON, exported as PDF/CSV, with a UI manager
+
+Slide 3: Challenges I Faced
+Title: ⚠️ Key Challenges During Development
+
+Regex matches alone created too many false positives
+
+AST validation integration was technically complex
+
+Creating reliable, scalable patterns for 3 languages took time
+
+UI/UX for developers to review findings needed clear workflows
+
+Syncing with QA/devs to validate patterns was time-intensive
+
+Slide 4: Teamwork & Impact
+Title: 🤝 Collaborating for Secure Code
+
+Worked closely with QA & developers to refine test cases
+
+Designed tool to be plug & play for any microservice team
+
+Empowered devs to self-review security flaws early
+
+Feedback loop helped us evolve new patterns & detection logic
+
+Slide 5: Learnings & Expectations
+Title: 🎯 Key Takeaways from My Internship
+
+Learned how static & dynamic analysis really work in practice
+
+Understood importance of dev-friendly security tooling
+
+Gained hands-on with AST parsing, regex tuning, JSON reporting
+
+Expected to drive independent research, own delivery, and cross-team coordination
