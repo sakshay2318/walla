@@ -45,3 +45,46 @@ Understood importance of dev-friendly security tooling
 Gained hands-on with AST parsing, regex tuning, JSON reporting
 
 Expected to drive independent research, own delivery, and cross-team coordination
+
+
+Slide 4: Key Learnings from the Internship
+Understood real-world gaps in SAST and DAST tooling
+
+Learned how to build scalable, secure, and reusable scripts
+
+Gained hands-on experience in AST parsing for code validation
+
+Developed regex patterns to detect complex auth vulnerabilities
+
+Improved cross-language support (Java, Scala, JS) in tooling
+
+Learned to prioritize developer experience in security tools
+
+Got better at debugging large codebases with layered logic
+
+Collaborated closely with QA, security, and dev teams
+
+Mastered how to triage, store, and present scan findings effectively
+
+Learned how small tools can drive big shifts in secure coding culture
+
+🎯 Slide 5: Expectations & Responsibilities During Internship
+Take ownership of a real-world security problem from day one
+
+Develop a fully functional, developer-friendly security tool
+
+Build an extensible engine that scales across services
+
+Minimize false positives through AST + regex validation
+
+Work cross-functionally with QA and dev teams for feedback
+
+Document the tool clearly for onboarding and future use
+
+Support custom test case creation and flexible scanning logic
+
+Ensure output is actionable via UI and reporting features
+
+Present progress regularly to stakeholders and mentors
+
+Demonstrate impact through measurable improvements in auth issue detection
